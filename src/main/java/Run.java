@@ -1,6 +1,3 @@
-import java.util.Arrays;
-import java.util.List;
-
 /**
  * Created with IntelliJ IDEA.
  * UserEntity: vanstr
@@ -69,11 +66,20 @@ public class Run {
         //*/
 
 
-        // get content of folger
+        /* get content of folger
         ContentBean contentBean = new ContentBean();
         List musicList = contentBean.getFiles("/", true, 1L);
         System.out.println(Arrays.toString(musicList.toArray()));
+        //*/
 
+        /* add user
+        UserEntity user = new UserEntity();
+        user.setLogin("Vasja");
+        user.setPassword("asd");
+
+        UserManager manager1 = new UserManager();
+        manager1.addUser(user);
+        //*/
     }
 
 }

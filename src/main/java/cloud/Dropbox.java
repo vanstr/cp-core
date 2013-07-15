@@ -37,7 +37,7 @@ public class Dropbox {
         try {
             authInfo = session.getAuthInfo();
         } catch (DropboxException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
 
     }
@@ -52,10 +52,9 @@ public class Dropbox {
 
 
     /**
-     *
      * @return
      */
-    public Tokens getRequestTokens(){
+    public Tokens getRequestTokens() {
         // Obtaining oAuth request token to be used for the rest of the authentication process.
         RequestTokenPair pair = authInfo.requestTokenPair;
 
@@ -67,18 +66,19 @@ public class Dropbox {
 
     /**
      * generate link, where user provides privileges to access his account data
+     *
      * @return
      */
-    public String getAuthLink(){
-        String url = authInfo.url;
-        return url;
+    public String getAuthLink() {
+        return authInfo.url;
     }
 
     /**
      * Get User access token pair
+     *
      * @return
      */
-    public Tokens getUserAccessTokens(Tokens requestTokens){
+    public Tokens getUserAccessTokens(Tokens requestTokens) {
 
         RequestTokenPair pair = new RequestTokenPair(requestTokens.key, requestTokens.secret);
 
@@ -90,12 +90,10 @@ public class Dropbox {
         }
         AccessTokenPair tokens = session.getAccessTokenPair();
 
-
         Tokens accessTokens = new Tokens(tokens.key, tokens.secret);
 
         return accessTokens;
     }
-
 
 
     /**
@@ -110,14 +108,15 @@ public class Dropbox {
         try {
             DropboxAPI.DropboxLink media = api.media(filePath, false);
             downloadLink = media.url;
-
+            /* Todo: to log
             System.out.println("path:" + filePath);
             System.out.println("Link:" + downloadLink);
             System.out.println("Exp:" + media.expires);
+            */
 
         } catch (DropboxException e) {
             System.out.println("getFileLink: " + e);
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
 
         return downloadLink;
@@ -143,31 +142,33 @@ public class Dropbox {
 
         // TODO create separate music list structure/class, should be similar in all clouds
         ArrayList<String> files = new ArrayList<String>();
-        System.out.println(getClass().getClassLoader().getResource("/logback.xml"));
-        System.out.println(getClass().getClassLoader().getResource("logback.xml"));
+
         for (DropboxAPI.Entry ent : dirent.contents) {
 
-            if (ent.isDir & recursion) {
-                // start recursion through all folders
-                System.out.println("Look in: " + ent.path);
-                files.addAll(getFileList(ent.path, false, fileType));
-            }
+            if (ent.isDir ) {
+                if( recursion ){
+                    // start recursion through all folders
+                    //TODO log System.out.println("Look in: " + ent.path);
+                    files.addAll(getFileList(ent.path, false, fileType));
+                }
+            } else {
 
-            // filter files by fileType -------------------------------->
-            // TODO separete function, multiple file types MWA,MP3,avi...
-            String fileName = ent.fileName().toLowerCase();
-            int nameLength = fileName.length();
-            String extension = fileName.substring(nameLength - 3, nameLength);
-            /*
-            System.out.println("nameL:" + nameLength );
-            System.out.println("ext" + extension);
-            System.out.println("fileTypes" + fileType);
-            //*/
-            if (extension.equals(fileType.toLowerCase())) {
-                files.add(new String(ent.path));
-            }
-            // --------------------------------------------------------->
+                // filter files by fileType -------------------------------->
+                // TODO separete function, multiple file types MWA,MP3,avi...
+                String fileName = ent.fileName().toLowerCase();
+                int nameLength = fileName.length();
+                String extension = fileName.substring(nameLength - 3, nameLength);
 
+                /*  TODO: to log
+                System.out.println("nameL:" + nameLength );
+                System.out.println("ext" + extension);
+                System.out.println("fileTypes" + fileType);
+                //*/
+                if (extension.equals(fileType.toLowerCase())) {
+                    files.add(new String(ent.path));
+                }
+                // --------------------------------------------------------->
+            }
         }
 
         return files;

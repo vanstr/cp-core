@@ -24,33 +24,36 @@ public class UserManager {
 
     public UserEntity getUserById(long id) {
 
-        /*
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        String hql = "from UserEntity s where s.id = :userID";
-        Query query = session.createQuery(hql).setParameter("userID", id);
-        List<UserEntity> list = query.list();
-        return list.get(0);
-        */
-
         UserEntity user = (UserEntity) session.load(UserEntity.class, id);
-        //System.out.println(user.getLogin());
 
         return user;
     }
 
-    public boolean addUser() {
+    public boolean addUser(UserEntity user) {
 
-        /*
-        UserEntity newUser = new UserEntity();
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        org.hibernate.Transaction transaction = session.beginTransaction();
-        newUser.setLogin("login");
-        newUser.setPassword("pwd");
-        session.save(newUser);
-        transaction.commit();
-        session.close();
-         */
-        return false;
+        boolean res = false;
+
+        Transaction ta = null;
+        try {
+            ta = session.beginTransaction();
+            session.save(user);
+            ta.commit();
+            res = true;
+        } catch (RuntimeException e) {
+            try {
+                System.out.println("Couldn’t commit");
+                ta.rollback();
+            } catch (Exception re) {
+                System.out.println("Couldn’t roll back transaction");
+            }
+            finally {
+                res = false;
+            }
+        }
+        finally {
+            return res;
+        }
+
     }
 
     public boolean updateUser(UserEntity user) {
@@ -60,26 +63,23 @@ public class UserManager {
         Transaction ta = null;
         try {
             ta = session.beginTransaction();
-            ta.setTimeout(5);
-
             session.update(user);
-
             ta.commit();
+            res = true;
         } catch (RuntimeException e) {
             try {
+                System.out.println("Couldn’t commit");
                 ta.rollback();
-            } catch (RuntimeException rbe) {
+            } catch (Exception re) {
                 System.out.println("Couldn’t roll back transaction");
             }
-            throw e;
-        } finally {
-            res = true;
+            finally {
+                res = false;
+            }
         }
-
-        //System.out.println(user.getLogin());
-
-        return res;
-
+        finally {
+            return res;
+        }
     }
 
 
