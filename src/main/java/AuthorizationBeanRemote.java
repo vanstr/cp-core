@@ -9,12 +9,12 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface AuthorizationBeanRemote {
-    public Long login(String userName, String password);
+    public String login(String userName, String password);
 
     public Boolean registerUser(String userName, String password);
 
     //
-    public String getDropbocAuthLink(Long userId);
+    public String getDropboxAuthLink(Long userId);
 
     //save user tokens to DB
     public Boolean retrieveDropboxAccessToken(Long userId);
