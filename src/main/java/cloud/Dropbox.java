@@ -157,7 +157,12 @@ public class Dropbox {
                 // TODO separete function, multiple file types MWA,MP3,avi...
                 String fileName = ent.fileName().toLowerCase();
                 int nameLength = fileName.length();
-                String extension = fileName.substring(nameLength - 3, nameLength);
+                int extensionLength = fileType.length();
+
+                // file name ".mp3" - not allowed, at least "a.mp3"
+                if( nameLength < (extensionLength +2) )  continue;
+
+                String extension = fileName.substring(nameLength - extensionLength, nameLength);
 
                 /*  TODO: to log
                 System.out.println("nameL:" + nameLength );
