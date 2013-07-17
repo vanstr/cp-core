@@ -2,6 +2,8 @@ import cloud.Dropbox;
 import persistence.UserEntity;
 import persistence.UserManager;
 
+import javax.ejb.Remote;
+import javax.ejb.Stateless;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,9 +14,11 @@ import java.util.List;
  * Time: 21:45
  * To change this template use File | Settings | File Templates.
  */
+
+@Stateless
+@Remote(ContentBeanRemote.class)
 public class ContentBean implements ContentBeanRemote {
 
-    @Override
     public List<String> getFiles(String folderPath, Boolean recursive, Long userId) {
 
         ArrayList<String> files = null;
@@ -36,7 +40,6 @@ public class ContentBean implements ContentBeanRemote {
         return files;
     }
 
-    @Override
     public String getFileSrc(String path, Long userId) {
 
         String file = null;

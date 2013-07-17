@@ -19,8 +19,8 @@ public class Dropbox {
     // private static final Logger logger = LoggerFactory.getLogger(Dropbox.class);
 
     // Define application params
-    final static private String APP_KEY = "uxw4eysrg39u7jw";
-    final static private String APP_SECRET = "77p0nl292u8op2p";
+    final static private String APP_KEY = "vw5zvh4m1fr72kw";
+    final static private String APP_SECRET = "0wjwqy7k55y0lzi";
     private static final Session.AccessType ACCESS_TYPE = Session.AccessType.DROPBOX;
     private static AppKeyPair appKeys = new AppKeyPair(APP_KEY, APP_SECRET);
 

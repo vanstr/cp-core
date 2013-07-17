@@ -16,7 +16,7 @@ public class HibernateUtil {
     static {
         try {
             sessionFactory = new Configuration()
-                    .configure("/resources/hibernate.cfg.xml")
+                    .configure()
                     .addPackage("persistence")
                     .addAnnotatedClass(UserEntity.class)
                     .buildSessionFactory();

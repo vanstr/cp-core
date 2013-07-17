@@ -48,6 +48,7 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
             <version>3.6.3.Final</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -142,6 +143,21 @@
                 <configuration>
                     <ejbVersion>3.1</ejbVersion>
                     <generateClient>true</generateClient>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <finalName>cp-core</finalName>
                 </configuration>
             </plugin>
         </plugins>

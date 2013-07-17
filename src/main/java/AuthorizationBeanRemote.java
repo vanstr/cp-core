@@ -1,3 +1,5 @@
+import javax.ejb.Remote;
+
 /**
  * Created with IntelliJ IDEA.
  * User: user
@@ -5,6 +7,7 @@
  * Time: 11:01 AM
  * TODO better rename USerComandBeanRemote
  */
+@Remote
 public interface AuthorizationBeanRemote {
 
     public Long login(String userName, String password);

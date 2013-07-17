@@ -1,7 +1,14 @@
 import cloud.Dropbox;
 import commons.Tokens;
+import org.hibernate.Query;
+import org.hibernate.Transaction;
+import org.hibernate.classic.Session;
+import persistence.HibernateUtil;
 import persistence.UserEntity;
 import persistence.UserManager;
+
+import javax.ejb.Stateless;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -11,16 +18,41 @@ import persistence.UserManager;
  * To change this template use File | Settings | File Templates.
  */
 
+@Stateless
 public class AuthorizationBean implements AuthorizationBeanRemote {
 
     @Override
-    public Long login(String userName, String password) {
-        return 1L;
+    public Long login(String login, String password) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Query query = session.createQuery("from UserEntity where login=:login and password=:password");
+        query.setString("login", login);
+        query.setString("password", password);
+        List<UserEntity> list = query.list();
+        if(list == null || list.size() < 1){
+            return null;
+        }
+        return list.get(0).getId();
     }
 
     @Override
-    public Boolean registerUser(String userName, String password) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public Boolean registerUser(String login, String password) {
+        try{
+            UserEntity newUser = new UserEntity();
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            Transaction transaction = session.beginTransaction();
+            newUser.setLogin(login);
+            newUser.setPassword(password);
+            session.save(newUser);
+            transaction.commit();
+            session.close();
+        }catch (NullPointerException e){
+            e.printStackTrace();
+            return false;
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     @Override
