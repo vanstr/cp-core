@@ -82,15 +82,18 @@ public class Dropbox {
 
         RequestTokenPair pair = new RequestTokenPair(requestTokens.key, requestTokens.secret);
 
+        Tokens accessTokens = null;
         try {
             session.retrieveWebAccessToken(pair);
         } catch (DropboxException e) {
-            System.out.println("ERROR: " + e.getMessage());
-            e.printStackTrace();
+            // TODO: log
+            //System.out.println("ERROR : " + e.toString() +" "+ e.getMessage());
+            //e.printStackTrace();
+            return accessTokens;
         }
         AccessTokenPair tokens = session.getAccessTokenPair();
 
-        Tokens accessTokens = new Tokens(tokens.key, tokens.secret);
+        accessTokens = new Tokens(tokens.key, tokens.secret);
 
         return accessTokens;
     }
@@ -104,7 +107,7 @@ public class Dropbox {
      */
     public String getFileLink(String filePath) {
 
-        String downloadLink = "";
+        String downloadLink = null;
         try {
             DropboxAPI.DropboxLink media = api.media(filePath, false);
             downloadLink = media.url;
@@ -115,8 +118,10 @@ public class Dropbox {
             */
 
         } catch (DropboxException e) {
-            System.out.println("getFileLink: " + e);
-            e.printStackTrace();
+            return null;
+            // TODO: log
+            //System.out.println("getFileLink: " + e);
+            //e.printStackTrace();
         }
 
         return downloadLink;
@@ -132,16 +137,17 @@ public class Dropbox {
      */
     public ArrayList<String> getFileList(String folderPath, boolean recursion, String fileType) {
 
+        // TODO create separate music list structure/class, should be similar in all clouds
+        ArrayList<String> files = new ArrayList<String>();
+
         // Get folder content
         DropboxAPI.Entry dirent = null;
         try {
             dirent = api.metadata(folderPath, 1000, null, true, null);
-        } catch (DropboxException e) {
-            System.out.println(e);
+        } catch (Exception e) {
+            System.out.println("getFileList"+e.toString());
+            return null; // TODO or maybe better exception
         }
-
-        // TODO create separate music list structure/class, should be similar in all clouds
-        ArrayList<String> files = new ArrayList<String>();
 
         for (DropboxAPI.Entry ent : dirent.contents) {
 
