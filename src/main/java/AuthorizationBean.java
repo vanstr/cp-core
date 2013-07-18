@@ -23,34 +23,37 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
 
     @Override
     public Long login(String login, String password) {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        Query query = session.createQuery("from UserEntity where login=:login and password=:password");
+        UserManager userManager = new UserManager();
+        Query query = userManager.getSession().createQuery("from UserEntity where login=:login and password=:password");
         query.setString("login", login);
         query.setString("password", password);
         List<UserEntity> list = query.list();
         if(list == null || list.size() < 1){
             return null;
         }
+        userManager.finalize();
         return list.get(0).getId();
     }
 
     @Override
     public Boolean registerUser(String login, String password) {
+        UserManager userManager = null;
         try{
+            userManager = new UserManager();
             UserEntity newUser = new UserEntity();
-            Session session = HibernateUtil.getSessionFactory().openSession();
-            Transaction transaction = session.beginTransaction();
             newUser.setLogin(login);
             newUser.setPassword(password);
-            session.save(newUser);
-            transaction.commit();
-            session.close();
+            userManager.addUser(newUser);
         }catch (NullPointerException e){
             e.printStackTrace();
             return false;
         }catch (Exception e){
             e.printStackTrace();
             return false;
+        }finally {
+            if(userManager != null){
+                userManager.finalize();
+            }
         }
         return true;
     }

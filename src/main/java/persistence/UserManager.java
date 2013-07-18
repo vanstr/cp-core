@@ -18,6 +18,10 @@ public class UserManager {
         session = HibernateUtil.getSessionFactory().openSession();
     }
 
+    public Session getSession() {
+        return session;
+    }
+
     public void finalize(){
         session.close();
     }
