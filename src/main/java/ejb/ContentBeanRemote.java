@@ -1,3 +1,5 @@
+package ejb;
+
 import javax.ejb.Remote;
 import java.util.List;
 

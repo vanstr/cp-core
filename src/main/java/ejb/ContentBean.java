@@ -1,3 +1,5 @@
+package ejb;
+
 import cloud.Dropbox;
 import persistence.UserEntity;
 import persistence.UserManager;
