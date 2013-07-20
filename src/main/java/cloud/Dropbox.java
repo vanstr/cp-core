@@ -143,31 +143,34 @@ public class Dropbox {
         // TODO create separate music list structure/class, should be similar in all clouds
         ArrayList<String> files = new ArrayList<String>();
 
-        for (DropboxAPI.Entry ent : dirent.contents) {
+        if(dirent.contents != null){
+            for (DropboxAPI.Entry ent : dirent.contents) {
 
-            if (ent.isDir ) {
-                if( recursion ){
-                    // start recursion through all folders
-                    //TODO log System.out.println("Look in: " + ent.path);
-                    files.addAll(getFileList(ent.path, false, fileType));
+                if (ent.isDir ) {
+                    if( recursion ){
+                        // start recursion through all folders
+                        //TODO log System.out.println("Look in: " + ent.path);
+                        files.addAll(getFileList(ent.path, false, fileType));
+                    }
+                } else {
+
+                    // filter files by fileType -------------------------------->
+                    // TODO separete function, multiple file types MWA,MP3,avi...
+                    String fileName = ent.fileName().toLowerCase();
+                    int nameLength = fileName.length();
+                    if( nameLength < (fileType.length() + 2) )  continue;
+                    String extension = fileName.substring(nameLength - fileType.length(), nameLength);
+
+                    /*  TODO: to log
+                    System.out.println("nameL:" + nameLength );
+                    System.out.println("ext" + extension);
+                    System.out.println("fileTypes" + fileType);
+                    //*/
+                    if (extension.equals(fileType.toLowerCase())) {
+                        files.add(new String(ent.path));
+                    }
+                    // --------------------------------------------------------->
                 }
-            } else {
-
-                // filter files by fileType -------------------------------->
-                // TODO separete function, multiple file types MWA,MP3,avi...
-                String fileName = ent.fileName().toLowerCase();
-                int nameLength = fileName.length();
-                String extension = fileName.substring(nameLength - 3, nameLength);
-
-                /*  TODO: to log
-                System.out.println("nameL:" + nameLength );
-                System.out.println("ext" + extension);
-                System.out.println("fileTypes" + fileType);
-                //*/
-                if (extension.equals(fileType.toLowerCase())) {
-                    files.add(new String(ent.path));
-                }
-                // --------------------------------------------------------->
             }
         }
 
