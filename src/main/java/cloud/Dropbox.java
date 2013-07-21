@@ -149,6 +149,8 @@ public class Dropbox {
             return null; // TODO or maybe better exception
         }
 
+        if(dirent == null) return null;
+
         for (DropboxAPI.Entry ent : dirent.contents) {
 
             if (ent.isDir ) {
