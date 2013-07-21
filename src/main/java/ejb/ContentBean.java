@@ -50,6 +50,7 @@ public class ContentBean implements ContentBeanRemote {
             UserManager manager = new UserManager();
             UserEntity user = manager.getUserById(userId);
 
+            // TODO check for NULL
             String accessTokenKey = user.getDropboxAccessKey();
             String accessTokenSecret = user.getDropboxAccessSecret();
 

@@ -127,7 +127,7 @@ public class Dropbox {
      * @param recursion  - if true also include files from sub folders recusievly
      * @param fileType   - if file type == NULL return all list, ex: folder, files, mp3, txt
      *                   TODO, what if i want to get wav & mp3
-     * @return TODO separate structure array{file_path,music metadata album song name, artist}
+     * @return optimize: separate structure array{file_path,music metadata album song name, artist}
      *         How to get meta data of file?
      */
     public ArrayList<String> getFileList(String folderPath, boolean recursion, String fileType) {
@@ -140,7 +140,6 @@ public class Dropbox {
             System.out.println(e);
         }
 
-        // TODO create separate music list structure/class, should be similar in all clouds
         ArrayList<String> files = new ArrayList<String>();
 
         if(dirent.contents != null){
@@ -149,7 +148,6 @@ public class Dropbox {
                 if (ent.isDir ) {
                     if( recursion ){
                         // start recursion through all folders
-                        //TODO log System.out.println("Look in: " + ent.path);
                         files.addAll(getFileList(ent.path, false, fileType));
                     }
                 } else {
