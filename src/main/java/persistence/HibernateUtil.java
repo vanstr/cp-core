@@ -2,6 +2,8 @@ package persistence;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,16 +15,18 @@ import org.hibernate.cfg.Configuration;
 public class HibernateUtil {
     private static final SessionFactory sessionFactory;
 
+    final static Logger logger = LoggerFactory.getLogger(HibernateUtil.class);
+
     static {
         try {
             sessionFactory = new Configuration()
-                    .configure("/resources/hibernate.cfg.xml")
+                    .configure("/src/main/resources/hibernate.cfg.xml")
                     .addPackage("persistence")
                     .addAnnotatedClass(UserEntity.class)
                     .buildSessionFactory();
 
         } catch (Throwable ex) {
-            System.err.println("Initial SessionFactory creation failed." + ex);
+            logger.warn("Initial SessionFactory creation failed." + ex);
             throw new ExceptionInInitializerError(ex);
         }
     }

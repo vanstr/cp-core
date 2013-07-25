@@ -3,6 +3,8 @@ package cloud;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.session.*;
 import commons.Tokens;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
@@ -15,7 +17,7 @@ import java.util.ArrayList;
  */
 public class Dropbox {
 
-    // private static final Logger logger = LoggerFactory.getLogger(Dropbox.class);
+    final static Logger logger = LoggerFactory.getLogger(Dropbox.class);
 
     // Define application params
     final static private String APP_KEY = "uxw4eysrg39u7jw";
@@ -42,7 +44,10 @@ public class Dropbox {
 
     public Dropbox(String accessTokenKey, String accessTokenSecret) throws Exception {
 
-        if( accessTokenKey == null || accessTokenSecret == null ) throw new Exception(EXCEPTION_EMPTY_ACCESS_TOKENS);
+        if( accessTokenKey == null || accessTokenSecret == null ){
+            logger.error("EXCEPTION_EMPTY_ACCESS_TOKENS");
+            throw new Exception(EXCEPTION_EMPTY_ACCESS_TOKENS);
+        }
 
         AccessTokenPair accessTokenPair = new AccessTokenPair(accessTokenKey, accessTokenSecret);
         session = new WebAuthSession(appKeys, ACCESS_TYPE);
@@ -81,7 +86,10 @@ public class Dropbox {
      */
     public Tokens getUserAccessTokens(Tokens requestTokens) throws Exception {
 
-        if( requestTokens == null || requestTokens.key == null || requestTokens.secret == null ) throw new Exception(EXCEPTION_EMPTY_REQUEST_TOKENS);
+        if( requestTokens == null || requestTokens.key == null || requestTokens.secret == null ) {
+            logger.error(EXCEPTION_EMPTY_REQUEST_TOKENS);
+            throw new Exception(EXCEPTION_EMPTY_REQUEST_TOKENS);
+        }
         RequestTokenPair pair = new RequestTokenPair(requestTokens.key, requestTokens.secret);
 
         session.retrieveWebAccessToken(pair);
@@ -125,14 +133,17 @@ public class Dropbox {
         // Get folder content
         DropboxAPI.Entry dirent = null;
         dirent = api.metadata(folderPath, 1000, null, true, null);
-        if(dirent == null) throw new Exception(EXCEPTION_UNDEFINED_DIR);
+        if(dirent == null){
+            logger.error(EXCEPTION_UNDEFINED_DIR);
+            throw new Exception(EXCEPTION_UNDEFINED_DIR);
+        }
 
         for (DropboxAPI.Entry ent : dirent.contents) {
 
             if (ent.isDir ) {
                 if( recursion ){
                     // start recursion through all folders
-                    //TODO log System.out.println("Look in: " + ent.path);
+                    logger.debug("Search in folder: " +ent.path );
                     files.addAll(getFileList(ent.path, false, fileType));
                 }
             } else {
@@ -148,11 +159,6 @@ public class Dropbox {
 
                 String extension = fileName.substring(nameLength - extensionLength, nameLength);
 
-                /*  TODO: to log
-                System.out.println("nameL:" + nameLength );
-                System.out.println("ext" + extension);
-                System.out.println("fileTypes" + fileType);
-                //*/
                 if (extension.equals(fileType.toLowerCase())) {
                     files.add(new String(ent.path));
                 }
