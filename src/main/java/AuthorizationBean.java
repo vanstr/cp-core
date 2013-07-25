@@ -13,6 +13,8 @@ import persistence.UserManager;
 
 public class AuthorizationBean implements AuthorizationBeanRemote {
 
+    private static final String EXCEPTION_DB_EXECUTION_ERROR = "EXCEPTION_DB_EXECUTION_ERROR";
+
     @Override
     public Long login(String userName, String password) {
         return 1L;
@@ -23,52 +25,79 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     *
+     * @param userId
+     * @return
+     *      String - link, where user should provide access to his account for this application
+     *      null - error
+     */
     @Override
     public String getDropboxAuthLink(Long userId) {
         String link = null;
-        Boolean res = false;
 
-        Dropbox drop = new Dropbox();
+        try {
+            Dropbox drop = new Dropbox();
 
-        Tokens requestTokens = drop.getRequestTokens();
+            Tokens requestTokens = drop.getRequestTokens();
 
-        // save requestTokens to DB
-        UserManager manager = new UserManager();
-        UserEntity user = manager.getUserById(userId);
-        user.setDropboxRequestKey(requestTokens.key);
-        user.setDropboxRequestSecret(requestTokens.secret);
-        res = manager.updateUser(user);
-        manager.finalize();
-        if ( res == false ){
-            //  error
+            // save requestTokens to DB
+            UserManager manager = new UserManager();
+            UserEntity user = manager.getUserById(userId);
+            user.setDropboxRequestKey(requestTokens.key);
+            user.setDropboxRequestSecret(requestTokens.secret);
+            boolean res = manager.updateUser(user);
+            manager.finalize();
+
+            // tokens was not saved
+            if (res == false) throw new Exception(EXCEPTION_DB_EXECUTION_ERROR);
+
+            link = drop.getAuthLink();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            return link;
         }
 
-        link = drop.getAuthLink();
-
-        return link;
     }
 
+    /**
+     *
+     * @param userId
+     * @return
+     *      true - user has provided access to app and access tokens saved.
+     *      false - error occurred
+     */
     @Override
     public Boolean retrieveDropboxAccessToken(Long userId) {
         boolean res = false;
 
-        // Work with dropbox service, start session
-        Dropbox drop = new Dropbox();
+        try {
+            // Work with dropbox service, start session
+            Dropbox drop = new Dropbox();
 
-        // get requestTokens from db
-        UserManager manager = new UserManager();
-        UserEntity user = manager.getUserById(userId);
-        Tokens requestTokens = new Tokens(user.getDropboxRequestKey(), user.getDropboxRequestSecret());
+            // get requestTokens from db
+            UserManager manager = new UserManager();
+            UserEntity user = manager.getUserById(userId);
+            Tokens requestTokens = new Tokens(user.getDropboxRequestKey(), user.getDropboxRequestSecret());
 
-        // retrive AccessToken
-        Tokens accessTokens = drop.getUserAccessTokens(requestTokens);
+            // retrive AccessToken
+            Tokens accessTokens = drop.getUserAccessTokens(requestTokens);
 
-        // save accessTokens to DB
-        user.setDropboxAccessKey(accessTokens.key);
-        user.setDropboxAccessSecret(accessTokens.secret);
-        res = manager.updateUser(user);
-        manager.finalize();
+            // save accessTokens to DB
+            user.setDropboxAccessKey(accessTokens.key);
+            user.setDropboxAccessSecret(accessTokens.secret);
+            res = manager.updateUser(user);
+            manager.finalize();
 
-        return res;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            return res;
+        }
+
     }
 }

@@ -1,7 +1,6 @@
 package cloud;
 
 import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.session.*;
 import commons.Tokens;
 
@@ -22,6 +21,9 @@ public class Dropbox {
     final static private String APP_KEY = "uxw4eysrg39u7jw";
     final static private String APP_SECRET = "77p0nl292u8op2p";
     private static final Session.AccessType ACCESS_TYPE = Session.AccessType.DROPBOX;
+    private static final String EXCEPTION_EMPTY_ACCESS_TOKENS = "EXCEPTION_EMPTY_ACCESS_TOKENS";
+    private static final String EXCEPTION_EMPTY_REQUEST_TOKENS = "EXCEPTION_EMPTY_REQUEST_TOKENS";
+    private static final String EXCEPTION_UNDEFINED_DIR = "EXCEPTION_UNDEFINED_DIR";
     private static AppKeyPair appKeys = new AppKeyPair(APP_KEY, APP_SECRET);
 
     private WebAuthSession session;
@@ -31,18 +33,17 @@ public class Dropbox {
     /**
      * Start session to likn user account with CloudMusic
      */
-    public Dropbox() {
-        //AppKeyPair appKeys = new AppKeyPair(APP_KEY, APP_SECRET);
+    public Dropbox() throws Exception {
+
         session = new WebAuthSession(appKeys, ACCESS_TYPE);
-        try {
-            authInfo = session.getAuthInfo();
-        } catch (DropboxException e) {
-            e.printStackTrace();
-        }
+        authInfo = session.getAuthInfo();
 
     }
 
-    public Dropbox(String accessTokenKey, String accessTokenSecret) {
+    public Dropbox(String accessTokenKey, String accessTokenSecret) throws Exception {
+
+        if( accessTokenKey == null || accessTokenSecret == null ) throw new Exception(EXCEPTION_EMPTY_ACCESS_TOKENS);
+
         AccessTokenPair accessTokenPair = new AccessTokenPair(accessTokenKey, accessTokenSecret);
         session = new WebAuthSession(appKeys, ACCESS_TYPE);
         session.setAccessTokenPair(accessTokenPair);
@@ -78,22 +79,16 @@ public class Dropbox {
      *
      * @return
      */
-    public Tokens getUserAccessTokens(Tokens requestTokens) {
+    public Tokens getUserAccessTokens(Tokens requestTokens) throws Exception {
 
+        if( requestTokens == null || requestTokens.key == null || requestTokens.secret == null ) throw new Exception(EXCEPTION_EMPTY_REQUEST_TOKENS);
         RequestTokenPair pair = new RequestTokenPair(requestTokens.key, requestTokens.secret);
 
-        Tokens accessTokens = null;
-        try {
-            session.retrieveWebAccessToken(pair);
-        } catch (DropboxException e) {
-            // TODO: log
-            //System.out.println("ERROR : " + e.toString() +" "+ e.getMessage());
-            //e.printStackTrace();
-            return accessTokens;
-        }
+        session.retrieveWebAccessToken(pair);
+
         AccessTokenPair tokens = session.getAccessTokenPair();
 
-        accessTokens = new Tokens(tokens.key, tokens.secret);
+        Tokens accessTokens = new Tokens(tokens.key, tokens.secret);
 
         return accessTokens;
     }
@@ -105,24 +100,11 @@ public class Dropbox {
      * @param filePath
      * @return
      */
-    public String getFileLink(String filePath) {
+    public String getFileLink(String filePath) throws Exception {
 
         String downloadLink = null;
-        try {
-            DropboxAPI.DropboxLink media = api.media(filePath, false);
-            downloadLink = media.url;
-            /* Todo: to log
-            System.out.println("path:" + filePath);
-            System.out.println("Link:" + downloadLink);
-            System.out.println("Exp:" + media.expires);
-            */
-
-        } catch (DropboxException e) {
-            return null;
-            // TODO: log
-            //System.out.println("getFileLink: " + e);
-            //e.printStackTrace();
-        }
+        DropboxAPI.DropboxLink media = api.media(filePath, false);
+        downloadLink = media.url;
 
         return downloadLink;
     }
@@ -135,21 +117,15 @@ public class Dropbox {
      * @return TODO separate structure array{file_path,music metadata album song name, artist}
      *         How to get meta data of file?
      */
-    public ArrayList<String> getFileList(String folderPath, boolean recursion, String fileType) {
+    public ArrayList<String> getFileList(String folderPath, boolean recursion, String fileType) throws Exception {
 
         // TODO create separate music list structure/class, should be similar in all clouds
         ArrayList<String> files = new ArrayList<String>();
 
         // Get folder content
         DropboxAPI.Entry dirent = null;
-        try {
-            dirent = api.metadata(folderPath, 1000, null, true, null);
-        } catch (Exception e) {
-            System.out.println("getFileList"+e.toString());
-            return null; // TODO or maybe better exception
-        }
-
-        if(dirent == null) return null;
+        dirent = api.metadata(folderPath, 1000, null, true, null);
+        if(dirent == null) throw new Exception(EXCEPTION_UNDEFINED_DIR);
 
         for (DropboxAPI.Entry ent : dirent.contents) {
 

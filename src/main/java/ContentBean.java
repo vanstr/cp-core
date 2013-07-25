@@ -19,20 +19,26 @@ public class ContentBean implements ContentBeanRemote {
 
         ArrayList<String> files = null;
 
-        // if files from dropbox
-        if (true) {
+        try {
+            // if files from dropbox
+            if (true) {
 
-            UserManager manager = new UserManager();
-            UserEntity user = manager.getUserById(userId);
+                UserManager manager = new UserManager();
+                UserEntity user = manager.getUserById(userId);
 
-            String accessTokenKey = user.getDropboxAccessKey();
-            String accessTokenSecret = user.getDropboxAccessSecret();
-            Dropbox drop = new Dropbox(accessTokenKey, accessTokenSecret);
-            files = drop.getFileList(folderPath, recursive, "mp3");
+                String accessTokenKey = user.getDropboxAccessKey();
+                String accessTokenSecret = user.getDropboxAccessSecret();
+                Dropbox drop = new Dropbox(accessTokenKey, accessTokenSecret);
 
+                files = drop.getFileList(folderPath, recursive, "mp3");
+
+            }
+            // else if files from GDrive
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        // if files from GDrive
         return files;
     }
 
@@ -40,17 +46,24 @@ public class ContentBean implements ContentBeanRemote {
     public String getFileSrc(String path, Long userId) {
 
         String file = null;
-        // if files from dropbox
-        if (true) {
-            UserManager manager = new UserManager();
-            UserEntity user = manager.getUserById(userId);
 
-            String accessTokenKey = user.getDropboxAccessKey();
-            String accessTokenSecret = user.getDropboxAccessSecret();
+        try {
+            // if files from dropbox
+            if (true) {
+                UserManager manager = new UserManager();
+                UserEntity user = manager.getUserById(userId);
 
-            Dropbox drop = new Dropbox(accessTokenKey, accessTokenSecret);
-            file = drop.getFileLink(path);
+                String accessTokenKey = user.getDropboxAccessKey();
+                String accessTokenSecret = user.getDropboxAccessSecret();
+
+                Dropbox drop = new Dropbox(accessTokenKey, accessTokenSecret);
+                file = drop.getFileLink(path);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
         return file;
 
     }
