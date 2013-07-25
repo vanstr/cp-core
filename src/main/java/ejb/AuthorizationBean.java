@@ -43,9 +43,6 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
             newUser.setLogin(login);
             newUser.setPassword(password);
             userManager.addUser(newUser);
-        }catch (NullPointerException e){
-            e.printStackTrace();
-            return false;
         }catch (Exception e){
             e.printStackTrace();
             return false;
