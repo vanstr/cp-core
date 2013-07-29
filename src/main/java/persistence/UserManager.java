@@ -4,7 +4,9 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Process CURD activities relatively User table
@@ -89,22 +91,25 @@ public class UserManager {
         }
     }
 
-    public List<UserEntity> getUserByFields(List<String> fieldNames, List<Object> fieldValues){
-        if(fieldNames == null || fieldNames.size() == 0 || fieldValues == null
-                || fieldValues.size() == 0 || fieldNames.size() != fieldValues.size()){
+    public List<UserEntity> getUserByFields(Map<String, String> fields){
+        if(fields == null || fields.size() == 0){
             return null;
         }
         String queryString = "from UserEntity where";
-        for(String fieldName : fieldNames){
-            if(fieldName.equals(fieldNames.get(0))){
-                queryString += " " + fieldName + "=?";
+        boolean first = true;
+        List<String> values = new ArrayList<String>();
+        for(String key : fields.keySet()){
+            if(first){
+                queryString += " " + key + "=?";
+                first = false;
             }else{
-                queryString += " and " + fieldName + "=?";
+                queryString += " and " + key + "=?";
             }
+            values.add(fields.get(key));
         }
         Query query = session.createQuery(queryString);
-        for(int i = 0; i < fieldValues.size(); i++){
-            query.setParameter(i, fieldValues.get(i));
+        for(int i = 0; i < values.size(); i++){
+            query.setParameter(i, values.get(i));
         }
         List<UserEntity> list = query.list();
         return list;
