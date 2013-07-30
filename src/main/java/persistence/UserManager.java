@@ -91,26 +91,23 @@ public class UserManager {
         }
     }
 
-    public List<UserEntity> getUserByFields(Map<String, String> fields){
+    public List<UserEntity> getUsersByFields(Map<String, Object> fields){
         if(fields == null || fields.size() == 0){
             return null;
         }
         String queryString = "from UserEntity where";
         boolean first = true;
-        List<String> values = new ArrayList<String>();
         for(String key : fields.keySet()){
             if(first){
-                queryString += " " + key + "=?";
+                queryString += " ";
                 first = false;
             }else{
-                queryString += " and " + key + "=?";
+                queryString += " and ";
             }
-            values.add(fields.get(key));
+            queryString += key + "=:" + key;
         }
         Query query = session.createQuery(queryString);
-        for(int i = 0; i < values.size(); i++){
-            query.setParameter(i, values.get(i));
-        }
+        query.setProperties(fields);
         List<UserEntity> list = query.list();
         return list;
     }
