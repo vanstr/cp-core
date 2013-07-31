@@ -20,13 +20,15 @@ public class Dropbox {
     final static Logger logger = LoggerFactory.getLogger(Dropbox.class);
 
     // Define application params
-    final static private String APP_KEY = "uxw4eysrg39u7jw";
-    final static private String APP_SECRET = "77p0nl292u8op2p";
-    private static final Session.AccessType ACCESS_TYPE = Session.AccessType.DROPBOX;
+    private static final String APP_KEY = "uxw4eysrg39u7jw";
+    private static final String APP_SECRET = "77p0nl292u8op2p";
+
     private static final String EXCEPTION_EMPTY_ACCESS_TOKENS = "EXCEPTION_EMPTY_ACCESS_TOKENS";
     private static final String EXCEPTION_EMPTY_REQUEST_TOKENS = "EXCEPTION_EMPTY_REQUEST_TOKENS";
     private static final String EXCEPTION_UNDEFINED_DIR = "EXCEPTION_UNDEFINED_DIR";
-    private static AppKeyPair appKeys = new AppKeyPair(APP_KEY, APP_SECRET);
+
+    private static final Session.AccessType ACCESS_TYPE = Session.AccessType.DROPBOX;
+    private static final AppKeyPair appKeys = new AppKeyPair(APP_KEY, APP_SECRET);
 
     private WebAuthSession session;
     private DropboxAPI<WebAuthSession> api;
@@ -44,7 +46,7 @@ public class Dropbox {
 
     public Dropbox(String accessTokenKey, String accessTokenSecret) throws Exception {
 
-        if( accessTokenKey == null || accessTokenSecret == null ){
+        if (accessTokenKey == null || accessTokenSecret == null) {
             logger.error("EXCEPTION_EMPTY_ACCESS_TOKENS");
             throw new Exception(EXCEPTION_EMPTY_ACCESS_TOKENS);
         }
@@ -86,7 +88,7 @@ public class Dropbox {
      */
     public Tokens getUserAccessTokens(Tokens requestTokens) throws Exception {
 
-        if( requestTokens == null || requestTokens.key == null || requestTokens.secret == null ) {
+        if (requestTokens == null || requestTokens.key == null || requestTokens.secret == null) {
             logger.error(EXCEPTION_EMPTY_REQUEST_TOKENS);
             throw new Exception(EXCEPTION_EMPTY_REQUEST_TOKENS);
         }
@@ -133,17 +135,17 @@ public class Dropbox {
         // Get folder content
         DropboxAPI.Entry dirent = null;
         dirent = api.metadata(folderPath, 1000, null, true, null);
-        if(dirent == null){
+        if (dirent == null) {
             logger.error(EXCEPTION_UNDEFINED_DIR);
             throw new Exception(EXCEPTION_UNDEFINED_DIR);
         }
 
         for (DropboxAPI.Entry ent : dirent.contents) {
 
-            if (ent.isDir ) {
-                if( recursion ){
+            if (ent.isDir) {
+                if (recursion) {
                     // start recursion through all folders
-                    logger.debug("Search in folder: " +ent.path );
+                    logger.debug("Search in folder: " + ent.path);
                     files.addAll(getFileList(ent.path, false, fileType));
                 }
             } else {
@@ -155,7 +157,7 @@ public class Dropbox {
                 int extensionLength = fileType.length();
 
                 // file name ".mp3" - not allowed, at least "a.mp3"
-                if( nameLength < (extensionLength +2) )  continue;
+                if (nameLength < (extensionLength + 2)) continue;
 
                 String extension = fileName.substring(nameLength - extensionLength, nameLength);
 
