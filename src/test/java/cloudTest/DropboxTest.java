@@ -29,14 +29,19 @@ public class DropboxTest {
     private static String correctMusicFile = "/JUnit/music.mp3";
 
     @BeforeClass
-    public static void method(){
-        dropUnAuth = new Dropbox();
+    public static void method() {
+        try {
+            dropUnAuth = new Dropbox();
 
 
-        // ATTENTION user with 1 id should be JUnit user and with access keys
-        UserManager manager = new UserManager();
-        UserEntity user = manager.getUserById(1);
-        dropAuth = new Dropbox(user.getDropboxAccessKey(),user.getDropboxAccessSecret());
+            // ATTENTION user with 1 id should be JUnit user and with access keys
+            UserManager manager = new UserManager();
+            UserEntity user = manager.getUserById(1);
+
+            dropAuth = new Dropbox(user.getDropboxAccessKey(), user.getDropboxAccessSecret());
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
 
     }
 
@@ -44,14 +49,14 @@ public class DropboxTest {
     public void testGetRequestTokens() throws Exception {
 
         Tokens res = dropUnAuth.getRequestTokens();
-        if( res.secret.isEmpty() || res.key.isEmpty() ) fail("key or secret is empty");
+        if (res.secret.isEmpty() || res.key.isEmpty()) fail("key or secret is empty");
     }
 
     @Test
     public void testGetAuthLink() throws Exception {
 
         String res = dropUnAuth.getAuthLink();
-        if( !res.contains("https://") ) fail("URl doesnt contain https://");
+        if (!res.contains("https://")) fail("URl doesnt contain https://");
     }
 
     // We assume that user has requestTokens in DB
@@ -62,7 +67,7 @@ public class DropboxTest {
         Tokens res = dropUnAuth.getRequestTokens();
         Tokens accessTokens = dropUnAuth.getUserAccessTokens(res);
         // accessTokens must be null because not provided access via link to account
-        assertNull("AccessTokens should be NULL!",accessTokens);
+        assertNull("AccessTokens should be NULL!", accessTokens);
 
         // 2.User has provided access to his account
         // assume that user has requestTokens in DB
@@ -91,7 +96,7 @@ public class DropboxTest {
 
         // 1. file exists
         String res = dropAuth.getFileLink(correctMusicFile); // http://dl.dropboxusercontent.com/1/view/n8cbbuw08p669ku/JUnit/music.mp3
-        if( !res.endsWith(correctMusicFile) ) fail("Bad file link:" + res);
+        if (!res.endsWith(correctMusicFile)) fail("Bad file link:" + res);
 
         // 2. file doesnt exist
         String res2 = dropAuth.getFileLink(incorrectMusicFile);
@@ -116,7 +121,7 @@ public class DropboxTest {
         int resSize = res.size();
         for (int i = 0; i < resSize; i++) {
             System.out.println(res.get(i));
-            if( res.get(i).equals(correctMusicFile) ) filePresents = true;
+            if (res.get(i).equals(correctMusicFile)) filePresents = true;
         }
         assertTrue("Music file not found", filePresents);
 
