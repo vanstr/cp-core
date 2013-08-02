@@ -3,8 +3,9 @@ package persistence;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,8 @@ import java.util.Map;
  * User table manager
  */
 public class UserManager {
+
+    final static Logger logger = LoggerFactory.getLogger(UserManager.class);
 
     private Session session = null;
 
@@ -50,10 +53,10 @@ public class UserManager {
             res = true;
         } catch (RuntimeException e) {
             try {
-                System.out.println("Couldn’t commit");
+                logger.error("Couldn’t commit");
                 ta.rollback();
             } catch (Exception re) {
-                System.out.println("Couldn’t roll back transaction");
+                logger.error("Couldn’t roll back transaction");
             }
             finally {
                 res = false;
@@ -77,10 +80,10 @@ public class UserManager {
             res = true;
         } catch (RuntimeException e) {
             try {
-                System.out.println("Couldn’t commit");
+                logger.error("Couldn’t commit");
                 ta.rollback();
             } catch (Exception re) {
-                System.out.println("Couldn’t roll back transaction");
+                logger.error("Couldn’t roll back transaction");
             }
             finally {
                 res = false;
