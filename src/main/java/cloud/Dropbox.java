@@ -56,8 +56,7 @@ public class Dropbox {
         session = new WebAuthSession(appKeys, ACCESS_TYPE);
         session.setAccessTokenPair(accessTokenPair);
         api = new DropboxAPI<WebAuthSession>(session);
-        logger.warn("warn instance with access key created");
-        logger.info("info instance with access key created");
+
         logger.debug("debug instance with access key created");
 
     }
@@ -127,13 +126,11 @@ public class Dropbox {
      * @param folderPath - in which folder look up
      * @param recursion  - if true also include files from sub folders recusievly
      * @param fileType   - if file type == NULL return all list, ex: folder, files, mp3, txt
-     *                   TODO, what if i want to get wav & mp3
-     * @return TODO separate structure array{file_path,music metadata album song name, artist}
-     *         How to get meta data of file?
+     *
+     * @return
      */
     public ArrayList<String> getFileList(String folderPath, boolean recursion, String fileType) throws Exception {
 
-        // TODO create separate music list structure/class, should be similar in all clouds
         ArrayList<String> files = new ArrayList<String>();
 
         // Get folder content
@@ -155,7 +152,6 @@ public class Dropbox {
             } else {
 
                 // filter files by fileType -------------------------------->
-                // TODO separete function, multiple file types MWA,MP3,avi...
                 String fileName = ent.fileName().toLowerCase();
                 int nameLength = fileName.length();
                 int extensionLength = fileType.length();
