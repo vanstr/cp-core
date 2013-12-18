@@ -1,5 +1,6 @@
 package persistence;
 
+import ejb.Initializator;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
@@ -21,6 +22,8 @@ public class HibernateUtil {
         try {
             sessionFactory = new Configuration()
                     .configure()
+                    //TODO hibernate props
+//                    .addProperties(Initializator.getLocalProperties())
                     .addPackage("persistence")
                     .addAnnotatedClass(UserEntity.class)
                     .buildSessionFactory();
