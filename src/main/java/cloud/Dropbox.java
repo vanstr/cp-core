@@ -48,7 +48,7 @@ public class Dropbox {
     public Dropbox(String accessTokenKey, String accessTokenSecret) throws Exception {
 
         if (accessTokenKey == null || accessTokenSecret == null) {
-            logger.error("EXCEPTION_EMPTY_ACCESS_TOKENS");
+            logger.info("EXCEPTION_EMPTY_ACCESS_TOKENS");
             throw new Exception(EXCEPTION_EMPTY_ACCESS_TOKENS);
         }
 
@@ -63,22 +63,20 @@ public class Dropbox {
 
 
     /**
-     * @return
+     * @return  Tokens
      */
     public Tokens getRequestTokens() {
         // Obtaining oAuth request token to be used for the rest of the authentication process.
         RequestTokenPair pair = authInfo.requestTokenPair;
 
-        Tokens requestTokens = new Tokens(pair.key, pair.secret);
-
-        return requestTokens;
+        return new Tokens(pair.key, pair.secret);
 
     }
 
     /**
      * generate link, where user provides privileges to access his account data
      *
-     * @return
+     * @return Auth link
      */
     public String getAuthLink() {
         return authInfo.url;
@@ -87,7 +85,7 @@ public class Dropbox {
     /**
      * Get User access token pair
      *
-     * @return
+     * @return Access tokens
      */
     public Tokens getUserAccessTokens(Tokens requestTokens) throws Exception {
 
@@ -101,25 +99,19 @@ public class Dropbox {
 
         AccessTokenPair tokens = session.getAccessTokenPair();
 
-        Tokens accessTokens = new Tokens(tokens.key, tokens.secret);
-
-        return accessTokens;
+        return new Tokens(tokens.key, tokens.secret);
     }
 
 
     /**
      * Get file link for downloading
-     *
-     * @param filePath
-     * @return
+     * @return  file download link
      */
     public String getFileLink(String filePath) throws Exception {
 
-        String downloadLink = null;
         DropboxAPI.DropboxLink media = api.media(filePath, false);
-        downloadLink = media.url;
 
-        return downloadLink;
+        return media.url;
     }
 
     /**
@@ -127,21 +119,20 @@ public class Dropbox {
      * @param recursion  - if true also include files from sub folders recusievly
      * @param fileType   - if file type == NULL return all list, ex: folder, files, mp3, txt
      *
-     * @return
+     * @return    array of file
      */
     public ArrayList<String> getFileList(String folderPath, boolean recursion, String fileType) throws Exception {
 
         ArrayList<String> files = new ArrayList<String>();
 
         // Get folder content
-        DropboxAPI.Entry dirent = null;
-        dirent = api.metadata(folderPath, 1000, null, true, null);
-        if (dirent == null) {
-            logger.error(EXCEPTION_UNDEFINED_DIR);
+        DropboxAPI.Entry dirEntities = api.metadata(folderPath, 1000, null, true, null);
+        if (dirEntities == null) {
+            logger.info(EXCEPTION_UNDEFINED_DIR);
             throw new Exception(EXCEPTION_UNDEFINED_DIR);
         }
 
-        for (DropboxAPI.Entry ent : dirent.contents) {
+        for (DropboxAPI.Entry ent : dirEntities.contents) {
 
             if (ent.isDir) {
                 if (recursion) {
@@ -162,7 +153,7 @@ public class Dropbox {
                 String extension = fileName.substring(nameLength - extensionLength, nameLength);
 
                 if (extension.equals(fileType.toLowerCase())) {
-                    files.add(new String(ent.path));
+                    files.add( ent.path);
                 }
                 // --------------------------------------------------------->
             }
