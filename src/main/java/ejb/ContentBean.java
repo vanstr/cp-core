@@ -37,7 +37,11 @@ public class ContentBean implements ContentBeanRemote {
                 String accessTokenSecret = user.getDropboxAccessSecret();
                 Dropbox drop = new Dropbox(accessTokenKey, accessTokenSecret);
 
-                files = drop.getFileList(folderPath, recursive, "mp3");
+                ArrayList<String> fileTypes = new ArrayList<String>();
+                fileTypes.add("mp3");
+                fileTypes.add("vaw");
+                fileTypes.add("ogg");
+                files = drop.getFileList(folderPath, recursive, fileTypes);
 
             }
             // else if files from GDrive
