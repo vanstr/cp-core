@@ -2,6 +2,7 @@ package cloud;
 
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.session.*;
+import commons.CloudFile;
 import commons.Tokens;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,11 +118,11 @@ public class Dropbox {
     /**
      * @param folderPath - in which folder look up
      * @param recursion  - if true also include files from sub folders recusievly
-     * @param fileType   - if file type == NULL return all list, ex: folder, files, mp3, txt
+     * @param requestedFileTypes  - if file type == NULL return all list, ex: folder, files, mp3, txt
      *
      * @return    array of file
      */
-    public ArrayList<String> getFileList(String folderPath, boolean recursion, String fileType) throws Exception {
+    public ArrayList<String> getFileList(String folderPath, boolean recursion, ArrayList<String> requestedFileTypes) throws Exception {
 
         ArrayList<String> files = new ArrayList<String>();
 
@@ -138,21 +139,14 @@ public class Dropbox {
                 if (recursion) {
                     // start recursion through all folders
                     logger.debug("Search in folder: " + ent.path);
-                    files.addAll(getFileList(ent.path, false, fileType));
+                    files.addAll(getFileList(ent.path, false, requestedFileTypes));
                 }
             } else {
 
                 // filter files by fileType -------------------------------->
                 String fileName = ent.fileName().toLowerCase();
-                int nameLength = fileName.length();
-                int extensionLength = fileType.length();
 
-                // file name ".mp3" - not allowed, at least "a.mp3"
-                if (nameLength < (extensionLength + 2)) continue;
-
-                String extension = fileName.substring(nameLength - extensionLength, nameLength);
-
-                if (extension.equals(fileType.toLowerCase())) {
+                if ( CloudFile.checkFileType(fileName, requestedFileTypes) ) {
                     files.add( ent.path);
                 }
                 // --------------------------------------------------------->

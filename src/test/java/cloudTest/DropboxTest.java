@@ -135,11 +135,14 @@ public class DropboxTest {
     @Test
     public void testGetFileList(){
 
+        ArrayList<String> fileTypes = new ArrayList<String>();
+        fileTypes.add("mp3");
+
         // 1. should be exception in method because dropbox session not established
         // unworked
         ArrayList<String> res5 = null;
         try {
-            res5 = dropUnAuth.getFileList("/", true, ".mp3");
+            res5 = dropUnAuth.getFileList("/", true, fileTypes);
         } catch (Exception e) {
             //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
@@ -148,7 +151,7 @@ public class DropboxTest {
         // 2.
         ArrayList<String> res = null;
         try {
-            res = dropAuth.getFileList("/", true, ".mp3");
+            res = dropAuth.getFileList("/", true, fileTypes);
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             fail("Exception");
