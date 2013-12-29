@@ -8,9 +8,9 @@ import java.util.ArrayList;
  * User: vanstr
  * Date: 13.26.12
  * Time: 14:39
- * To change this template use File | Settings | File Templates.
+ * To change this template use CloudFile | Settings | CloudFile Templates.
  */
-public class File {
+public class CloudFile {
 
     public static String getExtension(String filename) {
         if (filename == null) {
@@ -38,7 +38,9 @@ public class File {
                 int extensionLength = fileType.length();
 
                 // file name ".mp3" - not allowed, at least "a.mp3"
-                if (nameLength > (extensionLength + 2)) result = true;
+                if (nameLength > (extensionLength + 2)){
+                    result = true;
+                }
 
             }
 

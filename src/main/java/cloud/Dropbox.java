@@ -2,7 +2,7 @@ package cloud;
 
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.session.*;
-import commons.File;
+import commons.CloudFile;
 import commons.Tokens;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,11 +118,11 @@ public class Dropbox {
     /**
      * @param folderPath - in which folder look up
      * @param recursion  - if true also include files from sub folders recusievly
-     * @param requestedFileType  - if file type == NULL return all list, ex: folder, files, mp3, txt
+     * @param requestedFileTypes  - if file type == NULL return all list, ex: folder, files, mp3, txt
      *
      * @return    array of file
      */
-    public ArrayList<String> getFileList(String folderPath, boolean recursion, ArrayList<String> requestedFileType) throws Exception {
+    public ArrayList<String> getFileList(String folderPath, boolean recursion, ArrayList<String> requestedFileTypes) throws Exception {
 
         ArrayList<String> files = new ArrayList<String>();
 
@@ -139,14 +139,14 @@ public class Dropbox {
                 if (recursion) {
                     // start recursion through all folders
                     logger.debug("Search in folder: " + ent.path);
-                    files.addAll(getFileList(ent.path, false, requestedFileType));
+                    files.addAll(getFileList(ent.path, false, requestedFileTypes));
                 }
             } else {
 
                 // filter files by fileType -------------------------------->
                 String fileName = ent.fileName().toLowerCase();
 
-                if ( File.checkFileType(fileName, requestedFileType) ) {
+                if ( CloudFile.checkFileType(fileName, requestedFileTypes) ) {
                     files.add( ent.path);
                 }
                 // --------------------------------------------------------->
