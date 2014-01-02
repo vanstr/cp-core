@@ -26,9 +26,6 @@
         <maven.compiler.target>1.6</maven.compiler.target>
         <maven.compiler.source>1.6</maven.compiler.source>
 
-        <!-- Optional: to use jboss-as:run goal -->
-        <jboss-as.home>C:\Users\user\Documents\jboss-as-7.1.1.Final</jboss-as.home>
-
         <!-- logging tool versions -->
         <slf4j.version>1.6.4</slf4j.version>
         <logback.version>1.0.1</logback.version>

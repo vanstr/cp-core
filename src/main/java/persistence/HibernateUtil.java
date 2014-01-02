@@ -1,5 +1,6 @@
 package persistence;
 
+import commons.Initializator;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
@@ -19,11 +20,12 @@ public class HibernateUtil {
 
     static {
         try {
-            sessionFactory = new Configuration()
+            Configuration conf = new Configuration()
                     .configure()
+                    .addProperties(Initializator.getLocalProperties())
                     .addPackage("persistence")
-                    .addAnnotatedClass(UserEntity.class)
-                    .buildSessionFactory();
+                    .addAnnotatedClass(UserEntity.class);
+            sessionFactory = conf.buildSessionFactory();
 
         } catch (Throwable ex) {
             logger.warn("Initial SessionFactory creation failed." + ex);
