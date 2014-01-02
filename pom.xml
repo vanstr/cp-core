@@ -87,6 +87,23 @@
             <version>1.5.3</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.apis</groupId>
+            <artifactId>google-api-services-drive</artifactId>
+            <version>v2-rev110-1.14.2-beta</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.http-client</groupId>
+            <artifactId>google-http-client-jackson2</artifactId>
+            <version>1.17.0-rc</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.api.client</groupId>
+            <artifactId>google-api-client-http</artifactId>
+            <version>1.2.3-alpha</version>
+        </dependency>
 
         <!-- logging -->
         <dependency>
