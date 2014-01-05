@@ -1,6 +1,7 @@
 package ejb;
 
 import cloud.Dropbox;
+import cloud.GDrive;
 import commons.Tokens;
 import persistence.UserEntity;
 import persistence.UserManager;
@@ -131,5 +132,31 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
             return res;
         }
 
+    }
+
+    @Override
+    public Boolean retrieveGDriveCredentials(Long userId, String code) {
+        boolean res = false;
+
+        try {
+            GDrive gDrive = new GDrive(null);
+
+            UserManager manager = new UserManager();
+            UserEntity user = manager.getUserById(userId);
+
+            // retrive AccessToken
+            String accessToken = gDrive.retrieveAccessToken(code);
+
+            // save accessTokens to DB
+            user.setDriveAccessToken(accessToken);
+            res = manager.updateUser(user);
+            manager.finalize();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            return res;
+        }
     }
 }

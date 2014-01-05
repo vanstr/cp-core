@@ -3,11 +3,13 @@ package cloud;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.session.*;
 import commons.CloudFile;
+import commons.Initializator;
 import commons.Tokens;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * UserEntity: vanstr
@@ -21,8 +23,8 @@ public class Dropbox {
     final static Logger logger = LoggerFactory.getLogger(Dropbox.class);
 
     // Define application params
-    private static final String APP_KEY = "uxw4eysrg39u7jw";
-    private static final String APP_SECRET = "77p0nl292u8op2p";
+    private static final String APP_KEY = Initializator.getLocalProperties().getProperty("dropbox.app.key");
+    private static final String APP_SECRET = Initializator.getLocalProperties().getProperty("dropbox.app.secret");
 
     private static final String EXCEPTION_EMPTY_ACCESS_TOKENS = "EXCEPTION_EMPTY_ACCESS_TOKENS";
     private static final String EXCEPTION_EMPTY_REQUEST_TOKENS = "EXCEPTION_EMPTY_REQUEST_TOKENS";
@@ -122,7 +124,7 @@ public class Dropbox {
      *
      * @return    array of file
      */
-    public ArrayList<String> getFileList(String folderPath, boolean recursion, ArrayList<String> requestedFileTypes) throws Exception {
+    public ArrayList<String> getFileList(String folderPath, boolean recursion, List<String> requestedFileTypes) throws Exception {
 
         ArrayList<String> files = new ArrayList<String>();
 
@@ -144,6 +146,7 @@ public class Dropbox {
             } else {
 
                 // filter files by fileType -------------------------------->
+                //zachem lowercase?
                 String fileName = ent.fileName().toLowerCase();
 
                 if ( CloudFile.checkFileType(fileName, requestedFileTypes) ) {

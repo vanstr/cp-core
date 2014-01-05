@@ -20,4 +20,6 @@ public interface AuthorizationBeanRemote {
 
     //save user tokens to DB
     public Boolean retrieveDropboxAccessToken(Long userId);
+
+    public Boolean retrieveGDriveCredentials(Long userId, String code);
 }
