@@ -124,9 +124,9 @@ public class Dropbox {
      *
      * @return    array of file
      */
-    public ArrayList<String> getFileList(String folderPath, boolean recursion, List<String> requestedFileTypes) throws Exception {
+    public List<String[]> getFileList(String folderPath, boolean recursion, List<String> requestedFileTypes) throws Exception {
 
-        ArrayList<String> files = new ArrayList<String>();
+        ArrayList<String[]> files = new ArrayList<String[]>();
 
         // Get folder content
         DropboxAPI.Entry dirEntities = api.metadata(folderPath, 1000, null, true, null);
@@ -150,7 +150,8 @@ public class Dropbox {
                 String fileName = ent.fileName().toLowerCase();
 
                 if ( CloudFile.checkFileType(fileName, requestedFileTypes) ) {
-                    files.add( ent.path);
+                    //TODO maybe url?
+                    files.add(new String[]{ent.path});
                 }
                 // --------------------------------------------------------->
             }

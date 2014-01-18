@@ -8,6 +8,7 @@ import persistence.UserEntity;
 import persistence.UserManager;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
@@ -140,7 +141,7 @@ public class DropboxTest {
 
         // 1. should be exception in method because dropbox session not established
         // unworked
-        ArrayList<String> res5 = null;
+        List<String[]> res5 = null;
         try {
             res5 = dropUnAuth.getFileList("/", true, fileTypes);
         } catch (Exception e) {
@@ -149,7 +150,7 @@ public class DropboxTest {
         assertNull("Exception", res5);
 
         // 2.
-        ArrayList<String> res = null;
+        List<String[]> res = null;
         try {
             res = dropAuth.getFileList("/", true, fileTypes);
         } catch (Exception e) {

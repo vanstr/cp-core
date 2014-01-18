@@ -1,7 +1,6 @@
 package cloud;
 
 import com.google.api.services.drive.DriveScopes;
-import com.sun.servicetag.UnauthorizedAccessException;
 import commons.CloudFile;
 import commons.HttpWorker;
 import commons.Initializator;
@@ -12,6 +11,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 
 
@@ -61,26 +61,27 @@ public class GDrive {
         return tokens;
     }
 
-    public Map<String, String> getFileList(String folderPath, boolean recursive, List<String> fileTypes){
-        Map<String, String> files = null;
+    public List<String[]> getFileList(String folderPath, boolean recursive, List<String> fileTypes){
+        List<String[]> files = null;
         try {
             files = retrieveAllFiles(this.accessToken);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        Iterator<Map.Entry<String,String>> iter = files.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<String,String> entry = iter.next();
-            if ( !CloudFile.checkFileType(entry.getKey(), fileTypes) ) {
-                iter.remove();
+
+        Iterator<String[]> i = files.iterator();
+        while (i.hasNext()) {
+            String[] songData = i.next();
+            if ( !CloudFile.checkFileType(songData[0], fileTypes) ) {
+                i.remove();
             }
         }
         return files;
     }
 
-    public Map<String, String> retrieveAllFiles(String accessToken) throws IOException {
-        Map<String, String> result = new HashMap<String, String>();
+    public List<String[]> retrieveAllFiles(String accessToken) throws IOException {
+        List<String[]> result = new ArrayList<String[]>();
         String url = "https://www.googleapis.com/drive/v2/files?oauth_token=" + accessToken;
         JSONObject object = HttpWorker.sendGetRequest(url);
         JSONArray fileArray = object.getJSONArray("items");
@@ -89,8 +90,11 @@ public class GDrive {
                     && !"application/vnd.google-apps.folder".equals(fileArray.getJSONObject(i).getString("mimeType"))
                     && fileArray.getJSONObject(i).has("title")
                     && fileArray.getJSONObject(i).has("downloadUrl")){
-                result.put(fileArray.getJSONObject(i).getString("title"),
-                        fileArray.getJSONObject(i).getString("downloadUrl") + "&oauth_token=" + this.accessToken);
+                String[] data = new String[3];
+                data[0] = fileArray.getJSONObject(i).getString("title");
+                data[1] = fileArray.getJSONObject(i).getString("downloadUrl") + "&oauth_token=" + this.accessToken;
+                data[2] = fileArray.getJSONObject(i).getString("id");
+                result.add(data);
             }
         }
         return result;

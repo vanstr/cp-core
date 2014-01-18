@@ -8,10 +8,8 @@ import persistence.UserManager;
 
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -27,14 +25,14 @@ public class ContentBean implements ContentBeanRemote {
 
     private List<String> fileTypes = Arrays.asList("mp3", "wav", "ogg");
 
-    public List<String> getFiles(String folderPath, Boolean recursive, Long userId) {
-        List<String> files = this.getDropboxFiles(folderPath, recursive, userId);
-        files.addAll(this.getDriveFiles(folderPath, recursive, userId).keySet());
+    public List<String[]> getFiles(String folderPath, Boolean recursive, Long userId) {
+        List<String[]> files = this.getDropboxFiles(folderPath, recursive, userId);
+        files.addAll(this.getDriveFiles(folderPath, recursive, userId));
         return files;
     }
 
-    public List<String> getDropboxFiles(String folderPath, Boolean recursive, Long userId) {
-        ArrayList<String> files = null;
+    public List<String[]> getDropboxFiles(String folderPath, Boolean recursive, Long userId) {
+        List<String[]> files = null;
         try {
             UserManager manager = new UserManager();
             UserEntity user = manager.getUserById(userId);
@@ -50,8 +48,8 @@ public class ContentBean implements ContentBeanRemote {
         return files;
     }
 
-    public Map<String, String> getDriveFiles(String folderPath, Boolean recursive, Long userId){
-        Map<String, String> files = null;
+    public List<String[]> getDriveFiles(String folderPath, Boolean recursive, Long userId){
+        List<String[]> files = null;
         GDrive gDrive = null;
         UserEntity user = null;
         UserManager manager = null;
