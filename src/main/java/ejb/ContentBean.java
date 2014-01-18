@@ -81,21 +81,20 @@ public class ContentBean implements ContentBeanRemote {
         return files;
     }
 
-    public String getFileSrc(String path, Long userId) {
-
+    public String getFileSrc(Integer cloudId, String path, Long userId, String driveFileId) {
         String file = null;
-
+        UserManager manager = new UserManager();
+        UserEntity user = manager.getUserById(userId);
         try {
-            // if files from dropbox
-            if (true) {
-                UserManager manager = new UserManager();
-                UserEntity user = manager.getUserById(userId);
-
+            if (DROPBOX_CLOUD_ID.equals(cloudId)) {
                 String accessTokenKey = user.getDropboxAccessKey();
                 String accessTokenSecret = user.getDropboxAccessSecret();
 
                 Dropbox drop = new Dropbox(accessTokenKey, accessTokenSecret);
                 file = drop.getFileLink(path);
+            }else if(DRIVE_CLOUD_ID.equals(cloudId)){
+                GDrive gDrive = new GDrive(user.getDriveAccessToken(), user.getDriveRefreshToken());
+                file = gDrive.getFileLink(driveFileId);
             }
 
         } catch (Exception e) {

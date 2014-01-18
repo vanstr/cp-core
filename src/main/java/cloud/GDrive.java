@@ -65,18 +65,7 @@ public class GDrive {
         Map<String, String> files = null;
         try {
             files = retrieveAllFiles(this.accessToken);
-        } catch (UnauthorizedAccessException e) {
-            if("401".equals(e.getMessage())){
-                this.accessToken = this.refreshToken(this.refreshToken);
-                try {
-                    files = retrieveAllFiles(this.accessToken);
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e){
             e.printStackTrace();
         }
 
@@ -121,5 +110,12 @@ public class GDrive {
             e.printStackTrace();
         }
         return accessToken;
+    }
+
+    public String getFileLink(String fileId){
+        JSONObject object = HttpWorker.sendGetRequest("https://www.googleapis.com/drive/v2/files/"
+                + fileId + "?oauth_token=" + this.accessToken);
+        String fileSrc = object.getString("downloadUrl") + "&oauth_token=" + this.accessToken;
+        return fileSrc;
     }
 }
