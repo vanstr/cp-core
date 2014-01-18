@@ -27,6 +27,7 @@ public class UserEntity {
     private String dropboxRequestKey;
     private String dropboxRequestSecret;
     private String driveAccessToken;
+    private String driveRefreshToken;
 
     @javax.persistence.Column(name = "id")
     @Id
@@ -106,6 +107,16 @@ public class UserEntity {
 
     public void setDriveAccessToken(String driveAccessToken) {
         this.driveAccessToken = driveAccessToken;
+    }
+
+    @javax.persistence.Column(name = "drive_refresh_token")
+    @Basic
+    public String getDriveRefreshToken() {
+        return driveRefreshToken;
+    }
+
+    public void setDriveRefreshToken(String driveRefreshToken) {
+        this.driveRefreshToken = driveRefreshToken;
     }
 
     @Override

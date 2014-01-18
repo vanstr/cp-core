@@ -1,22 +1,18 @@
 package cloud;
 
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.model.File;
-import com.google.api.services.drive.model.FileList;
+import com.google.api.services.drive.DriveScopes;
+import com.sun.servicetag.UnauthorizedAccessException;
 import commons.CloudFile;
+import commons.HttpWorker;
 import commons.Initializator;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 
 public class GDrive {
@@ -24,47 +20,58 @@ public class GDrive {
     private static String CLIENT_ID = Initializator.getLocalProperties().getProperty("drive.client.id");
     private static String CLIENT_SECRET = Initializator.getLocalProperties().getProperty("drive.client.secret");
     private static String REDIRECT_URI = Initializator.getLocalProperties().getProperty("drive.redirect.uri");
-    private static final List<String> SCOPES = Arrays.asList(
-            "https://www.googleapis.com/auth/drive");
+    private static final String GRANT_TYPE = "refresh_token";
 
     private String accessToken;
+    private String refreshToken;
 
-    public GDrive(String accessToken){
+    public GDrive(String accessToken, String refreshToken){
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
     }
 
-
-    public String retrieveAccessToken(String code){
-        HttpTransport httpTransport = new NetHttpTransport();
-        JacksonFactory jsonFactory = new JacksonFactory();
-        GoogleAuthorizationCodeFlow flow =
-                new GoogleAuthorizationCodeFlow.Builder(httpTransport, jsonFactory,
-                        CLIENT_ID,
-                        CLIENT_SECRET, SCOPES)
-                        .setAccessType("offline").setApprovalPrompt("force").build();
-        try {
-            GoogleTokenResponse response =
-                    flow.newTokenRequest(code).setRedirectUri(REDIRECT_URI).execute();
-            Credential cred = flow.createAndStoreCredential(response, null);
-            return cred.getAccessToken();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public String getRefreshToken() {
+        return refreshToken;
     }
 
-    public List<String> getFileList(String folderPath, boolean recursive, List<String> fileTypes){
-        ArrayList<String> files = new ArrayList<String>();
-        Credential credential = new GoogleCredential().setAccessToken(this.accessToken);
-        HttpTransport httpTransport = new NetHttpTransport();
-        JacksonFactory jsonFactory = new JacksonFactory();
-        Drive service = new Drive.Builder(httpTransport, jsonFactory, credential).build();
-        List<File> filez = null;
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public Map<String, String> retrieveAccessToken(String code){
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("code", code);
+        params.put("client_id", CLIENT_ID);
+        params.put("client_secret", CLIENT_SECRET);
+        params.put("grant_type", GRANT_TYPE);
+        params.put("redirect_uri", REDIRECT_URI);
+        params.put("scope", DriveScopes.DRIVE);
+        JSONObject object = HttpWorker.sendPostRequest("https://accounts.google.com/o/oauth2/token", params);
+        Map<String, String> tokens = new HashMap<String, String>();
+        tokens.put("access_token", object.getString("access_token"));
+        tokens.put("refresh_token", object.getString("refresh_token"));
+        return tokens;
+    }
+
+    public Map<String, String> getFileList(String folderPath, boolean recursive, List<String> fileTypes){
+        Map<String, String> files = null;
         try {
-            filez = retrieveAllFiles(service);
-            for(File f: filez){
-                if ( CloudFile.checkFileType(f.getOriginalFilename(), fileTypes) ) {
-                    files.add(f.getOriginalFilename());
+            files = retrieveAllFiles(this.accessToken);
+        } catch (UnauthorizedAccessException e) {
+            if("401".equals(e.getMessage())){
+                this.accessToken = this.refreshToken(this.refreshToken);
+                try {
+                    files = retrieveAllFiles(this.accessToken);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
                 }
             }
         } catch (IOException e) {
@@ -72,26 +79,47 @@ public class GDrive {
         } catch (Exception e){
             e.printStackTrace();
         }
+
+        Iterator<Map.Entry<String,String>> iter = files.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<String,String> entry = iter.next();
+            if ( !CloudFile.checkFileType(entry.getKey(), fileTypes) ) {
+                iter.remove();
+            }
+        }
         return files;
     }
 
-    private static List<File> retrieveAllFiles(Drive service) throws IOException {
-        List<File> result = new ArrayList<File>();
-        Drive.Files.List request = service.files().list();
-
-        do {
-            try {
-                FileList files = request.execute();
-
-                result.addAll(files.getItems());
-                request.setPageToken(files.getNextPageToken());
-            } catch (IOException e) {
-                System.out.println("An error occurred: " + e);
-                request.setPageToken(null);
+    public Map<String, String> retrieveAllFiles(String accessToken) throws IOException {
+        Map<String, String> result = new HashMap<String, String>();
+        String url = "https://www.googleapis.com/drive/v2/files?oauth_token=" + accessToken;
+        JSONObject object = HttpWorker.sendGetRequest(url);
+        JSONArray fileArray = object.getJSONArray("items");
+        for(int i = 0; i < fileArray.length(); i++){
+            if(!fileArray.getJSONObject(i).getJSONObject("labels").getBoolean("trashed")
+                    && !"application/vnd.google-apps.folder".equals(fileArray.getJSONObject(i).getString("mimeType"))
+                    && fileArray.getJSONObject(i).has("title")
+                    && fileArray.getJSONObject(i).has("downloadUrl")){
+                result.put(fileArray.getJSONObject(i).getString("title"),
+                        fileArray.getJSONObject(i).getString("downloadUrl") + "&oauth_token=" + this.accessToken);
             }
-        } while (request.getPageToken() != null &&
-                request.getPageToken().length() > 0);
-
+        }
         return result;
+    }
+
+    public String refreshToken(String refreshToken){
+        String accessToken = null;
+        try {
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("client_id", CLIENT_ID);
+            params.put("client_secret", CLIENT_SECRET);
+            params.put("grant_type", GRANT_TYPE);
+            params.put("refresh_token", refreshToken);
+            JSONObject object = HttpWorker.sendPostRequest("https://accounts.google.com/o/oauth2/token", params);
+            accessToken = object.getString("access_token");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return accessToken;
     }
 }

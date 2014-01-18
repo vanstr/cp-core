@@ -139,16 +139,19 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
         boolean res = false;
 
         try {
-            GDrive gDrive = new GDrive(null);
+            GDrive gDrive = new GDrive(null, null);
 
             UserManager manager = new UserManager();
             UserEntity user = manager.getUserById(userId);
 
             // retrive AccessToken
-            String accessToken = gDrive.retrieveAccessToken(code);
+            Map<String, String> credentials = gDrive.retrieveAccessToken(code);
+            String accessToken = credentials.get("access_token");
+            String refreshToken = credentials.get("refresh_token");
 
             // save accessTokens to DB
             user.setDriveAccessToken(accessToken);
+            user.setDriveRefreshToken(refreshToken);
             res = manager.updateUser(user);
             manager.finalize();
 

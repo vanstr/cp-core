@@ -90,7 +90,7 @@
         <dependency>
             <groupId>com.google.apis</groupId>
             <artifactId>google-api-services-drive</artifactId>
-            <version>v2-rev110-1.14.2-beta</version>
+            <version>v2-rev111-1.15.0-rc</version>
         </dependency>
 
         <dependency>
@@ -102,7 +102,19 @@
         <dependency>
             <groupId>com.google.http-client</groupId>
             <artifactId>google-http-client</artifactId>
-            <version>1.14.1-beta</version>
+            <version>1.17.0-rc</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.apis</groupId>
+            <artifactId>google-api-services-oauth2</artifactId>
+            <version>v2-rev60-1.17.0-rc</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.metaparadigm</groupId>
+            <artifactId>json-rpc</artifactId>
+            <version>1.0</version>
         </dependency>
 
         <!-- logging -->

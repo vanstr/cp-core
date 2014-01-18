@@ -29,8 +29,7 @@ public class CloudFile {
 
         if(requestedFileTypes == null ){
             result = true;
-        }
-        else{
+        }else{
             String fileType = getExtension(fileName);
             if( requestedFileTypes.contains(fileType) ){
 
