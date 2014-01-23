@@ -8,6 +8,7 @@ import persistence.UserManager;
 
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,8 +27,16 @@ public class ContentBean implements ContentBeanRemote {
     private List<String> fileTypes = Arrays.asList("mp3", "wav", "ogg");
 
     public List<String[]> getFiles(String folderPath, Boolean recursive, Long userId) {
-        List<String[]> files = this.getDropboxFiles(folderPath, recursive, userId);
-        files.addAll(this.getDriveFiles(folderPath, recursive, userId));
+        //TODO threads
+        List<String[]> files = new ArrayList<String[]>();
+        List<String[]> dropboxFiles = this.getDropboxFiles(folderPath, recursive, userId);
+        if(dropboxFiles != null){
+            files.addAll(dropboxFiles);
+        }
+        List<String[]> driveFiles = this.getDriveFiles(folderPath, recursive, userId);
+        if(driveFiles != null){
+            files.addAll(driveFiles);
+        }
         return files;
     }
 

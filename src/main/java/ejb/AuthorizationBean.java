@@ -136,7 +136,7 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
 
     @Override
     public Boolean retrieveGDriveCredentials(Long userId, String code) {
-        boolean res = false;
+        Boolean result = false;
 
         try {
             GDrive gDrive = new GDrive(null, null);
@@ -144,6 +144,9 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
             UserManager manager = new UserManager();
             UserEntity user = manager.getUserById(userId);
 
+            if(user == null){
+                return false;
+            }
             // retrive AccessToken
             Map<String, String> credentials = gDrive.retrieveAccessToken(code);
             String accessToken = credentials.get("access_token");
@@ -152,14 +155,52 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
             // save accessTokens to DB
             user.setDriveAccessToken(accessToken);
             user.setDriveRefreshToken(refreshToken);
-            res = manager.updateUser(user);
+            result = manager.updateUser(user);
             manager.finalize();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        finally {
-            return res;
+        return result;
+    }
+
+    @Override
+    public Boolean removeDropboxAcoount(Long userId) {
+        Boolean result = false;
+        try{
+            UserManager manager = new UserManager();
+            UserEntity user = manager.getUserById(userId);
+            if(user == null){
+                return false;
+            }
+
+            user.setDropboxAccessKey(null);
+            user.setDropboxAccessSecret(null);
+            result = manager.updateUser(user);
+            manager.finalize();
+        } catch (Exception e){
+            e.printStackTrace();
         }
+        return result;
+    }
+
+    @Override
+    public Boolean removeGDriveAccount(Long userId) {
+        Boolean result = false;
+        try{
+            UserManager manager = new UserManager();
+            UserEntity user = manager.getUserById(userId);
+            if(user == null){
+                return false;
+            }
+
+            user.setDriveAccessToken(null);
+            user.setDriveRefreshToken(null);
+            result = manager.updateUser(user);
+            manager.finalize();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return result;
     }
 }

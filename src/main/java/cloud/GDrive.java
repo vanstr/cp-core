@@ -4,6 +4,7 @@ import com.google.api.services.drive.DriveScopes;
 import commons.CloudFile;
 import commons.HttpWorker;
 import commons.Initializator;
+import ejb.ContentBeanRemote;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -20,7 +21,8 @@ public class GDrive {
     private static String CLIENT_ID = Initializator.getLocalProperties().getProperty("drive.client.id");
     private static String CLIENT_SECRET = Initializator.getLocalProperties().getProperty("drive.client.secret");
     private static String REDIRECT_URI = Initializator.getLocalProperties().getProperty("drive.redirect.uri");
-    private static final String GRANT_TYPE = "refresh_token";
+    private static final String GRANT_TYPE_REFRESH = "refresh_token";
+    private static final String GRANT_TYPE_AUTHORIZATION = "authorization_code";
 
     private String accessToken;
     private String refreshToken;
@@ -51,7 +53,7 @@ public class GDrive {
         params.put("code", code);
         params.put("client_id", CLIENT_ID);
         params.put("client_secret", CLIENT_SECRET);
-        params.put("grant_type", GRANT_TYPE);
+        params.put("grant_type", GRANT_TYPE_AUTHORIZATION);
         params.put("redirect_uri", REDIRECT_URI);
         params.put("scope", DriveScopes.DRIVE);
         JSONObject object = HttpWorker.sendPostRequest("https://accounts.google.com/o/oauth2/token", params);
@@ -72,8 +74,8 @@ public class GDrive {
 
         Iterator<String[]> i = files.iterator();
         while (i.hasNext()) {
-            String[] songData = i.next();
-            if ( !CloudFile.checkFileType(songData[0], fileTypes) ) {
+            String[] track = i.next();
+            if ( !CloudFile.checkFileType(track[1], fileTypes) ) {
                 i.remove();
             }
         }
@@ -90,11 +92,14 @@ public class GDrive {
                     && !"application/vnd.google-apps.folder".equals(fileArray.getJSONObject(i).getString("mimeType"))
                     && fileArray.getJSONObject(i).has("title")
                     && fileArray.getJSONObject(i).has("downloadUrl")){
-                String[] data = new String[3];
-                data[0] = fileArray.getJSONObject(i).getString("title");
-                data[1] = fileArray.getJSONObject(i).getString("downloadUrl") + "&oauth_token=" + this.accessToken;
-                data[2] = fileArray.getJSONObject(i).getString("id");
-                result.add(data);
+
+                String[] track = new String[]{
+                    ContentBeanRemote.DRIVE_CLOUD_ID.toString(),
+                    fileArray.getJSONObject(i).getString("title"),
+                    fileArray.getJSONObject(i).getString("downloadUrl") + "&oauth_token=" + this.accessToken,
+                    fileArray.getJSONObject(i).getString("id")
+                };
+                result.add(track);
             }
         }
         return result;
@@ -106,7 +111,7 @@ public class GDrive {
             Map<String, String> params = new HashMap<String, String>();
             params.put("client_id", CLIENT_ID);
             params.put("client_secret", CLIENT_SECRET);
-            params.put("grant_type", GRANT_TYPE);
+            params.put("grant_type", GRANT_TYPE_REFRESH);
             params.put("refresh_token", refreshToken);
             JSONObject object = HttpWorker.sendPostRequest("https://accounts.google.com/o/oauth2/token", params);
             accessToken = object.getString("access_token");

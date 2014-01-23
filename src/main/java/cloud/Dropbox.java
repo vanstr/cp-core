@@ -5,6 +5,7 @@ import com.dropbox.client2.session.*;
 import commons.CloudFile;
 import commons.Initializator;
 import commons.Tokens;
+import ejb.ContentBeanRemote;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,8 +151,9 @@ public class Dropbox {
                 String fileName = ent.fileName().toLowerCase();
 
                 if ( CloudFile.checkFileType(fileName, requestedFileTypes) ) {
-                    //TODO maybe url?
-                    files.add(new String[]{ent.path});
+                    //TODO maybe url, id?
+                    files.add(new String[]{ContentBeanRemote.DROPBOX_CLOUD_ID.toString()
+                            , ent.path, null, null});
                 }
                 // --------------------------------------------------------->
             }

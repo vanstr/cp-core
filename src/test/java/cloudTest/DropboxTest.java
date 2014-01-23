@@ -164,7 +164,7 @@ public class DropboxTest {
         int resSize = res.size();
         for (int i = 0; i < resSize; i++) {
             System.out.println(res.get(i));
-            if (correctMusicFile.equals(res.get(i)[0])) filePresents = true;
+            if (correctMusicFile.equals(res.get(i)[1])) filePresents = true;
         }
         assertTrue("Music file not found", filePresents);
 
