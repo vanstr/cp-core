@@ -147,10 +147,7 @@ public class Dropbox {
             } else {
 
                 // filter files by fileType -------------------------------->
-                //zachem lowercase?
-                String fileName = ent.fileName().toLowerCase();
-
-                if ( CloudFile.checkFileType(fileName, requestedFileTypes) ) {
+                if ( CloudFile.checkFileType(ent.fileName(), requestedFileTypes) ) {
                     //TODO maybe url, id?
                     files.add(new String[]{ContentBeanRemote.DROPBOX_CLOUD_ID.toString()
                             , ent.path, null, null});

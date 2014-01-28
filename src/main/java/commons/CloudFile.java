@@ -25,6 +25,10 @@ public class CloudFile {
 
     public static boolean checkFileType(String fileName, List<String> requestedFileTypes){
 
+        if(fileName == null){
+            return false;
+        }
+        fileName = fileName.toLowerCase();
         boolean result = false;
 
         if(requestedFileTypes == null ){
