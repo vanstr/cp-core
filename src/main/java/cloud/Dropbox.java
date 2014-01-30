@@ -131,84 +131,17 @@ public class Dropbox {
 
         ArrayList<String[]> files = new ArrayList<String[]>();
 
-        class DropboxFetcherByType implements Runnable{
-
-            private String folderPath;
-            private String fileType;
-            List<String[]> files = new ArrayList<String[]>();
-
-            public DropboxFetcherByType(String folderPath, String fileType){
-                this.folderPath = folderPath;
-                this.fileType = fileType;
-            }
-
-            @Override
-            public void run() {
-                List<Entry> dropboxEntries = null;
-                try {
-                    dropboxEntries = api.search(folderPath, "." + fileType, 0, false);
-                } catch (DropboxException e) {
-                    e.printStackTrace();
-                }
-
-                if(dropboxEntries != null){
-                    for(Entry dropboxEntry : dropboxEntries){
-                        if(dropboxEntry.path.endsWith(fileType)){
-                            files.add(new String[]{ContentBeanRemote.DROPBOX_CLOUD_ID.toString()
-                                    , dropboxEntry.path, null, null});
-                        }
+        for(String fileType : requestedFileTypes){
+            List<Entry> dropboxEntries = api.search(folderPath, "." + fileType, 0, false);
+            if(dropboxEntries != null){
+                for(Entry dropboxEntry : dropboxEntries){
+                    if(CloudFile.checkFileType(dropboxEntry.fileName(), requestedFileTypes)){
+                        files.add(new String[]{ContentBeanRemote.DROPBOX_CLOUD_ID.toString()
+                                , dropboxEntry.path, null, null});
                     }
                 }
             }
-
-            List<String[]> getFiles() {
-                return files;
-            }
         }
-
-        List<Thread> fetcherThreadList = new ArrayList<Thread>();
-        List<DropboxFetcherByType> dropboxFetcherList = new ArrayList<DropboxFetcherByType>();
-        for(String fileType : requestedFileTypes){
-            DropboxFetcherByType fetcherByType = new DropboxFetcherByType(folderPath, fileType);
-            Thread thread = new Thread(fetcherByType);
-            thread.start();
-            dropboxFetcherList.add(fetcherByType);
-            fetcherThreadList.add(thread);
-        }
-        for(Thread thread : fetcherThreadList){
-            thread.join();
-        }
-        for(DropboxFetcherByType fetcherByType : dropboxFetcherList){
-            if(fetcherByType.getFiles() != null){
-                files.addAll(fetcherByType.getFiles());
-            }
-        }
-        // Get folder content
-//        DropboxAPI.Entry dirEntities = api.metadata(folderPath, 1000, null, true, null);
-//        if (dirEntities == null) {
-//            logger.info(EXCEPTION_UNDEFINED_DIR);
-//            throw new Exception(EXCEPTION_UNDEFINED_DIR);
-//        }
-//
-//        for (DropboxAPI.Entry ent : dirEntities.contents) {
-//
-//            if (ent.isDir) {
-//                if (recursion) {
-//                    // start recursion through all folders
-//                    logger.debug("Search in folder: " + ent.path);
-//                    files.addAll(getFileList(ent.path, false, requestedFileTypes));
-//                }
-//            } else {
-//
-//                // filter files by fileType -------------------------------->
-//                if ( CloudFile.checkFileType(ent.fileName(), requestedFileTypes) ) {
-//                    //TODO maybe url, id?
-//                    files.add(new String[]{ContentBeanRemote.DROPBOX_CLOUD_ID.toString()
-//                            , ent.path, null, null});
-//                }
-//                // --------------------------------------------------------->
-//            }
-//        }
 
         return files;
     }
