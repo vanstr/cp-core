@@ -136,6 +136,7 @@ public class Dropbox {
             if(dropboxEntries != null){
                 for(Entry dropboxEntry : dropboxEntries){
                     if(CloudFile.checkFileType(dropboxEntry.fileName(), requestedFileTypes)){
+                        //TODO maybe url, id?
                         files.add(new String[]{ContentBeanRemote.DROPBOX_CLOUD_ID.toString()
                                 , dropboxEntry.path, null, null});
                     }
