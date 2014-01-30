@@ -1,6 +1,8 @@
 package cloud;
 
 import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.DropboxAPI.Entry;
+import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.session.*;
 import commons.CloudFile;
 import commons.Initializator;
@@ -129,32 +131,84 @@ public class Dropbox {
 
         ArrayList<String[]> files = new ArrayList<String[]>();
 
-        // Get folder content
-        DropboxAPI.Entry dirEntities = api.metadata(folderPath, 1000, null, true, null);
-        if (dirEntities == null) {
-            logger.info(EXCEPTION_UNDEFINED_DIR);
-            throw new Exception(EXCEPTION_UNDEFINED_DIR);
-        }
+        class DropboxFetcherByType implements Runnable{
 
-        for (DropboxAPI.Entry ent : dirEntities.contents) {
+            private String folderPath;
+            private String fileType;
+            List<String[]> files = new ArrayList<String[]>();
 
-            if (ent.isDir) {
-                if (recursion) {
-                    // start recursion through all folders
-                    logger.debug("Search in folder: " + ent.path);
-                    files.addAll(getFileList(ent.path, false, requestedFileTypes));
+            public DropboxFetcherByType(String folderPath, String fileType){
+                this.folderPath = folderPath;
+                this.fileType = fileType;
+            }
+
+            @Override
+            public void run() {
+                List<Entry> dropboxEntries = null;
+                try {
+                    dropboxEntries = api.search(folderPath, "." + fileType, 0, false);
+                } catch (DropboxException e) {
+                    e.printStackTrace();
                 }
-            } else {
 
-                // filter files by fileType -------------------------------->
-                if ( CloudFile.checkFileType(ent.fileName(), requestedFileTypes) ) {
-                    //TODO maybe url, id?
-                    files.add(new String[]{ContentBeanRemote.DROPBOX_CLOUD_ID.toString()
-                            , ent.path, null, null});
+                if(dropboxEntries != null){
+                    for(Entry dropboxEntry : dropboxEntries){
+                        if(dropboxEntry.path.endsWith(fileType)){
+                            files.add(new String[]{ContentBeanRemote.DROPBOX_CLOUD_ID.toString()
+                                    , dropboxEntry.path, null, null});
+                        }
+                    }
                 }
-                // --------------------------------------------------------->
+            }
+
+            List<String[]> getFiles() {
+                return files;
             }
         }
+
+        List<Thread> fetcherThreadList = new ArrayList<Thread>();
+        List<DropboxFetcherByType> dropboxFetcherList = new ArrayList<DropboxFetcherByType>();
+        for(String fileType : requestedFileTypes){
+            DropboxFetcherByType fetcherByType = new DropboxFetcherByType(folderPath, fileType);
+            Thread thread = new Thread(fetcherByType);
+            thread.start();
+            dropboxFetcherList.add(fetcherByType);
+            fetcherThreadList.add(thread);
+        }
+        for(Thread thread : fetcherThreadList){
+            thread.join();
+        }
+        for(DropboxFetcherByType fetcherByType : dropboxFetcherList){
+            if(fetcherByType.getFiles() != null){
+                files.addAll(fetcherByType.getFiles());
+            }
+        }
+        // Get folder content
+//        DropboxAPI.Entry dirEntities = api.metadata(folderPath, 1000, null, true, null);
+//        if (dirEntities == null) {
+//            logger.info(EXCEPTION_UNDEFINED_DIR);
+//            throw new Exception(EXCEPTION_UNDEFINED_DIR);
+//        }
+//
+//        for (DropboxAPI.Entry ent : dirEntities.contents) {
+//
+//            if (ent.isDir) {
+//                if (recursion) {
+//                    // start recursion through all folders
+//                    logger.debug("Search in folder: " + ent.path);
+//                    files.addAll(getFileList(ent.path, false, requestedFileTypes));
+//                }
+//            } else {
+//
+//                // filter files by fileType -------------------------------->
+//                if ( CloudFile.checkFileType(ent.fileName(), requestedFileTypes) ) {
+//                    //TODO maybe url, id?
+//                    files.add(new String[]{ContentBeanRemote.DROPBOX_CLOUD_ID.toString()
+//                            , ent.path, null, null});
+//                }
+//                // --------------------------------------------------------->
+//            }
+//        }
 
         return files;
     }

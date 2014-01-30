@@ -55,6 +55,7 @@ public class ContentBean implements ContentBeanRemote {
         @Override
         public void run(){
             files = bean.getDropboxFiles(folderPath, recursive, userId);
+            System.out.println("Finished fetching Dropbox files");
         }
     }
 
@@ -67,6 +68,7 @@ public class ContentBean implements ContentBeanRemote {
         @Override
         public void run(){
             files = bean.getDriveFiles(folderPath, recursive, userId);
+            System.out.println("Finished fetching Drive files");
         }
     }
 
