@@ -1,7 +1,7 @@
 package commons;
 
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -23,14 +23,17 @@ public class CloudFile {
 
 
 
-    public static boolean checkFileType(String fileName,  ArrayList<String> requestedFileTypes){
+    public static boolean checkFileType(String fileName, List<String> requestedFileTypes){
 
+        if(fileName == null){
+            return false;
+        }
+        fileName = fileName.toLowerCase();
         boolean result = false;
 
         if(requestedFileTypes == null ){
             result = true;
-        }
-        else{
+        }else{
             String fileType = getExtension(fileName);
             if( requestedFileTypes.contains(fileType) ){
 
