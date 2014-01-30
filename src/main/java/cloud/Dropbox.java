@@ -122,12 +122,11 @@ public class Dropbox {
 
     /**
      * @param folderPath - in which folder look up
-     * @param recursion  - if true also include files from sub folders recusievly
      * @param requestedFileTypes  - if file type == NULL return all list, ex: folder, files, mp3, txt
      *
      * @return    array of file
      */
-    public List<String[]> getFileList(String folderPath, boolean recursion, List<String> requestedFileTypes) throws Exception {
+    public List<String[]> getFileList(String folderPath, List<String> requestedFileTypes) throws Exception {
 
         ArrayList<String[]> files = new ArrayList<String[]>();
 

@@ -28,14 +28,12 @@ public class ContentBean implements ContentBeanRemote {
 
         protected ContentBean bean;
         protected String folderPath;
-        protected Boolean recursive;
         protected Long userId;
         protected List<String[]> files;
 
-        public FileFetcher(ContentBean bean, String folderPath, Boolean recursive, Long userId){
+        public FileFetcher(ContentBean bean, String folderPath, Long userId){
             this.bean = bean;
             this.folderPath = folderPath;
-            this.recursive = recursive;
             this.userId = userId;
         }
 
@@ -48,34 +46,34 @@ public class ContentBean implements ContentBeanRemote {
 
     class DropboxFileFetcher extends FileFetcher implements Runnable{
 
-        public DropboxFileFetcher(ContentBean bean, String folderPath, Boolean recursive, Long userId) {
-            super(bean, folderPath, recursive, userId);
+        public DropboxFileFetcher(ContentBean bean, String folderPath, Long userId) {
+            super(bean, folderPath, userId);
         }
 
         @Override
         public void run(){
-            files = bean.getDropboxFiles(folderPath, recursive, userId);
+            files = bean.getDropboxFiles(folderPath, userId);
         }
     }
 
     class DriveFileFetcher extends FileFetcher implements Runnable{
 
-        public DriveFileFetcher(ContentBean bean, String folderPath, Boolean recursive, Long userId) {
-            super(bean, folderPath, recursive, userId);
+        public DriveFileFetcher(ContentBean bean, String folderPath, Long userId) {
+            super(bean, folderPath, userId);
         }
 
         @Override
         public void run(){
-            files = bean.getDriveFiles(folderPath, recursive, userId);
+            files = bean.getDriveFiles(folderPath, userId);
         }
     }
 
     private List<String> fileTypes = Arrays.asList("mp3", "wav", "ogg");
 
-    public List<String[]> getFiles(String folderPath, Boolean recursive, Long userId) {
+    public List<String[]> getFiles(String folderPath, Long userId) {
 
-        DropboxFileFetcher dropboxFetcher = new DropboxFileFetcher(this, folderPath, recursive, userId);
-        DriveFileFetcher driveFetcher = new DriveFileFetcher(this, folderPath, recursive, userId);
+        DropboxFileFetcher dropboxFetcher = new DropboxFileFetcher(this, folderPath, userId);
+        DriveFileFetcher driveFetcher = new DriveFileFetcher(this, folderPath, userId);
         Thread dropboxThread = new Thread(dropboxFetcher);
         Thread driveThread = new Thread(driveFetcher);
         dropboxThread.start();
@@ -98,7 +96,7 @@ public class ContentBean implements ContentBeanRemote {
         return files;
     }
 
-    public List<String[]> getDropboxFiles(String folderPath, Boolean recursive, Long userId) {
+    public List<String[]> getDropboxFiles(String folderPath, Long userId) {
         List<String[]> files = null;
         try {
             UserManager manager = new UserManager();
@@ -108,7 +106,7 @@ public class ContentBean implements ContentBeanRemote {
             String accessTokenSecret = user.getDropboxAccessSecret();
             if(accessTokenKey != null && accessTokenSecret != null){
                 Dropbox drop = new Dropbox(accessTokenKey, accessTokenSecret);
-                files = drop.getFileList(folderPath, recursive, fileTypes);
+                files = drop.getFileList(folderPath, fileTypes);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -116,7 +114,7 @@ public class ContentBean implements ContentBeanRemote {
         return files;
     }
 
-    public List<String[]> getDriveFiles(String folderPath, Boolean recursive, Long userId){
+    public List<String[]> getDriveFiles(String folderPath, Long userId){
         List<String[]> files = null;
         GDrive gDrive = null;
         UserEntity user = null;
@@ -128,13 +126,13 @@ public class ContentBean implements ContentBeanRemote {
             String driveRefreshToken = user.getDriveRefreshToken();
             if(driveAccessToken != null && driveRefreshToken != null){
                 gDrive = new GDrive(driveAccessToken, driveRefreshToken);
-                files = gDrive.getFileList(folderPath, recursive, fileTypes);
+                files = gDrive.getFileList(folderPath, fileTypes);
             }
         } catch (UnauthorizedAccessException e) {
             if("401".equals(e.getMessage())){
                 gDrive.setAccessToken(gDrive.refreshToken(gDrive.getRefreshToken()));
                 try {
-                    files = gDrive.getFileList(folderPath, recursive, fileTypes);
+                    files = gDrive.getFileList(folderPath, fileTypes);
                     user.setDriveAccessToken(gDrive.getAccessToken());
                     manager.updateUser(user);
                 } catch (Exception e1) {

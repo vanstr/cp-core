@@ -63,7 +63,7 @@ public class GDrive {
         return tokens;
     }
 
-    public List<String[]> getFileList(String folderPath, boolean recursive, List<String> fileTypes){
+    public List<String[]> getFileList(String folderPath, List<String> fileTypes){
         List<String[]> files = null;
         try {
             files = retrieveAllFiles(this.accessToken);

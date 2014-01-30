@@ -17,7 +17,7 @@ public interface ContentBeanRemote {
     public static final Integer DROPBOX_CLOUD_ID = 1;
     public static final Integer DRIVE_CLOUD_ID = 2;
 
-    public List<String[]> getFiles(String folderPath, Boolean recursive, Long userId);
+    public List<String[]> getFiles(String folderPath, Long userId);
 
     public String getFileSrc(Integer cloudId, String path, Long userId, String fileId);
 }
