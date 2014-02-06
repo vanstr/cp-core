@@ -143,7 +143,7 @@ public class DropboxTest {
         // unworked
         List<String[]> res5 = null;
         try {
-            res5 = dropUnAuth.getFileList("/", true, fileTypes);
+            res5 = dropUnAuth.getFileList("/", fileTypes);
         } catch (Exception e) {
             //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
@@ -152,7 +152,7 @@ public class DropboxTest {
         // 2.
         List<String[]> res = null;
         try {
-            res = dropAuth.getFileList("/", true, fileTypes);
+            res = dropAuth.getFileList("/", fileTypes);
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             fail("Exception");
