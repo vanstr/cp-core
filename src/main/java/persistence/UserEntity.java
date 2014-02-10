@@ -2,9 +2,9 @@ package persistence;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,7 +13,7 @@ import javax.persistence.Id;
  * Time: 16:24
  * To change this template use File | Settings | File Templates.
  */
-@javax.persistence.Table(name = "user", schema = "", catalog = "cloud_player")
+@Table(name = "user", schema = "", catalog = "cloud_player")
 @Entity
 @org.hibernate.annotations.Entity(
         dynamicUpdate = true
@@ -28,15 +28,24 @@ public class UserEntity {
     private String dropboxRequestSecret;
     private String driveAccessToken;
     private String driveRefreshToken;
+    private Set<SongEntity> songEntities = new HashSet<SongEntity>(0);
 
-    @javax.persistence.Column(name = "id")
-    @Id
+    @Id @Column(name = "id")
     public long getId() {
         return id;
     }
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    @OneToMany(mappedBy = "user")
+    public Set<SongEntity> getSongEntities() {
+        return this.songEntities;
+    }
+
+    public void setSongEntities(Set<SongEntity> songEntities) {
+        this.songEntities = songEntities;
     }
 
     @javax.persistence.Column(name = "login")

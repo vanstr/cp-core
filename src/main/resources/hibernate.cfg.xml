@@ -19,6 +19,7 @@
         <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
 
         <mapping class="persistence.UserEntity"/>
+        <mapping class="persistence.SongEntity"/>
 
     </session-factory>
 </hibernate-configuration>
