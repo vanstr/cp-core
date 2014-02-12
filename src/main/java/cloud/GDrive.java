@@ -86,6 +86,9 @@ public class GDrive {
         List<String[]> result = new ArrayList<String[]>();
         String url = "https://www.googleapis.com/drive/v2/files?oauth_token=" + accessToken;
         JSONObject object = HttpWorker.sendGetRequest(url);
+        if(object == null){
+            return result;
+        }
         JSONArray fileArray = object.getJSONArray("items");
         for(int i = 0; i < fileArray.length(); i++){
             if(!fileArray.getJSONObject(i).getJSONObject("labels").getBoolean("trashed")
