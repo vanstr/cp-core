@@ -1,5 +1,7 @@
 package persistence;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 
 
@@ -18,18 +20,21 @@ import javax.persistence.*;
 public class SongEntity {
 
     private long id;
-    private long userId;
+    //private long userId;
     private long cloudId;
     private String fileName;
-    private String fileSize;
+    private long fileSize;
     private String metadataTitle;
     private String metadataAuthor;
-    private int metadataLengthSeconds;
     private String metadataAlbum;
+    private int metadataLengthSeconds;
 
     private UserEntity user;
 
-    @Id @Column(name = "id")
+    @Id
+    @Column(name = "id")
+    @GenericGenerator(name="gen",strategy="increment")
+    @GeneratedValue(generator="gen")
     public long getId() {
         return id;
     }
@@ -38,7 +43,7 @@ public class SongEntity {
         this.id = id;
     }
 
-
+    /*
     @Column(name = "user_id")
     public long getUserId() {
         return userId;
@@ -47,6 +52,7 @@ public class SongEntity {
     public void setUserId(long user_id) {
         this.userId = user_id;
     }
+    */
 
     @Column(name = "cloud_id")
     public long getCloudId() {
@@ -67,11 +73,11 @@ public class SongEntity {
     }
 
     @Column(name = "file_size")
-    public String getFileSize() {
+    public long getFileSize() {
         return fileSize;
     }
 
-    public void setFileSize(String file_size) {
+    public void setFileSize(long file_size) {
         this.fileSize = file_size;
     }
 
