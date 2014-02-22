@@ -18,6 +18,8 @@
 
         <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
 
+        <property name="hibernate.current_session_context_class">org.hibernate.context.ThreadLocalSessionContext</property>
+
         <mapping class="persistence.UserEntity"/>
         <mapping class="persistence.SongEntity"/>
 

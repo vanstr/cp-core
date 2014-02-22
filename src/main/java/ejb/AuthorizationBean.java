@@ -4,7 +4,7 @@ import cloud.Dropbox;
 import cloud.GDrive;
 import commons.Tokens;
 import persistence.UserEntity;
-import persistence.UserManager;
+import persistence.manage.UserManager;
 
 import javax.ejb.Stateless;
 import java.util.HashMap;

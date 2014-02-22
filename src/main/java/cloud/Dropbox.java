@@ -2,7 +2,6 @@ package cloud;
 
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.DropboxAPI.Entry;
-import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.session.*;
 import commons.CloudFile;
 import commons.Initializator;
@@ -85,6 +84,7 @@ public class Dropbox {
      * @return Auth link
      */
     public String getAuthLink() {
+        logger.info("Dropbox auth link:" + authInfo.url);
         return authInfo.url;
     }
 

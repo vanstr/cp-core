@@ -4,7 +4,7 @@ import cloud.Dropbox;
 import cloud.GDrive;
 import com.sun.servicetag.UnauthorizedAccessException;
 import persistence.UserEntity;
-import persistence.UserManager;
+import persistence.manage.UserManager;
 
 import javax.ejb.Remote;
 import javax.ejb.Stateless;

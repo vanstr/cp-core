@@ -5,7 +5,7 @@ import commons.Tokens;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import persistence.UserEntity;
-import persistence.UserManager;
+import persistence.manage.UserManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +40,8 @@ public class DropboxTest {
             UserEntity user = manager.getUserById(1);
 
             dropAuth = new Dropbox(user.getDropboxAccessKey(), user.getDropboxAccessSecret());
+
+            manager.finalize();
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             fail("error in preparing");
@@ -169,5 +171,6 @@ public class DropboxTest {
         assertTrue("Music file not found", filePresents);
 
     }
+
 
 }

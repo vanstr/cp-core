@@ -3,6 +3,7 @@ package persistence;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 
 /**
@@ -22,6 +23,7 @@ public class SongEntity {
     private long id;
     //private long userId;
     private long cloudId;
+    private Timestamp lastTimeAccessed;
     private String fileName;
     private long fileSize;
     private String metadataTitle;
@@ -61,6 +63,15 @@ public class SongEntity {
 
     public void setCloudId(long cloud_id) {
         this.cloudId = cloud_id;
+    }
+
+    @Column(name = "last_time_accessed")
+    public Timestamp getLastTimeAccessed() {
+        return lastTimeAccessed;
+    }
+
+    public void setLastTimeAccessed(Timestamp lastAccess) {
+        this.lastTimeAccessed = lastAccess;
     }
 
     @Column(name = "file_name")
@@ -126,5 +137,12 @@ public class SongEntity {
     public void setUser(UserEntity user){
         this.user = user;
     }
+
+    @Override
+    public String toString() {
+        return this.cloudId + " " + this.fileName;
+    }
+
+
 
 }

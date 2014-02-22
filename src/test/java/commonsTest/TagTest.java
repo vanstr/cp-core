@@ -1,15 +1,24 @@
 package commonsTest;
 
 import cloud.Dropbox;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import persistence.SongEntity;
-import persistence.SongManager;
 import persistence.UserEntity;
-import persistence.UserManager;
+import persistence.manage.SongManager;
+import persistence.manage.UserManager;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,13 +27,20 @@ import static org.junit.Assert.fail;
  * Time: 20:12
  * To change this template use File | Settings | File Templates.
  */
+
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TagTest {
+
+    final static Logger logger = LoggerFactory.getLogger(TagTest.class);
+
 
     private static Dropbox dropUnAuth = null; // un authorized dropboz session
     private static Dropbox dropAuth = null; // authorized dropboz session
     private static UserManager userManager = null;
     private static UserEntity user  = null;
     private static SongManager songManger = null;
+
+    private static SongEntity song1 = null;
 
     @BeforeClass
     public static void method() {
@@ -34,7 +50,10 @@ public class TagTest {
             // ATTENTION user with 1 id should be JUnit user and with access keys
             userManager = new UserManager();
             songManger = new SongManager();
+
             user = userManager.getUserById(1);
+
+
 
             dropAuth = new Dropbox(user.getDropboxAccessKey(), user.getDropboxAccessSecret());
         } catch (Exception e) {
@@ -45,12 +64,11 @@ public class TagTest {
     }
 
     @Test
-    public void testSaveSongsInformation(){
-
-        SongEntity song1 = new SongEntity();
+    public void test1SaveSongs(){
+        song1 = new SongEntity();
         song1.setUser(user);
         song1.setCloudId(1);
-        song1.setFileName("BAraga.mp3");
+        song1.setFileName("Saga.mp3");
         song1.setFileSize(6666666);
         song1.setMetadataTitle("Basldlsa dasdas");
         assertTrue(songManger.addSong(song1));
@@ -58,17 +76,41 @@ public class TagTest {
     }
 
     @Test
-    public void testGetTagsForSongs(){
+    public void test2GetSongs(){
+
+        Map<String, Object> whereClause = new HashMap<String, Object>();
+        whereClause.put("id", song1.getId());
+        //whereClause.put("user", user);
+
+        List<SongEntity> list = songManger.getSongsByFields(whereClause);
+        assertNotNull(list);
 
     }
 
     @Test
-    public void testRemoveTags(){
+    public void test3RemoveSongs(){
+
+        List<Long> ids = new ArrayList<Long>();
+        ids.add(song1.getId());
+        boolean res = songManger.deleteSongsByID(ids);
+        assertTrue(res);
+
+
+        Map<String, Object> whereClause = new HashMap<String, Object>();
+        whereClause.put("id", song1.getId());
+        List<SongEntity> list = songManger.getSongsByFields(whereClause);
+        assertNull("Created song not removed",list);
 
     }
 
     @Test
     public void getTagsThatWasNotUsedTooLong(){
 
+    }
+
+    @AfterClass
+    public static void end() {
+        userManager.finalize();
+        songManger.finalize();
     }
 }

@@ -1,6 +1,6 @@
 package persistence;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -15,9 +15,6 @@ import java.util.Set;
  */
 @Table(name = "user", schema = "", catalog = "cloud_player")
 @Entity
-@org.hibernate.annotations.Entity(
-        dynamicUpdate = true
-)
 public class UserEntity {
     private long id;
     private String login;
@@ -30,7 +27,10 @@ public class UserEntity {
     private String driveRefreshToken;
     private Set<SongEntity> songEntities = new HashSet<SongEntity>(0);
 
-    @Id @Column(name = "id")
+    @Id
+    @Column(name = "id")
+    @GenericGenerator(name="gen",strategy="increment")
+    @GeneratedValue(generator="gen")
     public long getId() {
         return id;
     }
@@ -131,7 +131,8 @@ public class UserEntity {
     @Override
     public String toString(){
 
-        return ToStringBuilder.reflectionToString(this);
+        return "" + this.getLogin();
 
     }
+
 }

@@ -1,10 +1,6 @@
-package persistence;
+package persistence.manage;
 
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import persistence.UserEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -16,31 +12,39 @@ import java.util.Map;
  * Time: 18:26
  * User table manager
  */
-public class UserManager {
+public class UserManager extends EntityManager<UserEntity> {
 
-    final static Logger logger = LoggerFactory.getLogger(UserManager.class);
-
-    private Session session = null;
-
-    public UserManager() {
-        session = HibernateUtil.getSessionFactory().openSession();
-    }
-
-    public Session getSession() {
-        return session;
-    }
+    public static final String table =  "UserEntity";
 
     public void finalize(){
-        session.close();
+        super.finalize();
+    }
+
+    public boolean updateUser(final UserEntity user) {
+        return updateEntity(user);
+    }
+
+
+    public List<UserEntity> getUsersByFields(Map<String, Object> fields) {
+        return getEntitiesByFields(fields, table);
+    }
+
+    public boolean addUser(final UserEntity user) {
+        return addEntity(user);
+    }
+
+
+    public boolean deleteUsersByIDs(final List<Long> ids) {
+        return deleteEntityByIDs(ids, table);
     }
 
     public UserEntity getUserById(long id) {
-
-        UserEntity user = (UserEntity) session.load(UserEntity.class, id);
-
-        return user;
+        return getEntityById(UserEntity.class, id);
     }
 
+
+
+    /*
     public boolean addUser(UserEntity user) {
 
         boolean res = false;
@@ -115,6 +119,7 @@ public class UserManager {
         return list;
     }
 
+
     public List<UserEntity> getUsersByField(String fieldName, Object fieldValue){
         String queryString = "from UserEntity where " + fieldName + "=?";
         Query query = session.createQuery(queryString);
@@ -122,4 +127,5 @@ public class UserManager {
         List<UserEntity> list = query.list();
         return list;
     }
+    */
 }
