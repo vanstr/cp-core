@@ -5,7 +5,7 @@ import commons.Tokens;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import persistence.UserEntity;
-import persistence.manage.UserManager;
+import persistence.utility.UserManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -165,7 +165,7 @@ public class DropboxTest {
 
         int resSize = res.size();
         for (int i = 0; i < resSize; i++) {
-            System.out.println(res.get(i));
+            System.out.println(res.get(i)[1]);
             if (correctMusicFile.equals(res.get(i)[1])) filePresents = true;
         }
         assertTrue("Music file not found", filePresents);

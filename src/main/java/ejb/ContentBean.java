@@ -1,15 +1,15 @@
 package ejb;
 
+import cloud.DriveFileFetcher;
 import cloud.Dropbox;
+import cloud.DropboxFileFetcher;
 import cloud.GDrive;
-import com.sun.servicetag.UnauthorizedAccessException;
 import persistence.UserEntity;
-import persistence.manage.UserManager;
+import persistence.utility.UserManager;
 
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -24,56 +24,11 @@ import java.util.List;
 @Remote(ContentBeanRemote.class)
 public class ContentBean implements ContentBeanRemote {
 
-    class FileFetcher implements Runnable{
-
-        protected ContentBean bean;
-        protected String folderPath;
-        protected Long userId;
-        protected List<String[]> files;
-
-        public FileFetcher(ContentBean bean, String folderPath, Long userId){
-            this.bean = bean;
-            this.folderPath = folderPath;
-            this.userId = userId;
-        }
-
-        public void run(){}
-
-        public List<String[]> getFiles() {
-            return files;
-        }
-    }
-
-    class DropboxFileFetcher extends FileFetcher implements Runnable{
-
-        public DropboxFileFetcher(ContentBean bean, String folderPath, Long userId) {
-            super(bean, folderPath, userId);
-        }
-
-        @Override
-        public void run(){
-            files = bean.getDropboxFiles(folderPath, userId);
-        }
-    }
-
-    class DriveFileFetcher extends FileFetcher implements Runnable{
-
-        public DriveFileFetcher(ContentBean bean, String folderPath, Long userId) {
-            super(bean, folderPath, userId);
-        }
-
-        @Override
-        public void run(){
-            files = bean.getDriveFiles(folderPath, userId);
-        }
-    }
-
-    private List<String> fileTypes = Arrays.asList("mp3", "wav", "ogg");
 
     public List<String[]> getFiles(String folderPath, Long userId) {
 
-        DropboxFileFetcher dropboxFetcher = new DropboxFileFetcher(this, folderPath, userId);
-        DriveFileFetcher driveFetcher = new DriveFileFetcher(this, folderPath, userId);
+        DropboxFileFetcher dropboxFetcher = new DropboxFileFetcher(folderPath, userId);
+        DriveFileFetcher driveFetcher = new DriveFileFetcher(folderPath, userId);
         Thread dropboxThread = new Thread(dropboxFetcher);
         Thread driveThread = new Thread(driveFetcher);
         dropboxThread.start();
@@ -86,68 +41,16 @@ public class ContentBean implements ContentBeanRemote {
         }
 
         List<String[]> files = new ArrayList<String[]>();
-        if(dropboxFetcher.getFiles() != null){
+        if (dropboxFetcher.getFiles() != null) {
             files.addAll(dropboxFetcher.getFiles());
         }
-        if(driveFetcher.getFiles() != null){
+        if (driveFetcher.getFiles() != null) {
             files.addAll(driveFetcher.getFiles());
         }
 
         return files;
     }
 
-    public List<String[]> getDropboxFiles(String folderPath, Long userId) {
-        List<String[]> files = null;
-        try {
-            UserManager manager = new UserManager();
-            UserEntity user = manager.getUserById(userId);
-
-            String accessTokenKey = user.getDropboxAccessKey();
-            String accessTokenSecret = user.getDropboxAccessSecret();
-            if(accessTokenKey != null && accessTokenSecret != null){
-                Dropbox drop = new Dropbox(accessTokenKey, accessTokenSecret);
-                files = drop.getFileList(folderPath, fileTypes);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return files;
-    }
-
-    public List<String[]> getDriveFiles(String folderPath, Long userId){
-        List<String[]> files = null;
-        GDrive gDrive = null;
-        UserEntity user = null;
-        UserManager manager = null;
-        try{
-            manager = new UserManager();
-            user = manager.getUserById(userId);
-            String driveAccessToken = user.getDriveAccessToken();
-            String driveRefreshToken = user.getDriveRefreshToken();
-            if(driveAccessToken != null && driveRefreshToken != null){
-                gDrive = new GDrive(driveAccessToken, driveRefreshToken);
-                files = gDrive.getFileList(folderPath, fileTypes);
-            }
-        } catch (UnauthorizedAccessException e) {
-            if("401".equals(e.getMessage())){
-                gDrive.setAccessToken(gDrive.refreshToken(gDrive.getRefreshToken()));
-                try {
-                    files = gDrive.getFileList(folderPath, fileTypes);
-                    user.setDriveAccessToken(gDrive.getAccessToken());
-                    manager.updateUser(user);
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        } finally {
-            if(manager != null){
-                manager.finalize();
-            }
-        }
-        return files;
-    }
 
     public String getFileSrc(Integer cloudId, String path, Long userId, String driveFileId) {
         String file = null;
@@ -160,7 +63,7 @@ public class ContentBean implements ContentBeanRemote {
 
                 Dropbox drop = new Dropbox(accessTokenKey, accessTokenSecret);
                 file = drop.getFileLink(path);
-            }else if(DRIVE_CLOUD_ID.equals(cloudId)){
+            } else if (DRIVE_CLOUD_ID.equals(cloudId)) {
                 GDrive gDrive = new GDrive(user.getDriveAccessToken(), user.getDriveRefreshToken());
                 file = gDrive.getFileLink(driveFileId);
             }
@@ -168,6 +71,7 @@ public class ContentBean implements ContentBeanRemote {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        manager.finalize();
 
         return file;
 

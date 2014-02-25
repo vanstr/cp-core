@@ -10,8 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.SongEntity;
 import persistence.UserEntity;
-import persistence.manage.SongManager;
-import persistence.manage.UserManager;
+import persistence.utility.SongManager;
+import persistence.utility.UserManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,9 +29,9 @@ import static org.junit.Assert.*;
  */
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TagTest {
+public class SongTest {
 
-    final static Logger logger = LoggerFactory.getLogger(TagTest.class);
+    final static Logger logger = LoggerFactory.getLogger(SongTest.class);
 
 
     private static Dropbox dropUnAuth = null; // un authorized dropboz session

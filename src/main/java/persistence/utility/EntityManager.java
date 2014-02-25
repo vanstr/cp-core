@@ -1,7 +1,8 @@
-package persistence.manage;
+package persistence.utility;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.stat.Statistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.HibernateUtil;
@@ -19,34 +20,35 @@ import java.util.Map;
 public abstract class EntityManager<T> {
 
     final static Logger logger = LoggerFactory.getLogger(EntityManager.class);
+    public static Statistics statistic = HibernateUtil.getSessionFactory().getStatistics();
 
+    private TransactionWrapper transactionWrapper = new TransactionWrapper();
     private Session session;
 
-    private static int openedSession = 0;
-    private static int closedSession = 0;
+    public EntityManager() {
+        statistic.setStatisticsEnabled(true);
 
-    public static String getSessionStatistic() {
-        //HibernateUtil.getSessionFactory().getStatistics().
-        return "Sessions - opened:" + openedSession + " closed:" + closedSession;
+        getSession();
     }
 
-    TransactionWrapper transactionWrapper = new TransactionWrapper();
+    public static String getSessionStatistic() {
+        return "Session opened:" + statistic.getSessionOpenCount() + " Session closed:" + statistic.getSessionCloseCount();
+    }
 
     public void getSession() {
 
         if (session == null) {
-            openedSession++;
-            logger.info("Create new session");
+            logger.info("Session created");
             session = HibernateUtil.getSessionFactory().openSession();
-        }else{
-            logger.info("Sesion not created");
+        } else {
+            logger.info("Session restored");
         }
     }
 
     public void closeSession(Session session) {
         if (session != null) {
-            closedSession++;
             session.close();
+            session = null;
         }
     }
 
@@ -55,7 +57,6 @@ public abstract class EntityManager<T> {
     }
 
     public T getEntityById(Class<T> EntityClass, long id) {
-        getSession();
 
         T entity = (T) session.load(EntityClass, id);
 
@@ -74,7 +75,6 @@ public abstract class EntityManager<T> {
                 andSeparator = " AND ";
             }
 
-            getSession();
             Query query = session.createQuery(queryString);
             query.setProperties(fields);
             list = query.list();
@@ -89,7 +89,6 @@ public abstract class EntityManager<T> {
     }
 
     public boolean deleteEntityByIDs(final List<Long> ids, final String table) {
-        getSession();
 
         return transactionWrapper.run(session, new AbstractExecutor() {
             @Override
@@ -114,7 +113,6 @@ public abstract class EntityManager<T> {
 
 
     public boolean updateEntity(final T entity) {
-        getSession();
 
         return transactionWrapper.run(session, new AbstractExecutor() {
             @Override
@@ -125,7 +123,6 @@ public abstract class EntityManager<T> {
     }
 
     public boolean addEntity(final T entity) {
-        getSession();
 
         return transactionWrapper.run(session, new AbstractExecutor() {
             @Override

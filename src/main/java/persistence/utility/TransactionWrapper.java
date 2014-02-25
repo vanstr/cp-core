@@ -1,4 +1,4 @@
-package persistence.manage;
+package persistence.utility;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -19,11 +19,9 @@ public class TransactionWrapper {
     public boolean run(Session session, AbstractExecutor executor) {
 
         Transaction tx = null;
-
-        boolean res = false;
+        Boolean res = false;
 
         try {
-
             tx = session.beginTransaction();
             tx.setTimeout(5);
 
@@ -31,7 +29,6 @@ public class TransactionWrapper {
 
             tx.commit();
             res = true;
-
         } catch (RuntimeException e) {
             e.printStackTrace();
 

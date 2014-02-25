@@ -4,7 +4,7 @@ import cloud.Dropbox;
 import cloud.GDrive;
 import commons.Tokens;
 import persistence.UserEntity;
-import persistence.manage.UserManager;
+import persistence.utility.UserManager;
 
 import javax.ejb.Stateless;
 import java.util.HashMap;
@@ -26,48 +26,45 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
 
     @Override
     public Long login(String login, String password) {
-        UserManager userManager = new UserManager();
+        Long result = null;
+        UserManager manager = new UserManager();
         Map<String, Object> fieldMap = new HashMap<String, Object>();
         fieldMap.put("login", login);
         fieldMap.put("password", password);
-        List<UserEntity> list = userManager.getUsersByFields(fieldMap);
-        if(list == null || list.size() < 1){
-            return null;
+        List<UserEntity> list = manager.getUsersByFields(fieldMap);
+        if (list != null && list.size() > 0 ) {
+            result = list.get(0).getId();
         }
-        userManager.finalize();
-        return list.get(0).getId();
+        manager.finalize();
+        return result;
     }
 
     @Override
     public Boolean registerUser(String login, String password) {
-        UserManager userManager = null;
-        try{
-            userManager = new UserManager();
+        boolean result = false;
+        UserManager manager = new UserManager();
+        try {
             UserEntity newUser = new UserEntity();
             newUser.setLogin(login);
             newUser.setPassword(password);
-            userManager.addUser(newUser);
-        }catch (Exception e){
+            result = manager.addUser(newUser);
+        } catch (Exception e) {
             e.printStackTrace();
-            return false;
-        }finally {
-            if(userManager != null){
-                userManager.finalize();
-            }
+        } finally {
+            manager.finalize();
+            return result;
         }
-        return true;
     }
 
     /**
-     *
      * @param userId
-     * @return
-     *      String - link, where user should provide access to his account for this application
-     *      null - error
+     * @return String - link, where user should provide access to his account for this application
+     *         null - error
      */
     @Override
     public String getDropboxAuthLink(Long userId) {
         String link = null;
+        UserManager manager = new UserManager();
 
         try {
             Dropbox drop = new Dropbox();
@@ -75,12 +72,10 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
             Tokens requestTokens = drop.getRequestTokens();
 
             // save requestTokens to DB
-            UserManager manager = new UserManager();
             UserEntity user = manager.getUserById(userId);
             user.setDropboxRequestKey(requestTokens.key);
             user.setDropboxRequestSecret(requestTokens.secret);
             boolean res = manager.updateUser(user);
-            manager.finalize();
 
             // tokens was not saved
             if (res == false) throw new Exception(EXCEPTION_DB_EXECUTION_ERROR);
@@ -89,30 +84,28 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
 
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
+            manager.finalize();
             return link;
         }
 
     }
 
     /**
-     *
      * @param userId
-     * @return
-     *      true - user has provided access to app and access tokens saved.
-     *      false - error occurred
+     * @return true - user has provided access to app and access tokens saved.
+     *         false - error occurred
      */
     @Override
     public Boolean retrieveDropboxAccessToken(Long userId) {
-        boolean res = false;
+        boolean result = false;
+        UserManager manager = new UserManager();
 
         try {
             // Work with dropbox service, start session
             Dropbox drop = new Dropbox();
 
             // get requestTokens from db
-            UserManager manager = new UserManager();
             UserEntity user = manager.getUserById(userId);
             Tokens requestTokens = new Tokens(user.getDropboxRequestKey(), user.getDropboxRequestSecret());
 
@@ -122,14 +115,13 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
             // save accessTokens to DB
             user.setDropboxAccessKey(accessTokens.key);
             user.setDropboxAccessSecret(accessTokens.secret);
-            res = manager.updateUser(user);
-            manager.finalize();
+            result = manager.updateUser(user);
 
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        finally {
-            return res;
+        } finally {
+            manager.finalize();
+            return result;
         }
 
     }
@@ -137,70 +129,65 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
     @Override
     public Boolean retrieveGDriveCredentials(Long userId, String code) {
         Boolean result = false;
+        UserManager manager = new UserManager();
 
         try {
-            GDrive gDrive = new GDrive(null, null);
-
-            UserManager manager = new UserManager();
             UserEntity user = manager.getUserById(userId);
+            if (user != null) {
+                GDrive gDrive = new GDrive(null, null);
+                // retrive AccessToken
+                Map<String, String> credentials = gDrive.retrieveAccessToken(code);
+                String accessToken = credentials.get("access_token");
+                String refreshToken = credentials.get("refresh_token");
 
-            if(user == null){
-                return false;
+                // save accessTokens to DB
+                user.setDriveAccessToken(accessToken);
+                user.setDriveRefreshToken(refreshToken);
+                result = manager.updateUser(user);
             }
-            // retrive AccessToken
-            Map<String, String> credentials = gDrive.retrieveAccessToken(code);
-            String accessToken = credentials.get("access_token");
-            String refreshToken = credentials.get("refresh_token");
-
-            // save accessTokens to DB
-            user.setDriveAccessToken(accessToken);
-            user.setDriveRefreshToken(refreshToken);
-            result = manager.updateUser(user);
-            manager.finalize();
-
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            manager.finalize();
+            return result;
         }
-        return result;
     }
 
     @Override
     public Boolean removeDropboxAcoount(Long userId) {
         Boolean result = false;
-        try{
-            UserManager manager = new UserManager();
+        UserManager manager = new UserManager();
+        try {
             UserEntity user = manager.getUserById(userId);
-            if(user == null){
-                return false;
+            if (user != null) {
+                user.setDropboxAccessKey(null);
+                user.setDropboxAccessSecret(null);
+                result = manager.updateUser(user);
             }
-
-            user.setDropboxAccessKey(null);
-            user.setDropboxAccessSecret(null);
-            result = manager.updateUser(user);
-            manager.finalize();
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            manager.finalize();
+            return result;
         }
-        return result;
     }
 
     @Override
     public Boolean removeGDriveAccount(Long userId) {
         Boolean result = false;
-        try{
-            UserManager manager = new UserManager();
+        UserManager manager = new UserManager();
+        try {
             UserEntity user = manager.getUserById(userId);
-            if(user == null){
-                return false;
+            if (user != null) {
+                user.setDriveAccessToken(null);
+                user.setDriveRefreshToken(null);
+                result = manager.updateUser(user);
             }
-
-            user.setDriveAccessToken(null);
-            user.setDriveRefreshToken(null);
-            result = manager.updateUser(user);
-            manager.finalize();
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            manager.finalize();
+            return result;
         }
-        return result;
     }
 }

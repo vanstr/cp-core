@@ -1,4 +1,4 @@
-package persistence.manage;
+package persistence.utility;
 
 import persistence.SongEntity;
 
@@ -14,26 +14,21 @@ import java.util.Map;
  */
 public class SongManager extends EntityManager<SongEntity> {
 
-    public static final String table =  "SongEntity";
+    public static final String table = "SongEntity";
 
 
     public SongEntity getSongById(long id) {
-
         return getEntityById(SongEntity.class, id);
     }
 
 
     public boolean updateSong(final SongEntity song) {
         return updateEntity(song);
-
     }
 
 
-
     public List<SongEntity> getSongsByFields(Map<String, Object> fields) {
-
         return getEntitiesByFields(fields, table);
-
     }
 
     public boolean addSong(SongEntity song) {

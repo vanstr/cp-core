@@ -130,9 +130,7 @@ public class UserEntity {
 
     @Override
     public String toString(){
-
-        return "" + this.getLogin();
-
+        return "User login:" + this.getLogin();
     }
 
 }

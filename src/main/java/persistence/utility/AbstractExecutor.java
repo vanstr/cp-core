@@ -1,4 +1,4 @@
-package persistence.manage;
+package persistence.utility;
 
 /**
  * Created with IntelliJ IDEA.

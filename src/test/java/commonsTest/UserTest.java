@@ -9,7 +9,7 @@ import org.junit.runners.MethodSorters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.UserEntity;
-import persistence.manage.UserManager;
+import persistence.utility.UserManager;
 
 import static org.junit.Assert.fail;
 
@@ -23,7 +23,7 @@ import static org.junit.Assert.fail;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UserTest {
 
-    final static Logger logger = LoggerFactory.getLogger(TagTest.class);
+    final static Logger logger = LoggerFactory.getLogger(SongTest.class);
 
 
     private static Dropbox dropUnAuth = null; // un authorized dropboz session
