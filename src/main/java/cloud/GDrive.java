@@ -1,6 +1,5 @@
 package cloud;
 
-import com.google.api.services.drive.DriveScopes;
 import commons.CloudFile;
 import commons.HttpWorker;
 import commons.Initializator;
