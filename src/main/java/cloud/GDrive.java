@@ -55,11 +55,12 @@ public class GDrive {
         params.put("client_secret", CLIENT_SECRET);
         params.put("grant_type", GRANT_TYPE_AUTHORIZATION);
         params.put("redirect_uri", REDIRECT_URI);
-        params.put("scope", DriveScopes.DRIVE);
+        params.put("scope", "https://www.googleapis.com/auth/userinfo.email+https://www.googleapis.com/auth/drive");
         JSONObject object = HttpWorker.sendPostRequest("https://accounts.google.com/o/oauth2/token", params);
         Map<String, String> tokens = new HashMap<String, String>();
         tokens.put("access_token", object.getString("access_token"));
         tokens.put("refresh_token", object.getString("refresh_token"));
+        System.out.println(tokens + "TOKENS");
         return tokens;
     }
 

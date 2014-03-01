@@ -2,9 +2,7 @@ package persistence;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -28,9 +26,11 @@ public class UserEntity {
     private String dropboxRequestSecret;
     private String driveAccessToken;
     private String driveRefreshToken;
+    private String googleEmail;
 
-    @javax.persistence.Column(name = "id")
     @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @javax.persistence.Column(name = "id")
     public long getId() {
         return id;
     }
@@ -117,6 +117,15 @@ public class UserEntity {
 
     public void setDriveRefreshToken(String driveRefreshToken) {
         this.driveRefreshToken = driveRefreshToken;
+    }
+
+    @javax.persistence.Column(name = "google_email")
+    public String getGoogleEmail() {
+        return googleEmail;
+    }
+
+    public void setGoogleEmail(String googleEmail) {
+        this.googleEmail = googleEmail;
     }
 
     @Override

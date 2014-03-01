@@ -26,4 +26,6 @@ public interface AuthorizationBeanRemote {
     public Boolean removeDropboxAcoount(Long userId);
 
     public Boolean removeGDriveAccount(Long userId);
+
+    public Long authorizeWithDrive(String code);
 }

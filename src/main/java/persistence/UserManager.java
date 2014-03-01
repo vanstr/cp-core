@@ -41,30 +41,27 @@ public class UserManager {
         return user;
     }
 
-    public boolean addUser(UserEntity user) {
+    public Long addUser(UserEntity user) {
 
-        boolean res = false;
-
-        Transaction ta = null;
+        Long userId;
         try {
-            ta = session.beginTransaction();
+            session.beginTransaction();
             session.save(user);
-            ta.commit();
-            res = true;
+            session.getTransaction().commit();
+            userId = user.getId();
         } catch (RuntimeException e) {
             try {
                 logger.error("Couldn’t commit");
-                ta.rollback();
+                session.getTransaction().rollback();
             } catch (Exception re) {
                 logger.error("Couldn’t roll back transaction");
             }
             finally {
-                res = false;
+                userId = null;
             }
         }
-        finally {
-            return res;
-        }
+
+        return userId;
 
     }
 

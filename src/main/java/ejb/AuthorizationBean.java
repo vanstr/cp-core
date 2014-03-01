@@ -2,7 +2,10 @@ package ejb;
 
 import cloud.Dropbox;
 import cloud.GDrive;
+import commons.HttpWorker;
 import commons.Tokens;
+import org.codehaus.jackson.map.util.JSONPObject;
+import org.json.JSONObject;
 import persistence.UserEntity;
 import persistence.UserManager;
 
@@ -202,5 +205,32 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
             e.printStackTrace();
         }
         return result;
+    }
+
+    @Override
+    public Long authorizeWithDrive(String code) {
+        Long userId = null;
+        GDrive gDrive = new GDrive(null, null);
+        Map<String, String> tokens = gDrive.retrieveAccessToken(code);
+        UserManager userManager = new UserManager();
+        JSONObject object = HttpWorker.sendGetRequest("https://www.googleapis.com/userinfo/email?alt=json&oauth_token="
+                + tokens.get("access_token"));
+        String email = object.getJSONObject("data").get("email").toString();
+        List<UserEntity> userList = userManager.getUsersByField("google_email", email);
+        if(userList == null || userList.size() == 0){
+            UserEntity user = new UserEntity();
+            user.setDriveAccessToken(tokens.get("access_token"));
+            user.setDriveRefreshToken(tokens.get("refresh_token"));
+            user.setGoogleEmail(email);
+            userId = userManager.addUser(user);
+        }else{
+            UserEntity user = userList.get(0);
+            user.setDriveAccessToken(tokens.get("access_token"));
+            user.setDriveRefreshToken(tokens.get("refresh_token"));
+            userId = user.getId();
+            userManager.updateUser(user);
+        }
+        userManager.finalize();
+        return userId;
     }
 }
