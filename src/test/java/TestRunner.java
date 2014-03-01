@@ -1,14 +1,21 @@
 import cloudTest.DropboxTest;
-import commonsTest.SongTest;
-import commonsTest.UserTest;
+import commons.SongMetadataPopulationTest;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
-import persistence.utility.EntityManager;
+import persistenceTest.SongTest;
+import persistenceTest.UserTest;
 
 public class TestRunner {
     public static void main(String[] args) {
 
+
+
+
+        Result result1 = JUnitCore.runClasses(SongMetadataPopulationTest.class);
+        for (Failure failure : result1.getFailures()) {
+            System.out.println(failure.toString());
+        }
 
         Result result = JUnitCore.runClasses(UserTest.class);
         for (Failure failure : result.getFailures()) {
@@ -29,6 +36,6 @@ public class TestRunner {
         }
         // */
 
-        System.out.println(EntityManager.getSessionStatistic());
+        //System.out.println(EntityManager.getSessionStatistic());
     }
 } 

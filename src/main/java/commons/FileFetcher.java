@@ -1,4 +1,4 @@
-package cloud;
+package commons;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 //TODO: refactor
-public class FileFetcher implements Runnable{
+public abstract class FileFetcher implements Runnable{
 
     public final static List<String> REQUIRED_FILE_TYPES = Arrays.asList("mp3", "wav", "ogg");
 
@@ -24,9 +24,14 @@ public class FileFetcher implements Runnable{
         this.userId = userId;
     }
 
-    public void run(){}
-
     public List<String[]> getFiles() {
         return files;
     }
+
+    @Override
+    public void run(){
+        files = getCloudFiles(folderPath, userId);
+    }
+
+    public abstract List<String[]> getCloudFiles(String folderPath, Long userId);
 }

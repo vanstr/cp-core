@@ -1,4 +1,4 @@
-package commonsTest;
+package persistenceTest;
 
 import cloud.Dropbox;
 import org.junit.AfterClass;

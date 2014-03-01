@@ -1,5 +1,6 @@
 package cloud;
 
+import commons.FileFetcher;
 import persistence.UserEntity;
 import persistence.utility.UserManager;
 
@@ -12,20 +13,13 @@ import java.util.List;
  * Time: 19:23
  * To change this template use File | Settings | File Templates.
  */
-
-// TODO: move out from ContentBean -> to Cloud
-public class DropboxFileFetcher extends FileFetcher implements Runnable {
+public class DropboxFileFetcher extends FileFetcher {
 
     public DropboxFileFetcher(String folderPath, Long userId) {
         super(folderPath, userId);
     }
 
-    @Override
-    public void run() {
-        files = getDropboxFiles(folderPath, userId);
-    }
-
-    public List<String[]> getDropboxFiles(String folderPath, Long userId) {
+    public List<String[]> getCloudFiles(String folderPath, Long userId) {
         List<String[]> files = null;
         try {
             UserManager manager = new UserManager();

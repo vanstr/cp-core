@@ -82,29 +82,6 @@ public class GDrive {
         return files;
     }
 
-    public List<String[]> retrieveAllFiles(String accessToken) throws IOException {
-        List<String[]> result = new ArrayList<String[]>();
-        String url = "https://www.googleapis.com/drive/v2/files?oauth_token=" + accessToken;
-        JSONObject object = HttpWorker.sendGetRequest(url);
-        JSONArray fileArray = object.getJSONArray("items");
-        for(int i = 0; i < fileArray.length(); i++){
-            if(!fileArray.getJSONObject(i).getJSONObject("labels").getBoolean("trashed")
-                    && !"application/vnd.google-apps.folder".equals(fileArray.getJSONObject(i).getString("mimeType"))
-                    && fileArray.getJSONObject(i).has("title")
-                    && fileArray.getJSONObject(i).has("downloadUrl")){
-
-                String[] track = new String[]{
-                    ContentBeanRemote.DRIVE_CLOUD_ID.toString(),
-                    fileArray.getJSONObject(i).getString("title"),
-                    fileArray.getJSONObject(i).getString("downloadUrl") + "&oauth_token=" + this.accessToken,
-                    fileArray.getJSONObject(i).getString("id")
-                };
-                result.add(track);
-            }
-        }
-        return result;
-    }
-
     public String refreshToken(String refreshToken){
         String accessToken = null;
         try {
@@ -127,4 +104,28 @@ public class GDrive {
         String fileSrc = object.getString("downloadUrl") + "&oauth_token=" + this.accessToken;
         return fileSrc;
     }
+
+    private List<String[]> retrieveAllFiles(String accessToken) throws IOException {
+        List<String[]> result = new ArrayList<String[]>();
+        String url = "https://www.googleapis.com/drive/v2/files?oauth_token=" + accessToken;
+        JSONObject object = HttpWorker.sendGetRequest(url);
+        JSONArray fileArray = object.getJSONArray("items");
+        for(int i = 0; i < fileArray.length(); i++){
+            if(!fileArray.getJSONObject(i).getJSONObject("labels").getBoolean("trashed")
+                    && !"application/vnd.google-apps.folder".equals(fileArray.getJSONObject(i).getString("mimeType"))
+                    && fileArray.getJSONObject(i).has("title")
+                    && fileArray.getJSONObject(i).has("downloadUrl")){
+
+                String[] track = new String[]{
+                        ContentBeanRemote.DRIVE_CLOUD_ID.toString(),
+                        fileArray.getJSONObject(i).getString("title"),
+                        fileArray.getJSONObject(i).getString("downloadUrl") + "&oauth_token=" + this.accessToken,
+                        fileArray.getJSONObject(i).getString("id")
+                };
+                result.add(track);
+            }
+        }
+        return result;
+    }
+
 }

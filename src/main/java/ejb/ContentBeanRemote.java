@@ -1,5 +1,7 @@
 package ejb;
 
+import structure.PlayList;
+
 import javax.ejb.Remote;
 import java.util.List;
 
@@ -20,4 +22,6 @@ public interface ContentBeanRemote {
     public List<String[]> getFiles(String folderPath, Long userId);
 
     public String getFileSrc(Integer cloudId, String path, Long userId, String fileId);
+
+    public PlayList getPlayList(Long userId);
 }

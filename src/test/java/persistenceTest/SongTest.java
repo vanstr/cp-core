@@ -1,4 +1,4 @@
-package commonsTest;
+package persistenceTest;
 
 import cloud.Dropbox;
 import org.junit.AfterClass;
@@ -81,14 +81,13 @@ public class SongTest {
         Map<String, Object> whereClause = new HashMap<String, Object>();
         whereClause.put("id", song1.getId());
         //whereClause.put("user", user);
-
         List<SongEntity> list = songManger.getSongsByFields(whereClause);
+        logger.info("list: " + list);
         assertNotNull(list);
-
     }
 
     @Test
-    public void test3RemoveSongs(){
+    public void test3RemoveSongsById(){
 
         List<Long> ids = new ArrayList<Long>();
         ids.add(song1.getId());
@@ -103,10 +102,6 @@ public class SongTest {
 
     }
 
-    @Test
-    public void getTagsThatWasNotUsedTooLong(){
-
-    }
 
     @AfterClass
     public static void end() {

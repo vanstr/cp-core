@@ -28,20 +28,20 @@ public abstract class EntityManager<T> {
     public EntityManager() {
         statistic.setStatisticsEnabled(true);
 
-        getSession();
+        startSession();
     }
 
     public static String getSessionStatistic() {
         return "Session opened:" + statistic.getSessionOpenCount() + " Session closed:" + statistic.getSessionCloseCount();
     }
 
-    public void getSession() {
+    public void startSession() {
 
         if (session == null) {
-            logger.info("Session created");
+            logger.debug("Session created");
             session = HibernateUtil.getSessionFactory().openSession();
         } else {
-            logger.info("Session restored");
+            logger.debug("Session restored");
         }
     }
 

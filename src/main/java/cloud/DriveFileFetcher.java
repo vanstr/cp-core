@@ -1,6 +1,7 @@
 package cloud;
 
 import com.sun.servicetag.UnauthorizedAccessException;
+import commons.FileFetcher;
 import persistence.UserEntity;
 import persistence.utility.UserManager;
 
@@ -13,20 +14,13 @@ import java.util.List;
  * Time: 19:23
  * To change this template use File | Settings | File Templates.
  */
-
-public class DriveFileFetcher extends FileFetcher implements Runnable{
+public class DriveFileFetcher extends FileFetcher{
 
     public DriveFileFetcher(String folderPath, Long userId) {
         super(folderPath, userId);
     }
 
-    @Override
-    public void run(){
-        files = getDriveFiles(folderPath, userId);
-    }
-
-
-    public List<String[]> getDriveFiles(String folderPath, Long userId){
+    public List<String[]> getCloudFiles(String folderPath, Long userId){
         List<String[]> files = null;
         GDrive gDrive = null;
 

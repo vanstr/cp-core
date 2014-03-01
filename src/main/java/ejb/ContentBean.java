@@ -4,8 +4,11 @@ import cloud.DriveFileFetcher;
 import cloud.Dropbox;
 import cloud.DropboxFileFetcher;
 import cloud.GDrive;
+import commons.FileFetcher;
+import commons.SongMetadataPopulation;
 import persistence.UserEntity;
 import persistence.utility.UserManager;
+import structure.PlayList;
 
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
@@ -27,8 +30,8 @@ public class ContentBean implements ContentBeanRemote {
 
     public List<String[]> getFiles(String folderPath, Long userId) {
 
-        DropboxFileFetcher dropboxFetcher = new DropboxFileFetcher(folderPath, userId);
-        DriveFileFetcher driveFetcher = new DriveFileFetcher(folderPath, userId);
+        FileFetcher dropboxFetcher = new DropboxFileFetcher(folderPath, userId);
+        FileFetcher driveFetcher = new DriveFileFetcher(folderPath, userId);
         Thread dropboxThread = new Thread(dropboxFetcher);
         Thread driveThread = new Thread(driveFetcher);
         dropboxThread.start();
@@ -75,5 +78,14 @@ public class ContentBean implements ContentBeanRemote {
 
         return file;
 
+    }
+
+    @Override
+    public PlayList getPlayList(Long userId) {
+
+        List<String[]> data = getFiles("/", userId);
+        PlayList playList = SongMetadataPopulation.populate(data, userId);
+
+        return playList;
     }
 }
