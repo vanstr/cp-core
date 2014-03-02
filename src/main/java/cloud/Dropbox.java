@@ -40,6 +40,10 @@ public class Dropbox {
     private DropboxAPI<WebAuthSession> api;
     private WebAuthSession.WebAuthInfo authInfo = null;
 
+    public DropboxAPI<WebAuthSession> getApi() {
+        return api;
+    }
+
     /**
      * Start session to likn user account with CloudMusic
      */
@@ -67,6 +71,9 @@ public class Dropbox {
 
     }
 
+    public void initAPI(){
+        api = new DropboxAPI<WebAuthSession>(session);
+    }
 
     /**
      * @return  Tokens

@@ -1,6 +1,7 @@
 package ejb;
 
 import javax.ejb.Remote;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -28,4 +29,6 @@ public interface AuthorizationBeanRemote {
     public Boolean removeGDriveAccount(Long userId);
 
     public Long authorizeWithDrive(String code);
+
+    public Long createNewUserWithDropbox();
 }

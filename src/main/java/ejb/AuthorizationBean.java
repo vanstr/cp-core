@@ -125,6 +125,11 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
             // save accessTokens to DB
             user.setDropboxAccessKey(accessTokens.key);
             user.setDropboxAccessSecret(accessTokens.secret);
+            drop.initAPI();
+            System.out.println("API: " + drop.getApi());
+            System.out.println("info: " + drop.getApi().accountInfo());
+            System.out.println("uid: " + drop.getApi().accountInfo().uid);
+            user.setDropboxUid(drop.getApi().accountInfo().uid);
             res = manager.updateUser(user);
             manager.finalize();
 
@@ -209,7 +214,7 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
 
     @Override
     public Long authorizeWithDrive(String code) {
-        Long userId = null;
+        Long userId;
         GDrive gDrive = new GDrive(null, null);
         Map<String, String> tokens = gDrive.retrieveAccessToken(code);
         UserManager userManager = new UserManager();
@@ -231,6 +236,24 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
             userManager.updateUser(user);
         }
         userManager.finalize();
+        return userId;
+    }
+
+    @Override
+    public Long createNewUserWithDropbox() {
+        Long userId = null;
+        try {
+            Dropbox dropbox = new Dropbox();
+            Tokens requestTokens = dropbox.getRequestTokens();
+            UserManager userManager = new UserManager();
+            UserEntity user = new UserEntity();
+            user.setDropboxRequestKey(requestTokens.key);
+            user.setDropboxRequestSecret(requestTokens.secret);
+            userId = userManager.addUser(user);
+            userManager.finalize();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return userId;
     }
 }
