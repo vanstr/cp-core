@@ -61,6 +61,8 @@ public class SongTest {
             fail("error in preparing");
         }
 
+        logger.info("BeforeClass done");
+
     }
 
     @Test
@@ -73,6 +75,8 @@ public class SongTest {
         song1.setMetadataTitle("Basldlsa dasdas");
         assertTrue(songManger.addSong(song1));
 
+        logger.info("test1SaveSongs done");
+
     }
 
     @Test
@@ -82,8 +86,10 @@ public class SongTest {
         whereClause.put("id", song1.getId());
         //whereClause.put("user", user);
         List<SongEntity> list = songManger.getSongsByFields(whereClause);
-        logger.info("list: " + list);
+        logger.debug("list: " + list);
         assertNotNull(list);
+
+        logger.info("test2GetSongs done");
     }
 
     @Test
@@ -100,6 +106,7 @@ public class SongTest {
         List<SongEntity> list = songManger.getSongsByFields(whereClause);
         assertNull("Created song not removed",list);
 
+        logger.info("test3RemoveSongsById done");
     }
 
 
@@ -107,5 +114,6 @@ public class SongTest {
     public static void end() {
         userManager.finalize();
         songManger.finalize();
+        logger.info("AfterClass done");
     }
 }

@@ -4,6 +4,8 @@ import cloud.Dropbox;
 import commons.Tokens;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import persistence.UserEntity;
 import persistence.utility.UserManager;
 
@@ -23,6 +25,8 @@ import static org.junit.Assert.fail;
  */
 public class DropboxTest {
 
+    final static Logger logger = LoggerFactory.getLogger(DropboxTest.class);
+
     private static Dropbox dropUnAuth = null; // un authorized dropboz session
     private static Dropbox dropAuth = null; // authorized dropboz session
 
@@ -34,7 +38,6 @@ public class DropboxTest {
         try {
             dropUnAuth = new Dropbox();
 
-
             // ATTENTION user with 1 id should be JUnit user and with access keys
             UserManager manager = new UserManager();
             UserEntity user = manager.getUserById(1);
@@ -43,22 +46,24 @@ public class DropboxTest {
 
             manager.finalize();
         } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             fail("error in preparing");
         }
+        logger.info("BeforeClass done");
 
     }
 
     @Test
-    public void testDropbox(){
+    public void testDropboxFail(){
 
         try{
             new Dropbox(null, null);
         }catch( Exception e){
+            logger.info("testDropboxFail done");
             return;
         }
 
-        fail("testDropbox frong result with NULL key pair value");
+        fail("testDropbox wrong result with NULL key pair value");
     }
 
     @Test
@@ -66,6 +71,8 @@ public class DropboxTest {
 
         Tokens res = dropUnAuth.getRequestTokens();
         if (res.secret.isEmpty() || res.key.isEmpty()) fail("key or secret is empty");
+
+        logger.info("testGetRequestTokens done");
     }
 
     @Test
@@ -73,6 +80,8 @@ public class DropboxTest {
 
         String res = dropUnAuth.getAuthLink();
         if (!res.contains("https://")) fail("URl doesnt contain https://");
+
+        logger.info("testGetAuthLink done");
     }
 
     // We assume that user has requestTokens in DB
@@ -109,11 +118,11 @@ public class DropboxTest {
         manager.updateUser(user);
         manager.finalize();
         */
+        logger.info("testGetUserAccessTokens done");
     }
 
     @Test
     public void testGetFileLink(){
-
 
         // 1. file exists
         String res = null; // http://dl.dropboxusercontent.com/1/view/n8cbbuw08p669ku/JUnit/music.mp3
@@ -133,6 +142,7 @@ public class DropboxTest {
         }
         assertNull("Bad file link", res2);
 
+        logger.info("testGetFileLink done");
     }
 
     @Test
@@ -165,11 +175,12 @@ public class DropboxTest {
 
         int resSize = res.size();
         for (int i = 0; i < resSize; i++) {
-            System.out.println(res.get(i)[1]);
+            logger.debug(res.get(i)[1]);
             if (correctMusicFile.equals(res.get(i)[1])) filePresents = true;
         }
         assertTrue("Music file not found", filePresents);
 
+        logger.info("testGetFileList done");
     }
 
 

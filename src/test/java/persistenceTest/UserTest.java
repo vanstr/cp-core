@@ -23,7 +23,7 @@ import static org.junit.Assert.fail;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UserTest {
 
-    final static Logger logger = LoggerFactory.getLogger(SongTest.class);
+    final static Logger logger = LoggerFactory.getLogger(UserTest.class);
 
 
     private static Dropbox dropUnAuth = null; // un authorized dropboz session
@@ -42,24 +42,26 @@ public class UserTest {
 
             user = userManager.getUserById(1);
 
-            System.out.println(userManager.getSessionStatistic());
+            logger.debug(userManager.getSessionStatistic());
 
             dropAuth = new Dropbox(user.getDropboxAccessKey(), user.getDropboxAccessSecret());
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             fail("error in preparing");
         }
+        logger.info("BeforeClass done");
 
     }
 
     @Test
-    public void test1SaveSongs(){
-
+    public void test1SaveUser(){
+        //TODO
     }
 
     @AfterClass
     public static void end() {
         userManager.finalize();
+        logger.info("AfterClass done");
     }
 
 }

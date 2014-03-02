@@ -84,7 +84,7 @@ public class Dropbox {
      * @return Auth link
      */
     public String getAuthLink() {
-        logger.info("Dropbox auth link:" + authInfo.url);
+        logger.debug("Dropbox auth link:" + authInfo.url);
         return authInfo.url;
     }
 

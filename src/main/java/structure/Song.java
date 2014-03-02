@@ -17,43 +17,39 @@ import java.io.Serializable;
 @Entity
 public class Song implements Serializable {
 
+    private String filePath;
     private String fileName;
-    private String downloadURL;
+    private String url;
     private long cloudId;
     private SongMetadata metadata;
-    private String driveId; // TODO: what to do??  add field fileUniqueField in gdrive it will be ID in Dropbox fileName
+    private String driveId; // TODO: what to do??  add field fileUniqueField in gdrive it will be ID in Dropbox filePath
 
-    public Song(String fileName, long cloudId) {
-        this.fileName = fileName;
-        this.cloudId = cloudId;
-    }
-
-    public Song(UserEntity user, long cloudId, String fileName, String downloadURL, String driveId) {
-        this.fileName = fileName;
+    public Song(UserEntity user, long cloudId, String filePath, String url, String driveId) {
+        this.filePath = filePath;
+        this.fileName = createFileNameFromFilePath(filePath);
         this.cloudId = cloudId;
         this.driveId = driveId;
-        this.downloadURL = downloadURL;
+        this.url = url;
 
         SongManager manager = new SongManager();
-        SongEntity songEntity = manager.getSongByHash(user, cloudId, fileName);
-        this.metadata = new SongMetadata(songEntity);
+        SongEntity songEntity = manager.getSongByHash(user, cloudId, filePath);
+        if (songEntity != null) {
+            this.metadata = new SongMetadata(songEntity);
+        }
         manager.finalize();
 
     }
 
-
-    public Song(SongEntity songEntity) {
-        this(songEntity.getFileName(), songEntity.getCloudId());
-
-        this.metadata = new SongMetadata(songEntity);
+    public String createFileNameFromFilePath(String filePath){
+        return filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length());
     }
 
-    public String getFileName() {
-        return fileName;
+    public String getFilePath() {
+        return filePath;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
     public long getCloudId() {
@@ -65,12 +61,12 @@ public class Song implements Serializable {
     }
 
 
-    public String getDownloadURL() {
-        return downloadURL;
+    public String getUrl() {
+        return url;
     }
 
-    public void setDownloadURL(String downloadURL) {
-        this.downloadURL = downloadURL;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public SongMetadata getMetadata() {
@@ -81,8 +77,26 @@ public class Song implements Serializable {
         this.metadata = metadata;
     }
 
-    public String toString(){
-         return "Song name:" + this.fileName + " metadata:" + this.metadata;
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getDriveId() {
+        return driveId;
+    }
+
+    public void setDriveId(String driveId) {
+        this.driveId = driveId;
+    }
+
+
+    public String toString() {
+        return "Song name:" + this.filePath + " metadata:" + this.metadata;
     }
 
 }

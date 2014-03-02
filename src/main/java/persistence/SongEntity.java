@@ -27,8 +27,10 @@ public class SongEntity {
     private String fileName;
     private long fileSize;
     private String metadataTitle;
-    private String metadataAuthor;
+    private String metadataArtist;
     private String metadataAlbum;
+    private String metadataYear;
+    private String metadataGenre;
     private int metadataLengthSeconds;
 
     private UserEntity user;
@@ -101,13 +103,13 @@ public class SongEntity {
         this.metadataTitle = metadata_title;
     }
 
-    @Column(name = "metadata_author")
-    public String getMetadataAuthor() {
-        return metadataAuthor;
+    @Column(name = "metadata_artist")
+    public String getMetadataArtist() {
+        return metadataArtist;
     }
 
-    public void setMetadataAuthor(String metadata_author) {
-        this.metadataAuthor = metadata_author;
+    public void setMetadataArtist(String metadata_author) {
+        this.metadataArtist = metadata_author;
     }
 
     @Column(name = "metadata_length_seconds")
@@ -127,6 +129,25 @@ public class SongEntity {
     public void setMetadataAlbum(String metadata_album) {
         this.metadataAlbum = metadata_album;
     }
+
+    @Column(name = "metadata_genre")
+    public String getMetadataGenre() {
+        return metadataGenre;
+    }
+
+    public void setMetadataGenre(String metadataGenre) {
+        this.metadataGenre = metadataGenre;
+    }
+
+    @Column(name = "metadata_year")
+    public String getMetadataYear() {
+        return metadataYear;
+    }
+
+    public void setMetadataYear(String metadataYear) {
+        this.metadataYear = metadataYear;
+    }
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

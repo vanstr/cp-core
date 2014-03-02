@@ -13,15 +13,20 @@ import java.io.Serializable;
  */
 public class SongMetadata implements Serializable{
     private String title;
-    private String author;
+    private String artits;
     private String album;
     private long lengthSeconds;
+    private String year;
+    private String genre;
+
 
     public SongMetadata(SongEntity songEntity) {
         if (songEntity != null) {
             this.title = songEntity.getMetadataTitle();
             this.album = songEntity.getMetadataAlbum();
-            this.author = songEntity.getMetadataAuthor();
+            this.artits = songEntity.getMetadataArtist();
+            this.year = songEntity.getMetadataYear();
+            this.genre = songEntity.getMetadataGenre();
             this.lengthSeconds = songEntity.getMetadataLengthSeconds();
         }
     }
@@ -34,12 +39,12 @@ public class SongMetadata implements Serializable{
         this.title = title;
     }
 
-    public String getAuthor() {
-        return author;
+    public String getArtits() {
+        return artits;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setArtits(String artits) {
+        this.artits = artits;
     }
 
     public String getAlbum() {
@@ -58,8 +63,24 @@ public class SongMetadata implements Serializable{
         this.lengthSeconds = lengthSeconds;
     }
 
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
+    }
+
     public String toString(){
-        return title + " " + album + " " + author;
+        return title + " " + album + " " + artits;
     }
 
 }

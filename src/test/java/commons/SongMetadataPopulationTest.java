@@ -49,6 +49,7 @@ public class SongMetadataPopulationTest {
         song1.setMetadataTitle("JUnitTests");
         songManger.addSong(song1);
 
+        logger.info("BeforeClass done");
     }
     @Test
     public void test1PopulatePlaylist(){
@@ -62,17 +63,18 @@ public class SongMetadataPopulationTest {
 
         PlayList playList = SongMetadataPopulation.populate(data, userId);
 
-        logger.info("Songs in playlist:" + playList.size());
+        logger.debug("Songs in playlist:" + playList.size());
         for (Song song:playList){
-            if(song.getFileName().equals(song1.getFileName())){
-                logger.info("song" + song.getMetadata().getTitle());
+            if(song.getFilePath().equals(song1.getFileName())){
+                logger.debug("song:" + song.getMetadata().getTitle());
                 assertTrue("Incorrect authors",song.getMetadata().getTitle().equals(song1.getMetadataTitle()));
             }else{
-                logger.info("line " + song.getMetadata().getAuthor());
-                assertNull("Methodata should not present",song.getMetadata().getAuthor());
+                logger.debug("line " + song.getMetadata());
+                assertNull("Methodata should not present",song.getMetadata());
             }
             //logger.info(song.toString());
         }
+        logger.info("test1PopulatePlaylist done");
     }
 
     @AfterClass
@@ -81,8 +83,9 @@ public class SongMetadataPopulationTest {
         List<Long> ids = new ArrayList<Long>();
         ids.add(song1.getId());
         songManger.deleteSongsByID(ids);
-
         songManger.finalize();
+
+        logger.info("AfterClass done");
     }
 
 }
