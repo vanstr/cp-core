@@ -31,18 +31,21 @@ public class DropboxTest {
 
     @BeforeClass
     public static void method() {
+
+        UserManager manager = new UserManager();
         try {
             dropUnAuth = new Dropbox();
 
 
             // ATTENTION user with 1 id should be JUnit user and with access keys
-            UserManager manager = new UserManager();
             UserEntity user = manager.getUserById(1);
 
             dropAuth = new Dropbox(user.getDropboxAccessKey(), user.getDropboxAccessSecret());
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             fail("error in preparing");
+        } finally {
+            manager.finalize();
         }
 
     }

@@ -40,22 +40,19 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
 
     @Override
     public Boolean registerUser(String login, String password) {
-        UserManager userManager = null;
+        Boolean result = false;
+        UserManager userManager = new UserManager();
         try{
-            userManager = new UserManager();
             UserEntity newUser = new UserEntity();
             newUser.setLogin(login);
             newUser.setPassword(password);
-            userManager.addUser(newUser);
+            result = userManager.addUser(newUser);
         }catch (Exception e){
             e.printStackTrace();
-            return false;
         }finally {
-            if(userManager != null){
-                userManager.finalize();
-            }
+            userManager.finalize();
         }
-        return true;
+        return result;
     }
 
     /**
@@ -68,19 +65,17 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
     @Override
     public String getDropboxAuthLink(Long userId) {
         String link = null;
-
+        UserManager manager = new UserManager();
         try {
             Dropbox drop = new Dropbox();
 
             Tokens requestTokens = drop.getRequestTokens();
 
             // save requestTokens to DB
-            UserManager manager = new UserManager();
             UserEntity user = manager.getUserById(userId);
             user.setDropboxRequestKey(requestTokens.key);
             user.setDropboxRequestSecret(requestTokens.secret);
             boolean res = manager.updateUser(user);
-            manager.finalize();
 
             // tokens was not saved
             if (res == false) throw new Exception(EXCEPTION_DB_EXECUTION_ERROR);
@@ -91,9 +86,9 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
             e.printStackTrace();
         }
         finally {
-            return link;
+            manager.finalize();
         }
-
+        return link;
     }
 
     /**
@@ -105,14 +100,13 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
      */
     @Override
     public Boolean retrieveDropboxAccessToken(Long userId) {
-        boolean res = false;
-
+        Boolean result = false;
+        UserManager manager = new UserManager();
         try {
             // Work with dropbox service, start session
             Dropbox drop = new Dropbox();
 
             // get requestTokens from db
-            UserManager manager = new UserManager();
             UserEntity user = manager.getUserById(userId);
             Tokens requestTokens = new Tokens(user.getDropboxRequestKey(), user.getDropboxRequestSecret());
 
@@ -122,26 +116,22 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
             // save accessTokens to DB
             user.setDropboxAccessKey(accessTokens.key);
             user.setDropboxAccessSecret(accessTokens.secret);
-            res = manager.updateUser(user);
-            manager.finalize();
-
+            result = manager.updateUser(user);
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            manager.finalize();
         }
-        finally {
-            return res;
-        }
-
+        return result;
     }
 
     @Override
     public Boolean retrieveGDriveCredentials(Long userId, String code) {
         Boolean result = false;
-
+        UserManager manager = new UserManager();
         try {
             GDrive gDrive = new GDrive(null, null);
 
-            UserManager manager = new UserManager();
             UserEntity user = manager.getUserById(userId);
 
             if(user == null){
@@ -156,10 +146,10 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
             user.setDriveAccessToken(accessToken);
             user.setDriveRefreshToken(refreshToken);
             result = manager.updateUser(user);
-            manager.finalize();
-
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            manager.finalize();
         }
         return result;
     }
@@ -167,8 +157,8 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
     @Override
     public Boolean removeDropboxAcoount(Long userId) {
         Boolean result = false;
+        UserManager manager = new UserManager();
         try{
-            UserManager manager = new UserManager();
             UserEntity user = manager.getUserById(userId);
             if(user == null){
                 return false;
@@ -177,9 +167,10 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
             user.setDropboxAccessKey(null);
             user.setDropboxAccessSecret(null);
             result = manager.updateUser(user);
-            manager.finalize();
         } catch (Exception e){
             e.printStackTrace();
+        } finally {
+            manager.finalize();
         }
         return result;
     }
@@ -187,8 +178,8 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
     @Override
     public Boolean removeGDriveAccount(Long userId) {
         Boolean result = false;
+        UserManager manager = new UserManager();
         try{
-            UserManager manager = new UserManager();
             UserEntity user = manager.getUserById(userId);
             if(user == null){
                 return false;
@@ -197,9 +188,10 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
             user.setDriveAccessToken(null);
             user.setDriveRefreshToken(null);
             result = manager.updateUser(user);
-            manager.finalize();
         } catch (Exception e){
             e.printStackTrace();
+        } finally {
+            manager.finalize();
         }
         return result;
     }
