@@ -47,17 +47,6 @@ public class SongEntity {
         this.id = id;
     }
 
-    /*
-    @Column(name = "user_id")
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(long user_id) {
-        this.userId = user_id;
-    }
-    */
-
     @Column(name = "cloud_id")
     public long getCloudId() {
         return cloudId;

@@ -13,7 +13,7 @@ import java.io.Serializable;
  */
 public class SongMetadata implements Serializable{
     private String title;
-    private String artits;
+    private String artist;
     private String album;
     private long lengthSeconds;
     private String year;
@@ -24,7 +24,7 @@ public class SongMetadata implements Serializable{
         if (songEntity != null) {
             this.title = songEntity.getMetadataTitle();
             this.album = songEntity.getMetadataAlbum();
-            this.artits = songEntity.getMetadataArtist();
+            this.artist = songEntity.getMetadataArtist();
             this.year = songEntity.getMetadataYear();
             this.genre = songEntity.getMetadataGenre();
             this.lengthSeconds = songEntity.getMetadataLengthSeconds();
@@ -39,12 +39,12 @@ public class SongMetadata implements Serializable{
         this.title = title;
     }
 
-    public String getArtits() {
-        return artits;
+    public String getArtist() {
+        return artist;
     }
 
-    public void setArtits(String artits) {
-        this.artits = artits;
+    public void setArtist(String artist) {
+        this.artist = artist;
     }
 
     public String getAlbum() {
@@ -80,7 +80,7 @@ public class SongMetadata implements Serializable{
     }
 
     public String toString(){
-        return title + " " + album + " " + artits;
+        return title + " " + album + " " + artist;
     }
 
 }

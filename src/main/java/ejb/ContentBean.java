@@ -6,9 +6,15 @@ import cloud.DropboxFileFetcher;
 import cloud.GDrive;
 import commons.FileFetcher;
 import commons.SongMetadataPopulation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import persistence.SongEntity;
 import persistence.UserEntity;
+import persistence.utility.SongManager;
 import persistence.utility.UserManager;
 import structure.PlayList;
+import structure.Song;
+import structure.SongMetadata;
 
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
@@ -27,6 +33,7 @@ import java.util.List;
 @Remote(ContentBeanRemote.class)
 public class ContentBean implements ContentBeanRemote {
 
+    final static Logger logger = LoggerFactory.getLogger(ContentBean.class);
 
     public List<String[]> getFiles(String folderPath, Long userId) {
 
@@ -87,5 +94,47 @@ public class ContentBean implements ContentBeanRemote {
         PlayList playList = SongMetadataPopulation.populate(data, userId);
 
         return playList;
+    }
+
+    @Override
+    public boolean saveSongMetadata(Song song, Long userId) {
+
+        UserEntity user = new UserEntity();
+        user.setId(userId);
+
+        // 1. get song by id
+        SongManager songManager = new SongManager();
+        logger.info("pass1" + song + " " + song.getCloudId() + " "+ song.getFilePath() );
+        SongEntity songEntity = songManager.getSongByHash(user, song.getCloudId(), song.getFilePath());
+        logger.info("pass2");
+        //1.1 songEntity is empty, create new
+        // TODO refactor
+        if(songEntity == null){
+            songEntity = new SongEntity();
+            songEntity.setCloudId(song.getCloudId());
+            songEntity.setFileName(song.getFilePath());
+            songEntity.setUser(user);
+            songManager.addEntity(songEntity);
+        }
+        // 2. update metadata
+        songEntity = updateSongMetadata(songEntity, song);
+        logger.info("pass3");
+        boolean res = songManager.updateSong(songEntity);
+        songManager.finalize();
+
+        return res;
+    }
+
+    // TODO: move to songManager
+    private SongEntity updateSongMetadata(SongEntity songEntity, Song song) {
+        SongMetadata metadata = song.getMetadata();
+        if( metadata != null){
+            songEntity.setMetadataTitle(metadata.getTitle());
+            songEntity.setMetadataAlbum(metadata.getAlbum());
+            songEntity.setMetadataArtist(metadata.getArtist());
+            songEntity.setMetadataGenre(metadata.getGenre());
+            songEntity.setMetadataYear(metadata.getYear());
+        }
+        return songEntity;
     }
 }
