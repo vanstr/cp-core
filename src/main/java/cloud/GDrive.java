@@ -47,7 +47,7 @@ public class GDrive {
         this.refreshToken = refreshToken;
     }
 
-    public Map<String, String> retrieveAccessToken(String code){
+    public OAuth2UserData retrieveAccessToken(String code){
         Map<String, String> params = new HashMap<String, String>();
         params.put("code", code);
         params.put("client_id", CLIENT_ID);
@@ -56,11 +56,8 @@ public class GDrive {
         params.put("redirect_uri", REDIRECT_URI);
         params.put("scope", "https://www.googleapis.com/auth/userinfo.email+https://www.googleapis.com/auth/drive");
         JSONObject object = HttpWorker.sendPostRequest("https://accounts.google.com/o/oauth2/token", params);
-        Map<String, String> tokens = new HashMap<String, String>();
-        tokens.put("access_token", object.getString("access_token"));
-        tokens.put("refresh_token", object.getString("refresh_token"));
-        System.out.println(tokens + "TOKENS");
-        return tokens;
+        OAuth2UserData oAuth2UserData = OAuth2UserData.parseDriveData(object);
+        return oAuth2UserData;
     }
 
     public List<String[]> getFileList(String folderPath, List<String> fileTypes){

@@ -88,9 +88,9 @@
 
         <!-- dropbox SDK api -->
         <dependency>
-            <groupId>org.syncloud</groupId>
-            <artifactId>dropbox-client</artifactId>
-            <version>1.5.3</version>
+            <groupId>com.dropbox.core</groupId>
+            <artifactId>dropbox-core-sdk</artifactId>
+            <version>1.7.4</version>
         </dependency>
 
         <dependency>

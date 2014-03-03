@@ -27,7 +27,7 @@ public class UserEntity {
     private String driveAccessToken;
     private String driveRefreshToken;
     private String googleEmail;
-    private Long dropboxUid;
+    private String dropboxUid;
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -130,11 +130,11 @@ public class UserEntity {
     }
 
     @javax.persistence.Column(name = "dropbox_uid")
-    public Long getDropboxUid() {
+    public String getDropboxUid() {
         return dropboxUid;
     }
 
-    public void setDropboxUid(Long dropboxUid) {
+    public void setDropboxUid(String dropboxUid) {
         this.dropboxUid = dropboxUid;
     }
 

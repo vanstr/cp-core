@@ -2,6 +2,7 @@ package ejb;
 
 import cloud.Dropbox;
 import cloud.GDrive;
+import cloud.OAuth2UserData;
 import commons.HttpWorker;
 import commons.Tokens;
 import org.codehaus.jackson.map.util.JSONPObject;
@@ -42,14 +43,14 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
     }
 
     @Override
-    public Long registerUser(String login, String password) {
-        Long result = null;
+    public Boolean registerUser(String login, String password) {
+        Boolean result = null;
         UserManager userManager = new UserManager();
         try{
             UserEntity newUser = new UserEntity();
             newUser.setLogin(login);
             newUser.setPassword(password);
-            result = userManager.addUser(newUser);
+            result = userManager.addUser(newUser) > 0;
         }catch (Exception e){
             e.printStackTrace();
         }finally {
@@ -102,31 +103,23 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
      *      false - error occurred
      */
     @Override
-    public Boolean retrieveDropboxAccessToken(Long userId) {
+    public Boolean retrieveDropboxCredentials(Long userId, String code) {
         Boolean result = false;
         UserManager manager = new UserManager();
         try {
             // Work with dropbox service, start session
             Dropbox drop = new Dropbox();
 
+            OAuth2UserData oAuth2UserData = drop.retrieveAccessToken(code);
             // get requestTokens from db
             UserEntity user = manager.getUserById(userId);
-            Tokens requestTokens = new Tokens(user.getDropboxRequestKey(), user.getDropboxRequestSecret());
-
-            // retrive AccessToken
-            Tokens accessTokens = drop.getUserAccessTokens(requestTokens);
 
             // save accessTokens to DB
-            user.setDropboxAccessKey(accessTokens.key);
-            user.setDropboxAccessSecret(accessTokens.secret);
+            user.setDropboxAccessKey(oAuth2UserData.getAccessToken());
+//            user.setDropboxAccessSecret(accessTokens.secret); // what TODO?
 
-            drop.initAPI();
-            System.out.println("API: " + drop.getApi());
-            System.out.println("info: " + drop.getApi().accountInfo());
-            System.out.println("uid: " + drop.getApi().accountInfo().uid);
-            user.setDropboxUid(drop.getApi().accountInfo().uid);
+            user.setDropboxUid(oAuth2UserData.getUniqueCloudId());
             result = manager.updateUser(user);
-            manager.finalize();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -148,9 +141,9 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
                 return false;
             }
             // retrive AccessToken
-            Map<String, String> credentials = gDrive.retrieveAccessToken(code);
-            String accessToken = credentials.get("access_token");
-            String refreshToken = credentials.get("refresh_token");
+            OAuth2UserData credentials = gDrive.retrieveAccessToken(code);
+            String accessToken = credentials.getAccessToken();
+            String refreshToken = credentials.getRefreshToken();
 
             // save accessTokens to DB
             user.setDriveAccessToken(accessToken);
@@ -210,22 +203,19 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
     public Long authorizeWithDrive(String code) {
         Long userId;
         GDrive gDrive = new GDrive(null, null);
-        Map<String, String> tokens = gDrive.retrieveAccessToken(code);
+        OAuth2UserData oAuth2UserData = gDrive.retrieveAccessToken(code);
         UserManager userManager = new UserManager();
-        JSONObject object = HttpWorker.sendGetRequest("https://www.googleapis.com/userinfo/email?alt=json&oauth_token="
-                + tokens.get("access_token"));
-        String email = object.getJSONObject("data").get("email").toString();
-        List<UserEntity> userList = userManager.getUsersByField("google_email", email);
-        if(userList == null || userList.size() == 0){
+        List<UserEntity> userList = userManager.getUsersByField("google_email", oAuth2UserData.getUniqueCloudId());
+        if(userList == null || userList.isEmpty()){
             UserEntity user = new UserEntity();
-            user.setDriveAccessToken(tokens.get("access_token"));
-            user.setDriveRefreshToken(tokens.get("refresh_token"));
-            user.setGoogleEmail(email);
+            user.setDriveAccessToken(oAuth2UserData.getAccessToken());
+            user.setDriveRefreshToken(oAuth2UserData.getRefreshToken());
+            user.setGoogleEmail(oAuth2UserData.getUniqueCloudId());
             userId = userManager.addUser(user);
         }else{
             UserEntity user = userList.get(0);
-            user.setDriveAccessToken(tokens.get("access_token"));
-            user.setDriveRefreshToken(tokens.get("refresh_token"));
+            user.setDriveAccessToken(oAuth2UserData.getAccessToken());
+            user.setDriveRefreshToken(oAuth2UserData.getRefreshToken());
             userId = user.getId();
             userManager.updateUser(user);
         }
@@ -234,20 +224,30 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
     }
 
     @Override
-    public Long createNewUserWithDropbox() {
+    public Long authorizeWithDropbox(String code) {
         Long userId = null;
+        UserManager userManager = new UserManager();
         try {
             Dropbox dropbox = new Dropbox();
-            Tokens requestTokens = dropbox.getRequestTokens();
-            UserManager userManager = new UserManager();
-            UserEntity user = new UserEntity();
-            user.setDropboxRequestKey(requestTokens.key);
-            user.setDropboxRequestSecret(requestTokens.secret);
-            userId = userManager.addUser(user);
-            userManager.finalize();
+            OAuth2UserData oAuth2UserData = dropbox.retrieveAccessToken(code);
+            List<UserEntity> userList = userManager.getUsersByField("dropbox_uid", oAuth2UserData.getUniqueCloudId());
+            if(userList == null || userList.isEmpty()){
+                UserEntity user = new UserEntity();
+                user.setDropboxAccessKey(oAuth2UserData.getAccessToken());
+                user.setDropboxUid(oAuth2UserData.getUniqueCloudId());
+                userId = userManager.addUser(user);
+            }else{
+                UserEntity user = userList.get(0);
+                user.setDropboxAccessKey(oAuth2UserData.getAccessToken());
+                userId = user.getId();
+                userManager.updateUser(user);
+            }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            userManager.finalize();
         }
         return userId;
     }
+
 }
