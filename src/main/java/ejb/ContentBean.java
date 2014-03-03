@@ -98,8 +98,8 @@ public class ContentBean implements ContentBeanRemote {
 
     public List<String[]> getDropboxFiles(String folderPath, Long userId) {
         List<String[]> files = null;
+        UserManager manager = new UserManager();
         try {
-            UserManager manager = new UserManager();
             UserEntity user = manager.getUserById(userId);
 
             String accessTokenKey = user.getDropboxAccessKey();
@@ -110,6 +110,8 @@ public class ContentBean implements ContentBeanRemote {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            manager.finalize();
         }
         return files;
     }
@@ -118,9 +120,8 @@ public class ContentBean implements ContentBeanRemote {
         List<String[]> files = null;
         GDrive gDrive = null;
         UserEntity user = null;
-        UserManager manager = null;
+        UserManager manager = new UserManager();
         try{
-            manager = new UserManager();
             user = manager.getUserById(userId);
             String driveAccessToken = user.getDriveAccessToken();
             String driveRefreshToken = user.getDriveRefreshToken();
@@ -142,9 +143,7 @@ public class ContentBean implements ContentBeanRemote {
         } catch (Exception e){
             e.printStackTrace();
         } finally {
-            if(manager != null){
-                manager.finalize();
-            }
+            manager.finalize();
         }
         return files;
     }
@@ -167,6 +166,8 @@ public class ContentBean implements ContentBeanRemote {
 
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            manager.finalize();
         }
 
         return file;
