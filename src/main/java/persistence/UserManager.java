@@ -31,6 +31,11 @@ public class UserManager {
     }
 
     public void finalize(){
+        if(session.getTransaction() != null && session.getTransaction().isActive()){
+            session.getTransaction().commit();
+        }
+        session.flush();
+        session.clear();
         session.close();
     }
 
