@@ -17,7 +17,7 @@ public interface AuthorizationBeanRemote {
 
     public Boolean registerUser(String userName, String password);
 
-    public String getDropboxAuthLink(Long userId);
+//    public String getDropboxAuthLink(Long userId);
 
     //save user tokens to DB
     public Boolean retrieveDropboxCredentials(Long userId, String code);

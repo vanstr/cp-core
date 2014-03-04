@@ -2,12 +2,15 @@ package ejb;
 
 import cloud.Dropbox;
 import cloud.GDrive;
+import com.dropbox.core.DbxEntry;
 import com.sun.servicetag.UnauthorizedAccessException;
+import commons.CloudFile;
 import persistence.UserEntity;
 import persistence.UserManager;
 
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +32,7 @@ public class ContentBean implements ContentBeanRemote {
         protected ContentBean bean;
         protected String folderPath;
         protected Long userId;
-        protected List<String[]> files;
+        protected List<CloudFile> files;
 
         public FileFetcher(ContentBean bean, String folderPath, Long userId){
             this.bean = bean;
@@ -39,7 +42,7 @@ public class ContentBean implements ContentBeanRemote {
 
         public void run(){}
 
-        public List<String[]> getFiles() {
+        public List<CloudFile> getFiles() {
             return files;
         }
     }
@@ -70,7 +73,7 @@ public class ContentBean implements ContentBeanRemote {
 
     private List<String> fileTypes = Arrays.asList("mp3", "wav", "ogg");
 
-    public List<String[]> getFiles(String folderPath, Long userId) {
+    public List<CloudFile> getFiles(String folderPath, Long userId) {
 
         DropboxFileFetcher dropboxFetcher = new DropboxFileFetcher(this, folderPath, userId);
         DriveFileFetcher driveFetcher = new DriveFileFetcher(this, folderPath, userId);
@@ -85,7 +88,7 @@ public class ContentBean implements ContentBeanRemote {
             e.printStackTrace();
         }
 
-        List<String[]> files = new ArrayList<String[]>();
+        List<CloudFile> files = new ArrayList<CloudFile>();
         if(dropboxFetcher.getFiles() != null){
             files.addAll(dropboxFetcher.getFiles());
         }
@@ -96,16 +99,15 @@ public class ContentBean implements ContentBeanRemote {
         return files;
     }
 
-    public List<String[]> getDropboxFiles(String folderPath, Long userId) {
-        List<String[]> files = null;
+    public List<CloudFile> getDropboxFiles(String folderPath, Long userId) {
+        List<CloudFile> files = null;
         UserManager manager = new UserManager();
         try {
             UserEntity user = manager.getUserById(userId);
 
             String accessTokenKey = user.getDropboxAccessKey();
-            String accessTokenSecret = user.getDropboxAccessSecret();
-            if(accessTokenKey != null && accessTokenSecret != null){
-                Dropbox drop = new Dropbox(accessTokenKey, accessTokenSecret);
+            if(accessTokenKey != null){
+                Dropbox drop = new Dropbox(accessTokenKey);
                 files = drop.getFileList(folderPath, fileTypes);
             }
         } catch (Exception e) {
@@ -116,8 +118,8 @@ public class ContentBean implements ContentBeanRemote {
         return files;
     }
 
-    public List<String[]> getDriveFiles(String folderPath, Long userId){
-        List<String[]> files = null;
+    public List<CloudFile> getDriveFiles(String folderPath, Long userId){
+        List<CloudFile> files = null;
         GDrive gDrive = null;
         UserEntity user = null;
         UserManager manager = new UserManager();
@@ -125,8 +127,9 @@ public class ContentBean implements ContentBeanRemote {
             user = manager.getUserById(userId);
             String driveAccessToken = user.getDriveAccessToken();
             String driveRefreshToken = user.getDriveRefreshToken();
+            Long tokenExpires = user.getDriveTokenExpires();
             if(driveAccessToken != null && driveRefreshToken != null){
-                gDrive = new GDrive(driveAccessToken, driveRefreshToken);
+                gDrive = new GDrive(driveAccessToken, driveRefreshToken, tokenExpires);
                 files = gDrive.getFileList(folderPath, fileTypes);
             }
         } catch (UnauthorizedAccessException e) {
@@ -135,6 +138,7 @@ public class ContentBean implements ContentBeanRemote {
                 try {
                     files = gDrive.getFileList(folderPath, fileTypes);
                     user.setDriveAccessToken(gDrive.getAccessToken());
+                    user.setDriveTokenExpires(gDrive.getTokenExpires());
                     manager.updateUser(user);
                 } catch (Exception e1) {
                     e1.printStackTrace();
@@ -155,12 +159,11 @@ public class ContentBean implements ContentBeanRemote {
         try {
             if (DROPBOX_CLOUD_ID.equals(cloudId)) {
                 String accessTokenKey = user.getDropboxAccessKey();
-                String accessTokenSecret = user.getDropboxAccessSecret();
 
-                Dropbox drop = new Dropbox(accessTokenKey, accessTokenSecret);
+                Dropbox drop = new Dropbox(accessTokenKey);
                 file = drop.getFileLink(path);
             }else if(DRIVE_CLOUD_ID.equals(cloudId)){
-                GDrive gDrive = new GDrive(user.getDriveAccessToken(), user.getDriveRefreshToken());
+                GDrive gDrive = new GDrive(user.getDriveAccessToken(), user.getDriveRefreshToken(), user.getDriveTokenExpires());
                 file = gDrive.getFileLink(driveFileId);
             }
 

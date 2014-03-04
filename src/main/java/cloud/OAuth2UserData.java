@@ -4,6 +4,8 @@ import commons.HttpWorker;
 import org.codehaus.jackson.map.util.JSONPObject;
 import org.json.JSONObject;
 
+import java.util.Date;
+
 /**
  * Created with IntelliJ IDEA.
  * User: alex
@@ -15,6 +17,7 @@ public class OAuth2UserData {
     private String accessToken;
     private String refreshToken;
     private String uniqueCloudId;
+    private Integer expiresIn;
 
     public String getAccessToken() {
         return accessToken;
@@ -40,6 +43,14 @@ public class OAuth2UserData {
         this.uniqueCloudId = uniqueCloudId;
     }
 
+    public Integer getExpiresIn() {
+        return expiresIn;
+    }
+
+    public void setExpiresIn(Integer expiresIn) {
+        this.expiresIn = expiresIn;
+    }
+
     public static OAuth2UserData parseDropboxData(JSONObject jsonObject){
         OAuth2UserData oAuth2UserData = new OAuth2UserData();
         oAuth2UserData.accessToken = jsonObject.getString("access_token");
@@ -51,6 +62,7 @@ public class OAuth2UserData {
         OAuth2UserData oAuth2UserData = new OAuth2UserData();
         oAuth2UserData.accessToken = jsonObject.getString("access_token");
         oAuth2UserData.refreshToken = jsonObject.getString("refresh_token");
+        oAuth2UserData.expiresIn = jsonObject.getInt("expires_in");
         JSONObject object = HttpWorker.sendGetRequest("https://www.googleapis.com/userinfo/email?alt=json&oauth_token="
                 + oAuth2UserData.accessToken);
         String email = object.getJSONObject("data").get("email").toString();

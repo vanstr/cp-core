@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -25,10 +26,12 @@ public class GDrive {
 
     private String accessToken;
     private String refreshToken;
+    private Long tokenExpires;
 
-    public GDrive(String accessToken, String refreshToken){
+    public GDrive(String accessToken, String refreshToken, Long tokenExpires){
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
+        this.tokenExpires = tokenExpires;
     }
 
     public String getAccessToken() {
@@ -47,6 +50,14 @@ public class GDrive {
         this.refreshToken = refreshToken;
     }
 
+    public Long getTokenExpires() {
+        return tokenExpires;
+    }
+
+    public void setTokenExpires(Long tokenExpires) {
+        this.tokenExpires = tokenExpires;
+    }
+
     public OAuth2UserData retrieveAccessToken(String code){
         Map<String, String> params = new HashMap<String, String>();
         params.put("code", code);
@@ -60,28 +71,27 @@ public class GDrive {
         return oAuth2UserData;
     }
 
-    public List<String[]> getFileList(String folderPath, List<String> fileTypes){
-        List<String[]> files = null;
+    public List<CloudFile> getFileList(String folderPath, List<String> fileTypes){
+        List<CloudFile> files = null;
         try {
-            files = retrieveAllFiles(this.accessToken);
+            files = retrieveAllFiles();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-
-        Iterator<String[]> i = files.iterator();
+        Iterator<CloudFile> i = files.iterator();
         while (i.hasNext()) {
-            String[] track = i.next();
-            if ( !CloudFile.checkFileType(track[1], fileTypes) ) {
+            CloudFile track = i.next();
+            if ( !CloudFile.checkFileType(track.getName(), fileTypes) ) {
                 i.remove();
             }
         }
         return files;
     }
 
-    public List<String[]> retrieveAllFiles(String accessToken) throws IOException {
-        List<String[]> result = new ArrayList<String[]>();
-        String url = "https://www.googleapis.com/drive/v2/files?oauth_token=" + accessToken;
+    public List<CloudFile> retrieveAllFiles() throws IOException {
+        List<CloudFile> result = new ArrayList<CloudFile>();
+        String url = "https://www.googleapis.com/drive/v2/files?oauth_token=" + this.accessToken;
         JSONObject object = HttpWorker.sendGetRequest(url);
         if(object == null){
             return result;
@@ -93,12 +103,14 @@ public class GDrive {
                     && fileArray.getJSONObject(i).has("title")
                     && fileArray.getJSONObject(i).has("downloadUrl")){
 
-                String[] track = new String[]{
-                    ContentBeanRemote.DRIVE_CLOUD_ID.toString(),
-                    fileArray.getJSONObject(i).getString("title"),
-                    fileArray.getJSONObject(i).getString("downloadUrl") + "&oauth_token=" + this.accessToken,
-                    fileArray.getJSONObject(i).getString("id")
-                };
+//                String[] track = new String[]{
+//                    ContentBeanRemote.DRIVE_CLOUD_ID.toString(),
+//                    fileArray.getJSONObject(i).getString("title"),
+//                    fileArray.getJSONObject(i).getString("downloadUrl") + "&oauth_token=" + this.accessToken,
+//                    fileArray.getJSONObject(i).getString("id")
+//                };
+                CloudFile track = new CloudFile(ContentBeanRemote.DRIVE_CLOUD_ID, fileArray.getJSONObject(i).getString("title"),
+                        fileArray.getJSONObject(i).getString("downloadUrl") + "&oauth_token=" + this.accessToken, this.tokenExpires);
                 result.add(track);
             }
         }
@@ -115,6 +127,7 @@ public class GDrive {
             params.put("refresh_token", refreshToken);
             JSONObject object = HttpWorker.sendPostRequest("https://accounts.google.com/o/oauth2/token", params);
             accessToken = object.getString("access_token");
+            this.tokenExpires = object.getLong("expires_in")*1000 + System.currentTimeMillis();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -1,14 +1,9 @@
 package cloud;
 
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.DropboxAPI.Entry;
-import com.dropbox.client2.exception.DropboxException;
-import com.dropbox.client2.session.*;
 import com.dropbox.core.*;
 import commons.CloudFile;
 import commons.HttpWorker;
 import commons.Initializator;
-import commons.Tokens;
 import ejb.ContentBeanRemote;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -57,6 +52,7 @@ public class Dropbox {
 
     public Dropbox(String accessToken) throws Exception {
           this.accessToken = accessToken;
+          this.client = new DbxClient(config, accessToken);
 //        if (accessTokenKey == null || accessTokenSecret == null) {
 //            logger.info("EXCEPTION_EMPTY_ACCESS_TOKENS");
 //            throw new Exception(EXCEPTION_EMPTY_ACCESS_TOKENS);
@@ -76,9 +72,6 @@ public class Dropbox {
      * @return  file download link
      */
     public String getFileLink(String filePath) throws Exception {
-
-        DbxWebAuthNoRedirect webAuth = new DbxWebAuthNoRedirect(config, appInfo);
-        client = new DbxClient(config, accessToken);
         return client.createTemporaryDirectUrl(filePath).url;
     }
 
@@ -88,22 +81,35 @@ public class Dropbox {
      *
      * @return    array of file
      */
-    public List<String[]> getFileList(String folderPath, List<String> requestedFileTypes) throws Exception {
+    public List<CloudFile> getFileList(String folderPath, List<String> requestedFileTypes) throws Exception {
 
-        ArrayList<String[]> files = new ArrayList<String[]>();
+        ArrayList<CloudFile> files = new ArrayList<CloudFile>();
 
-        for(String fileType : requestedFileTypes){
-            List<Entry> dropboxEntries = api.search(folderPath, "." + fileType, 0, false);
-            if(dropboxEntries != null){
-                for(Entry dropboxEntry : dropboxEntries){
-                    if(CloudFile.checkFileType(dropboxEntry.fileName(), requestedFileTypes)){
-                        //TODO maybe url, id?
-                        files.add(new String[]{ContentBeanRemote.DROPBOX_CLOUD_ID.toString()
-                                , dropboxEntry.path, null, null});
-                    }
+        for(String requestedType : requestedFileTypes){
+            List<DbxEntry> entryList = client.searchFileAndFolderNames(folderPath, "." + requestedType);
+            for(DbxEntry entry : entryList){
+
+                if(CloudFile.checkFileType(entry.asFile().name, requestedFileTypes)){
+                    DbxUrlWithExpiration urlWithExpiration = client.createTemporaryDirectUrl(entry.path);
+                    CloudFile cloudFile = new CloudFile(ContentBeanRemote.DROPBOX_CLOUD_ID, entry.path,
+                            urlWithExpiration.url, urlWithExpiration.expires.getTime());
+                    files.add(cloudFile);
                 }
             }
         }
+
+//        for(String fileType : requestedFileTypes){
+//            List<Entry> dropboxEntries = api.search(folderPath, "." + fileType, 0, false);
+//            if(dropboxEntries != null){
+//                for(Entry dropboxEntry : dropboxEntries){
+//                    if(CloudFile.checkFileType(dropboxEntry.fileName(), requestedFileTypes)){
+//                        //TODO maybe url, id?
+//                        files.add(new String[]{ContentBeanRemote.DROPBOX_CLOUD_ID.toString()
+//                                , dropboxEntry.path, null, null});
+//                    }
+//                }
+//            }
+//        }
 
         return files;
     }
@@ -119,4 +125,9 @@ public class Dropbox {
         OAuth2UserData oAuth2UserData = OAuth2UserData.parseDropboxData(object);
         return oAuth2UserData;
     }
+
+//    public void retrieveAndSetAccessToken(String code){
+//        OAuth2UserData oAuth2UserData = this.retrieveAccessToken(code);
+//        this.accessToken = oAuth2UserData.getAccessToken();
+//    }
 }

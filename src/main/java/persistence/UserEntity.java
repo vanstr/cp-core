@@ -3,6 +3,7 @@ package persistence;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import javax.persistence.*;
+import java.sql.Date;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,13 +22,11 @@ public class UserEntity {
     private String login;
     private String password;
     private String dropboxAccessKey;
-    private String dropboxAccessSecret;
-    private String dropboxRequestKey;
-    private String dropboxRequestSecret;
     private String driveAccessToken;
     private String driveRefreshToken;
     private String googleEmail;
     private String dropboxUid;
+    private Long driveTokenExpires;
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -70,36 +69,6 @@ public class UserEntity {
         this.dropboxAccessKey = token;
     }
 
-    @javax.persistence.Column(name = "dropbox_access_secret")
-    @Basic
-    public String getDropboxAccessSecret() {
-        return dropboxAccessSecret;
-    }
-
-    public void setDropboxAccessSecret(String token) {
-        this.dropboxAccessSecret = token;
-    }
-
-    @javax.persistence.Column(name = "dropbox_request_key")
-    @Basic
-    public String getDropboxRequestKey() {
-        return dropboxRequestKey;
-    }
-
-    public void setDropboxRequestKey(String token) {
-        this.dropboxRequestKey = token;
-    }
-
-    @javax.persistence.Column(name = "dropbox_request_secret")
-    @Basic
-    public String getDropboxRequestSecret() {
-        return dropboxRequestSecret;
-    }
-
-    public void setDropboxRequestSecret(String token) {
-        this.dropboxRequestSecret = token;
-    }
-
     @javax.persistence.Column(name = "drive_access_token")
     @Basic
     public String getDriveAccessToken() {
@@ -136,6 +105,15 @@ public class UserEntity {
 
     public void setDropboxUid(String dropboxUid) {
         this.dropboxUid = dropboxUid;
+    }
+
+    @javax.persistence.Column(name = "drive_token_expires")
+    public Long getDriveTokenExpires() {
+        return driveTokenExpires;
+    }
+
+    public void setDriveTokenExpires(Long driveTokenExpires) {
+        this.driveTokenExpires = driveTokenExpires;
     }
 
     @Override

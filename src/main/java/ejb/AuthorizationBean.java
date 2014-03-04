@@ -11,6 +11,7 @@ import persistence.UserEntity;
 import persistence.UserManager;
 
 import javax.ejb.Stateless;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,34 +67,34 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
      *      String - link, where user should provide access to his account for this application
      *      null - error
      */
-    @Override
-    public String getDropboxAuthLink(Long userId) {
-        String link = null;
-        UserManager manager = new UserManager();
-        try {
-            Dropbox drop = new Dropbox();
-
-            Tokens requestTokens = drop.getRequestTokens();
-
-            // save requestTokens to DB
-            UserEntity user = manager.getUserById(userId);
-            user.setDropboxRequestKey(requestTokens.key);
-            user.setDropboxRequestSecret(requestTokens.secret);
-            boolean res = manager.updateUser(user);
-
-            // tokens was not saved
-            if (res == false) throw new Exception(EXCEPTION_DB_EXECUTION_ERROR);
-
-            link = drop.getAuthLink();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        finally {
-            manager.finalize();
-        }
-        return link;
-    }
+//    @Override
+//    public String getDropboxAuthLink(Long userId) {
+//        String link = null;
+//        UserManager manager = new UserManager();
+//        try {
+//            Dropbox drop = new Dropbox();
+//
+//            Tokens requestTokens = drop.getRequestTokens();
+//
+//            // save requestTokens to DB
+//            UserEntity user = manager.getUserById(userId);
+//            user.setDropboxRequestKey(requestTokens.key);
+//            user.setDropboxRequestSecret(requestTokens.secret);
+//            boolean res = manager.updateUser(user);
+//
+//            // tokens was not saved
+//            if (res == false) throw new Exception(EXCEPTION_DB_EXECUTION_ERROR);
+//
+//            link = drop.getAuthLink();
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        finally {
+//            manager.finalize();
+//        }
+//        return link;
+//    }
 
     /**
      *
@@ -133,7 +134,7 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
         Boolean result = false;
         UserManager manager = new UserManager();
         try {
-            GDrive gDrive = new GDrive(null, null);
+            GDrive gDrive = new GDrive(null, null, null);
 
             UserEntity user = manager.getUserById(userId);
 
@@ -148,6 +149,8 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
             // save accessTokens to DB
             user.setDriveAccessToken(accessToken);
             user.setDriveRefreshToken(refreshToken);
+            user.setDriveTokenExpires(credentials.getExpiresIn()*1000 + System.currentTimeMillis());
+            user.setGoogleEmail(credentials.getUniqueCloudId());
             result = manager.updateUser(user);
         } catch (Exception e) {
             e.printStackTrace();
@@ -168,7 +171,7 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
             }
 
             user.setDropboxAccessKey(null);
-            user.setDropboxAccessSecret(null);
+            user.setDropboxUid(null);
             result = manager.updateUser(user);
         } catch (Exception e){
             e.printStackTrace();
@@ -190,6 +193,8 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
 
             user.setDriveAccessToken(null);
             user.setDriveRefreshToken(null);
+            user.setDriveTokenExpires(null);
+            user.setGoogleEmail(null);
             result = manager.updateUser(user);
         } catch (Exception e){
             e.printStackTrace();
@@ -202,7 +207,7 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
     @Override
     public Long authorizeWithDrive(String code) {
         Long userId;
-        GDrive gDrive = new GDrive(null, null);
+        GDrive gDrive = new GDrive(null, null, null);
         OAuth2UserData oAuth2UserData = gDrive.retrieveAccessToken(code);
         UserManager userManager = new UserManager();
         List<UserEntity> userList = userManager.getUsersByField("google_email", oAuth2UserData.getUniqueCloudId());
@@ -211,11 +216,13 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
             user.setDriveAccessToken(oAuth2UserData.getAccessToken());
             user.setDriveRefreshToken(oAuth2UserData.getRefreshToken());
             user.setGoogleEmail(oAuth2UserData.getUniqueCloudId());
+            user.setDriveTokenExpires(oAuth2UserData.getExpiresIn()*1000 + System.currentTimeMillis());
             userId = userManager.addUser(user);
         }else{
             UserEntity user = userList.get(0);
             user.setDriveAccessToken(oAuth2UserData.getAccessToken());
             user.setDriveRefreshToken(oAuth2UserData.getRefreshToken());
+            user.setDriveTokenExpires(oAuth2UserData.getExpiresIn()*1000 + System.currentTimeMillis());
             userId = user.getId();
             userManager.updateUser(user);
         }
