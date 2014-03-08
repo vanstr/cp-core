@@ -8,7 +8,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.sql.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -103,12 +102,6 @@ public class GDrive {
                     && fileArray.getJSONObject(i).has("title")
                     && fileArray.getJSONObject(i).has("downloadUrl")){
 
-//                String[] track = new String[]{
-//                    ContentBeanRemote.DRIVE_CLOUD_ID.toString(),
-//                    fileArray.getJSONObject(i).getString("title"),
-//                    fileArray.getJSONObject(i).getString("downloadUrl") + "&oauth_token=" + this.accessToken,
-//                    fileArray.getJSONObject(i).getString("id")
-//                };
                 CloudFile track = new CloudFile(ContentBeanRemote.DRIVE_CLOUD_ID, fileArray.getJSONObject(i).getString("title"),
                         fileArray.getJSONObject(i).getString("downloadUrl") + "&oauth_token=" + this.accessToken, this.tokenExpires);
                 result.add(track);

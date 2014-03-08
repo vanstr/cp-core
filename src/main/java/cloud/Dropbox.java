@@ -9,7 +9,11 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * UserEntity: vanstr
@@ -35,36 +39,14 @@ public class Dropbox {
 
     private String accessToken;
     private DbxRequestConfig config = new DbxRequestConfig(
-            "JavaTutorial/1.0", Locale.getDefault().toString());
-    private DbxAppInfo appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
+            "Cloud_Player", Locale.getDefault().toString());
     private DbxClient client;
 
-    /**
-     * Start session to likn user account with CloudMusic
-     */
-    public Dropbox() throws Exception {
-
-//        session = new WebAuthSession(appKeys, ACCESS_TYPE);
-//        authInfo = session.getAuthInfo();
-//
-//        logger.debug("instance created");
-    }
+    public Dropbox(){}
 
     public Dropbox(String accessToken) throws Exception {
           this.accessToken = accessToken;
           this.client = new DbxClient(config, accessToken);
-//        if (accessTokenKey == null || accessTokenSecret == null) {
-//            logger.info("EXCEPTION_EMPTY_ACCESS_TOKENS");
-//            throw new Exception(EXCEPTION_EMPTY_ACCESS_TOKENS);
-//        }
-//
-//        AccessTokenPair accessTokenPair = new AccessTokenPair(accessTokenKey, accessTokenSecret);
-//        session = new WebAuthSession(appKeys, ACCESS_TYPE);
-//        session.setAccessTokenPair(accessTokenPair);
-//        api = new DropboxAPI<WebAuthSession>(session);
-//
-//        logger.debug("debug instance with access key created");
-
     }
 
     /**
@@ -98,19 +80,6 @@ public class Dropbox {
             }
         }
 
-//        for(String fileType : requestedFileTypes){
-//            List<Entry> dropboxEntries = api.search(folderPath, "." + fileType, 0, false);
-//            if(dropboxEntries != null){
-//                for(Entry dropboxEntry : dropboxEntries){
-//                    if(CloudFile.checkFileType(dropboxEntry.fileName(), requestedFileTypes)){
-//                        //TODO maybe url, id?
-//                        files.add(new String[]{ContentBeanRemote.DROPBOX_CLOUD_ID.toString()
-//                                , dropboxEntry.path, null, null});
-//                    }
-//                }
-//            }
-//        }
-
         return files;
     }
 
@@ -125,9 +94,4 @@ public class Dropbox {
         OAuth2UserData oAuth2UserData = OAuth2UserData.parseDropboxData(object);
         return oAuth2UserData;
     }
-
-//    public void retrieveAndSetAccessToken(String code){
-//        OAuth2UserData oAuth2UserData = this.retrieveAccessToken(code);
-//        this.accessToken = oAuth2UserData.getAccessToken();
-//    }
 }

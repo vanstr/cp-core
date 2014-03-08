@@ -64,42 +64,6 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
      *
      * @param userId
      * @return
-     *      String - link, where user should provide access to his account for this application
-     *      null - error
-     */
-//    @Override
-//    public String getDropboxAuthLink(Long userId) {
-//        String link = null;
-//        UserManager manager = new UserManager();
-//        try {
-//            Dropbox drop = new Dropbox();
-//
-//            Tokens requestTokens = drop.getRequestTokens();
-//
-//            // save requestTokens to DB
-//            UserEntity user = manager.getUserById(userId);
-//            user.setDropboxRequestKey(requestTokens.key);
-//            user.setDropboxRequestSecret(requestTokens.secret);
-//            boolean res = manager.updateUser(user);
-//
-//            // tokens was not saved
-//            if (res == false) throw new Exception(EXCEPTION_DB_EXECUTION_ERROR);
-//
-//            link = drop.getAuthLink();
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        finally {
-//            manager.finalize();
-//        }
-//        return link;
-//    }
-
-    /**
-     *
-     * @param userId
-     * @return
      *      true - user has provided access to app and access tokens saved.
      *      false - error occurred
      */
@@ -117,8 +81,6 @@ public class AuthorizationBean implements AuthorizationBeanRemote {
 
             // save accessTokens to DB
             user.setDropboxAccessKey(oAuth2UserData.getAccessToken());
-//            user.setDropboxAccessSecret(accessTokens.secret); // what TODO?
-
             user.setDropboxUid(oAuth2UserData.getUniqueCloudId());
             result = manager.updateUser(user);
         } catch (Exception e) {
