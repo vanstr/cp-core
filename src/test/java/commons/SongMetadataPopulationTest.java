@@ -27,14 +27,14 @@ import static org.junit.Assert.assertTrue;
 public class SongMetadataPopulationTest {
     final static Logger logger = LoggerFactory.getLogger(SongMetadataPopulationTest.class);
 
-    static SongEntity  song1 = null;
+    static SongEntity song1 = null;
     static Long userId = 1l;
     static Long cloudId = 1l;
     static UserEntity user;
     static SongManager songManger;
 
     @BeforeClass
-    public static void method(){
+    public static void method() {
         user = new UserEntity();
         user.setId(userId);
 
@@ -51,34 +51,40 @@ public class SongMetadataPopulationTest {
 
         logger.info("BeforeClass done");
     }
-    @Test
-    public void test1PopulatePlaylist(){
 
-        List<String[]> data = new ArrayList<String[]>();
+    @Test
+    public void test1PopulatePlaylist() {
+
+        List<Song> data = new ArrayList<Song>();
         // existed song
-        String[] trackHasMetadata = new String[]{ ((Long)song1.getCloudId()).toString(), song1.getFileName(), null, null };
-        String[] trackDoesNotHasMetadata = new String[]{ cloudId.toString(),"NoThatSong", null, null };
+        Song trackHasMetadata = new Song(song1.getCloudId(), song1.getFileName(), song1.getFileName(), null);
+        Song trackDoesNotHasMetadata = new Song(cloudId, "NoThatSong", "", null);
         data.add(trackHasMetadata);
         data.add(trackDoesNotHasMetadata);
 
         PlayList playList = SongMetadataPopulation.populate(data, userId);
 
         logger.debug("Songs in playlist:" + playList.size());
-        for (Song song:playList){
-            if(song.getFilePath().equals(song1.getFileName())){
-                logger.debug("song:" + song.getMetadata().getTitle());
-                assertTrue("Incorrect authors",song.getMetadata().getTitle().equals(song1.getMetadataTitle()));
-            }else{
-                logger.debug("line " + song.getMetadata());
-                assertNull("Methodata should not present",song.getMetadata());
+        try {
+
+            for (Song song : playList) {
+                if (song.getFileName().equals(song1.getFileName())) {
+                    logger.debug("song:" + song.getMetadata().getTitle());
+                    assertTrue("Incorrect authors", song.getMetadata().getTitle().equals(song1.getMetadataTitle()));
+                } else {
+                    logger.debug("line " + song.getMetadata());
+                    assertNull("Methodata should not present", song.getMetadata());
+                }
+                logger.info(song.toString());
             }
-            //logger.info(song.toString());
+        } catch (RuntimeException e) {
+            e.printStackTrace();
         }
         logger.info("test1PopulatePlaylist done");
     }
 
     @AfterClass
-    public static void testRemoveSong(){
+    public static void testRemoveSong() {
 
         List<Long> ids = new ArrayList<Long>();
         ids.add(song1.getId());

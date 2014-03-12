@@ -24,7 +24,8 @@ public class HibernateUtil {
                     .configure()
                     .addProperties(Initializator.getLocalProperties())
                     .addPackage("persistence")
-                    .addAnnotatedClass(UserEntity.class);
+                    .addAnnotatedClass(UserEntity.class)
+                    .addAnnotatedClass(SongEntity.class);
             sessionFactory = conf.buildSessionFactory();
 
         } catch (Throwable ex) {

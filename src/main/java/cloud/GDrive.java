@@ -7,12 +7,13 @@ import commons.Initializator;
 import ejb.ContentBeanRemote;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import structure.PlayList;
+import structure.Song;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 
 
@@ -63,19 +64,19 @@ public class GDrive {
         return tokens;
     }
 
-    public List<String[]> getFileList(String folderPath, List<String> fileTypes){
-        List<String[]> files = null;
+    public PlayList getFileList(String folderPath, List<String> fileTypes){
+        PlayList files = null;
         try {
-            files = retrieveAllFiles(this.accessToken);
+            files = retrieveAllFiles();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
 
-        Iterator<String[]> i = files.iterator();
+        Iterator<Song> i = files.iterator();
         while (i.hasNext()) {
-            String[] track = i.next();
-            if ( !CloudFile.checkFileType(track[1], fileTypes) ) {
+            Song track = i.next();
+            if ( !CloudFile.checkFileType(track.getFileName(), fileTypes) ) {
                 i.remove();
             }
         }
@@ -105,9 +106,9 @@ public class GDrive {
         return fileSrc;
     }
 
-    private List<String[]> retrieveAllFiles(String accessToken) throws IOException {
-        List<String[]> result = new ArrayList<String[]>();
-        String url = "https://www.googleapis.com/drive/v2/files?oauth_token=" + accessToken;
+    private PlayList retrieveAllFiles() throws IOException {
+        PlayList playList = new PlayList();
+        String url = "https://www.googleapis.com/drive/v2/files?oauth_token=" + this.accessToken;
         JSONObject object = HttpWorker.sendGetRequest(url);
         JSONArray fileArray = object.getJSONArray("items");
         for(int i = 0; i < fileArray.length(); i++){
@@ -116,16 +117,16 @@ public class GDrive {
                     && fileArray.getJSONObject(i).has("title")
                     && fileArray.getJSONObject(i).has("downloadUrl")){
 
-                String[] track = new String[]{
-                        ContentBeanRemote.DRIVE_CLOUD_ID.toString(),
+                Song song = new Song(
+                        (long)(ContentBeanRemote.DRIVE_CLOUD_ID),
+                        fileArray.getJSONObject(i).getString("id"),
                         fileArray.getJSONObject(i).getString("title"),
-                        fileArray.getJSONObject(i).getString("downloadUrl") + "&oauth_token=" + this.accessToken,
-                        fileArray.getJSONObject(i).getString("id")
-                };
-                result.add(track);
+                        fileArray.getJSONObject(i).getString("downloadUrl") + "&oauth_token=" + this.accessToken
+                );
+                playList.add(song);
             }
         }
-        return result;
+        return playList;
     }
 
 }

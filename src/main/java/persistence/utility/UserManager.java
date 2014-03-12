@@ -14,7 +14,11 @@ import java.util.Map;
  */
 public class UserManager extends EntityManager<UserEntity> {
 
-    public static final String table =  "UserEntity";
+    public static final String table =  UserEntity.class.getName();
+
+    public UserManager(){
+        super(table);
+    }
 
     public void finalize(){
         super.finalize();
@@ -26,7 +30,7 @@ public class UserManager extends EntityManager<UserEntity> {
 
 
     public List<UserEntity> getUsersByFields(Map<String, Object> fields) {
-        return getEntitiesByFields(fields, table);
+        return getEntitiesByFields(fields);
     }
 
     public boolean addUser(final UserEntity user) {
@@ -35,7 +39,7 @@ public class UserManager extends EntityManager<UserEntity> {
 
 
     public boolean deleteUsersByIDs(final List<Long> ids) {
-        return deleteEntityByIDs(ids, table);
+        return deleteEntityByIDs(ids);
     }
 
     public UserEntity getUserById(long id) {

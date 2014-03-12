@@ -18,8 +18,11 @@ import java.util.Map;
  */
 public class SongManager extends EntityManager<SongEntity> {
     final static Logger logger = LoggerFactory.getLogger(SongManager.class);
-    public static final String table = "SongEntity";
+    public static final String table = SongEntity.class.getName();
 
+    public SongManager(){
+        super(table);
+    }
 
     public SongEntity getSongById(long id) {
         return getEntityById(SongEntity.class, id);
@@ -32,7 +35,7 @@ public class SongManager extends EntityManager<SongEntity> {
 
 
     public List<SongEntity> getSongsByFields(Map<String, Object> fields) {
-        return getEntitiesByFields(fields, table);
+        return getEntitiesByFields(fields);
     }
 
     public boolean addSong(SongEntity song) {
@@ -41,7 +44,7 @@ public class SongManager extends EntityManager<SongEntity> {
 
 
     public boolean deleteSongsByID(List<Long> ids) {
-        return deleteEntityByIDs(ids, table);
+        return deleteEntityByIDs(ids);
     }
 
 
@@ -51,7 +54,7 @@ public class SongManager extends EntityManager<SongEntity> {
         fieldMap.put("cloudId", cloudId);
         fieldMap.put("fileName", fileName);
         fieldMap.put("user", user);
-        List<SongEntity> list = getEntitiesByFields(fieldMap, table);
+        List<SongEntity> list = getEntitiesByFields(fieldMap);
 
         SongEntity songEntity = null;
         if (list != null) {

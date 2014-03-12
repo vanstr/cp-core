@@ -1,10 +1,5 @@
 package structure;
 
-import persistence.SongEntity;
-import persistence.UserEntity;
-import persistence.utility.SongManager;
-
-import javax.persistence.Entity;
 import java.io.Serializable;
 
 /**
@@ -14,43 +9,30 @@ import java.io.Serializable;
  * Time: 19:04
  * To change this template use File | Settings | File Templates.
  */
-@Entity
 public class Song implements Serializable {
 
-    private String filePath;
+    private String fileId;
     private String fileName;
     private String url;
     private long cloudId;
     private SongMetadata metadata;
-    private String driveId; // TODO: what to do??  add field fileUniqueField in gdrive it will be ID in Dropbox filePath
 
-    public Song(UserEntity user, long cloudId, String filePath, String url, String driveId) {
-        this.filePath = filePath;
-        this.fileName = createFileNameFromFilePath(filePath);
+    public Song(long cloudId, String fileId, String fileName, String url) {
+
+        this.fileName = fileName;
         this.cloudId = cloudId;
-        this.driveId = driveId;
+        this.fileId = fileId;
         this.url = url;
-
-        SongManager manager = new SongManager();
-        SongEntity songEntity = manager.getSongByHash(user, cloudId, filePath);
-        if (songEntity != null) {
-            this.metadata = new SongMetadata(songEntity);
-        }
-        manager.finalize();
-
     }
 
-    public String createFileNameFromFilePath(String filePath){
-        return filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length());
+    public String getFileId() {
+        return fileId;
     }
 
-    public String getFilePath() {
-        return filePath;
+    public void setFileId(String fileId) {
+        this.fileId = fileId;
     }
 
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
 
     public long getCloudId() {
         return cloudId;
@@ -86,17 +68,8 @@ public class Song implements Serializable {
         this.fileName = fileName;
     }
 
-    public String getDriveId() {
-        return driveId;
-    }
-
-    public void setDriveId(String driveId) {
-        this.driveId = driveId;
-    }
-
-
     public String toString() {
-        return "Song name:" + this.filePath + " metadata:" + this.metadata;
+        return "Song name:" + this.fileName + " metadata:" + this.metadata;
     }
 
 }

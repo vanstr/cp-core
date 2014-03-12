@@ -24,8 +24,11 @@ public abstract class EntityManager<T> {
 
     private TransactionWrapper transactionWrapper = new TransactionWrapper();
     private Session session;
+    private String table;
 
-    public EntityManager() {
+    public EntityManager(String table) {
+        this.table = table;
+
         statistic.setStatisticsEnabled(true);
 
         startSession();
@@ -63,7 +66,7 @@ public abstract class EntityManager<T> {
         return entity;
     }
 
-    public List<T> getEntitiesByFields(Map<String, Object> fields, String table) {
+    public List<T> getEntitiesByFields(Map<String, Object> fields) {
 
         List<T> list = null;
         if (fields != null && fields.size() > 0) {
@@ -88,7 +91,7 @@ public abstract class EntityManager<T> {
         return list;
     }
 
-    public boolean deleteEntityByIDs(final List<Long> ids, final String table) {
+    public boolean deleteEntityByIDs(final List<Long> ids) {
 
         return transactionWrapper.run(session, new AbstractExecutor() {
             @Override

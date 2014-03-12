@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import persistence.UserEntity;
 import persistence.utility.UserManager;
+import structure.Song;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -153,7 +154,7 @@ public class DropboxTest {
 
         // 1. should be exception in method because dropbox session not established
         // unworked
-        List<String[]> res5 = null;
+        List<Song> res5 = null;
         try {
             res5 = dropUnAuth.getFileList("/", fileTypes);
         } catch (Exception e) {
@@ -162,7 +163,7 @@ public class DropboxTest {
         assertNull("Exception", res5);
 
         // 2.
-        List<String[]> res = null;
+        List<Song> res = null;
         try {
             res = dropAuth.getFileList("/", fileTypes);
         } catch (Exception e) {
@@ -175,8 +176,8 @@ public class DropboxTest {
 
         int resSize = res.size();
         for (int i = 0; i < resSize; i++) {
-            logger.debug(res.get(i)[1]);
-            if (correctMusicFile.equals(res.get(i)[1])) filePresents = true;
+            logger.debug(res.get(i).getFileId());
+            if (correctMusicFile.equals(res.get(i).getFileId())) filePresents = true;
         }
         assertTrue("Music file not found", filePresents);
 

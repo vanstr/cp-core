@@ -9,6 +9,7 @@ import commons.Tokens;
 import ejb.ContentBeanRemote;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import structure.Song;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -126,9 +127,9 @@ public class Dropbox {
      *
      * @return    array of file
      */
-    public List<String[]> getFileList(String folderPath, List<String> requestedFileTypes) throws Exception {
+    public List<Song> getFileList(String folderPath, List<String> requestedFileTypes) throws Exception {
 
-        ArrayList<String[]> files = new ArrayList<String[]>();
+        ArrayList<Song> files = new ArrayList<Song>();
 
         for(String fileType : requestedFileTypes){
             List<Entry> dropboxEntries = api.search(folderPath, "." + fileType, 0, false);
@@ -137,13 +138,20 @@ public class Dropbox {
                     if(CloudFile.checkFileType(dropboxEntry.fileName(), requestedFileTypes)){
                         //TODO maybe url, id?
                         // TODO: move DROPBOX_CLOUD_ID to settings
-                        files.add(new String[]{ContentBeanRemote.DROPBOX_CLOUD_ID.toString()
-                                , dropboxEntry.path, null, null});
+                        files.add(new Song( ContentBeanRemote.DROPBOX_CLOUD_ID,
+                                            dropboxEntry.path,
+                                            getFileNameFromFilePath(dropboxEntry.path),
+                                            null)
+                        );
                     }
                 }
             }
         }
 
         return files;
+    }
+
+    private String getFileNameFromFilePath(String filePath){
+        return filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length());
     }
 }

@@ -21,7 +21,6 @@ import java.sql.Timestamp;
 public class SongEntity {
 
     private long id;
-    //private long userId;
     private long cloudId;
     private Timestamp lastTimeAccessed;
     private String fileName;

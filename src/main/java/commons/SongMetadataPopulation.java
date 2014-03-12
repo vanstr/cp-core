@@ -1,8 +1,11 @@
 package commons;
 
+import persistence.SongEntity;
 import persistence.UserEntity;
+import persistence.utility.SongManager;
 import structure.PlayList;
 import structure.Song;
+import structure.SongMetadata;
 
 import java.util.List;
 
@@ -15,7 +18,7 @@ import java.util.List;
  */
 public class SongMetadataPopulation {
 
-    public static PlayList populate(  List<String[]> data, long userId ){
+    public static PlayList populate(List<Song> data, long userId) {
 
         UserEntity userEntity = new UserEntity();
         userEntity.setId(userId);
@@ -23,10 +26,17 @@ public class SongMetadataPopulation {
         PlayList playList = new PlayList();
 
         int size = data.size();
-        for (int i = 0; i< size; i++){
-            String[] item = data.get(i);
+        for (int i = 0; i < size; i++) {
+            Song song = data.get(i);
 
-            Song song = new Song(userEntity, Long.parseLong(item[0]),item[1],item[2],item[3]);
+            SongManager manager = new SongManager();
+            SongEntity songEntity = manager.getSongByHash(userEntity, song.getCloudId(), song.getFileName());
+            if (songEntity != null) {
+                SongMetadata metadata = new SongMetadata(songEntity);
+                song.setMetadata(metadata);
+            }
+            manager.finalize();
+
             playList.add(song);
         }
 

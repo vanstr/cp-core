@@ -4,7 +4,6 @@ import structure.PlayList;
 import structure.Song;
 
 import javax.ejb.Remote;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,9 +20,9 @@ public interface ContentBeanRemote {
     public static final Integer DRIVE_CLOUD_ID = 2;
 
     // TODO: replace with getPlayList
-    public List<String[]> getFiles(String folderPath, Long userId);
+    //public List<String[]> getFiles(String folderPath, Long userId);
 
-    public String getFileSrc(Integer cloudId, String path, Long userId, String fileId);
+    public String getFileSrc(Long userId, Integer cloudId, String fileId);
 
     public PlayList getPlayList(Long userId);
 

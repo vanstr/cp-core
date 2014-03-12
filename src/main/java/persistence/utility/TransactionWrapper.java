@@ -29,7 +29,7 @@ public class TransactionWrapper {
 
             tx.commit();
             res = true;
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             e.printStackTrace();
 
             doRollback(tx);

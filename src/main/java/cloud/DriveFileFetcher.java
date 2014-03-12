@@ -4,6 +4,7 @@ import com.sun.servicetag.UnauthorizedAccessException;
 import commons.FileFetcher;
 import persistence.UserEntity;
 import persistence.utility.UserManager;
+import structure.Song;
 
 import java.util.List;
 
@@ -20,8 +21,8 @@ public class DriveFileFetcher extends FileFetcher{
         super(folderPath, userId);
     }
 
-    public List<String[]> getCloudFiles(String folderPath, Long userId){
-        List<String[]> files = null;
+    public List<Song> getCloudFiles(String folderPath, Long userId){
+        List<Song> files = null;
         GDrive gDrive = null;
 
         UserManager manager = new UserManager();

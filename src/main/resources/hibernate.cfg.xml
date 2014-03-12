@@ -20,8 +20,5 @@
 
         <property name="hibernate.current_session_context_class">org.hibernate.context.ThreadLocalSessionContext</property>
 
-        <mapping class="persistence.UserEntity"/>
-        <mapping class="persistence.SongEntity"/>
-
     </session-factory>
 </hibernate-configuration>
