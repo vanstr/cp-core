@@ -2,7 +2,6 @@ package ejb;
 
 import cloud.Dropbox;
 import cloud.GDrive;
-import com.dropbox.core.DbxEntry;
 import com.sun.servicetag.UnauthorizedAccessException;
 import commons.CloudFile;
 import persistence.UserEntity;
@@ -10,7 +9,6 @@ import persistence.UserManager;
 
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

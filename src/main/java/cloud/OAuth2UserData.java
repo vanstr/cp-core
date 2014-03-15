@@ -50,23 +50,4 @@ public class OAuth2UserData {
     public void setExpiresIn(Integer expiresIn) {
         this.expiresIn = expiresIn;
     }
-
-    public static OAuth2UserData parseDropboxData(JSONObject jsonObject){
-        OAuth2UserData oAuth2UserData = new OAuth2UserData();
-        oAuth2UserData.accessToken = jsonObject.getString("access_token");
-        oAuth2UserData.uniqueCloudId = jsonObject.getString("uid");
-        return oAuth2UserData;
-    }
-
-    public static OAuth2UserData parseDriveData(JSONObject jsonObject){
-        OAuth2UserData oAuth2UserData = new OAuth2UserData();
-        oAuth2UserData.accessToken = jsonObject.getString("access_token");
-        oAuth2UserData.refreshToken = jsonObject.getString("refresh_token");
-        oAuth2UserData.expiresIn = jsonObject.getInt("expires_in");
-        JSONObject object = HttpWorker.sendGetRequest("https://www.googleapis.com/userinfo/email?alt=json&oauth_token="
-                + oAuth2UserData.accessToken);
-        String email = object.getJSONObject("data").get("email").toString();
-        oAuth2UserData.uniqueCloudId = email;
-        return oAuth2UserData;
-    }
 }

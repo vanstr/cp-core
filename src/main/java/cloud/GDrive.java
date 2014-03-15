@@ -20,6 +20,10 @@ public class GDrive {
     private static String CLIENT_ID = Initializator.getLocalProperties().getProperty("drive.client.id");
     private static String CLIENT_SECRET = Initializator.getLocalProperties().getProperty("drive.client.secret");
     private static String REDIRECT_URI = Initializator.getLocalProperties().getProperty("drive.redirect.uri");
+    private static String DRIVE_EMAIL_URL = Initializator.getLocalProperties().getProperty("drive.email.url");
+    private static String DRIVE_TOKEN_URL = Initializator.getLocalProperties().getProperty("drive.token.url");
+    private static String DRIVE_FILES_URL = Initializator.getLocalProperties().getProperty("drive.files.url");
+    private static String DRIVE_SCOPE_URL = Initializator.getLocalProperties().getProperty("drive.scope.url");
     private static final String GRANT_TYPE_REFRESH = "refresh_token";
     private static final String GRANT_TYPE_AUTHORIZATION = "authorization_code";
 
@@ -64,9 +68,9 @@ public class GDrive {
         params.put("client_secret", CLIENT_SECRET);
         params.put("grant_type", GRANT_TYPE_AUTHORIZATION);
         params.put("redirect_uri", REDIRECT_URI);
-        params.put("scope", "https://www.googleapis.com/auth/userinfo.email+https://www.googleapis.com/auth/drive");
-        JSONObject object = HttpWorker.sendPostRequest("https://accounts.google.com/o/oauth2/token", params);
-        OAuth2UserData oAuth2UserData = OAuth2UserData.parseDriveData(object);
+        params.put("scope", DRIVE_EMAIL_URL + "+" + DRIVE_SCOPE_URL);
+        JSONObject object = HttpWorker.sendPostRequest(DRIVE_TOKEN_URL, params);
+        OAuth2UserData oAuth2UserData = parseDriveData(object);
         return oAuth2UserData;
     }
 
@@ -90,7 +94,7 @@ public class GDrive {
 
     public List<CloudFile> retrieveAllFiles() throws IOException {
         List<CloudFile> result = new ArrayList<CloudFile>();
-        String url = "https://www.googleapis.com/drive/v2/files?oauth_token=" + this.accessToken;
+        String url = DRIVE_FILES_URL + "?oauth_token=" + this.accessToken;
         JSONObject object = HttpWorker.sendGetRequest(url);
         if(object == null){
             return result;
@@ -118,7 +122,7 @@ public class GDrive {
             params.put("client_secret", CLIENT_SECRET);
             params.put("grant_type", GRANT_TYPE_REFRESH);
             params.put("refresh_token", refreshToken);
-            JSONObject object = HttpWorker.sendPostRequest("https://accounts.google.com/o/oauth2/token", params);
+            JSONObject object = HttpWorker.sendPostRequest(DRIVE_TOKEN_URL, params);
             accessToken = object.getString("access_token");
             this.tokenExpires = object.getLong("expires_in")*1000 + System.currentTimeMillis();
         } catch (Exception e) {
@@ -128,9 +132,21 @@ public class GDrive {
     }
 
     public String getFileLink(String fileId){
-        JSONObject object = HttpWorker.sendGetRequest("https://www.googleapis.com/drive/v2/files/"
+        JSONObject object = HttpWorker.sendGetRequest(DRIVE_FILES_URL
                 + fileId + "?oauth_token=" + this.accessToken);
         String fileSrc = object.getString("downloadUrl") + "&oauth_token=" + this.accessToken;
         return fileSrc;
+    }
+
+    public static OAuth2UserData parseDriveData(JSONObject jsonObject){
+        OAuth2UserData oAuth2UserData = new OAuth2UserData();
+        oAuth2UserData.setAccessToken(jsonObject.getString("access_token"));
+        oAuth2UserData.setRefreshToken(jsonObject.getString("refresh_token"));
+        oAuth2UserData.setExpiresIn(jsonObject.getInt("expires_in"));
+        JSONObject object = HttpWorker.sendGetRequest(DRIVE_EMAIL_URL + "?alt=json&oauth_token="
+                + oAuth2UserData.getAccessToken());
+        String email = object.getJSONObject("data").get("email").toString();
+        oAuth2UserData.setUniqueCloudId(email);
+        return oAuth2UserData;
     }
 }

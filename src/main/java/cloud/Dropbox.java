@@ -30,6 +30,7 @@ public class Dropbox {
     private static final String APP_KEY = Initializator.getLocalProperties().getProperty("dropbox.app.key");
     private static final String APP_SECRET = Initializator.getLocalProperties().getProperty("dropbox.app.secret");
     private static String REDIRECT_URI = Initializator.getLocalProperties().getProperty("dropbox.redirect.uri");
+    private static String DROPBOX_TOKEN_URL = Initializator.getLocalProperties().getProperty("dropbox.token.url");
     private static final String GRANT_TYPE_REFRESH = "refresh_token";
     private static final String GRANT_TYPE_AUTHORIZATION = "authorization_code";
 
@@ -90,8 +91,15 @@ public class Dropbox {
         params.put("client_secret", APP_SECRET);
         params.put("grant_type", GRANT_TYPE_AUTHORIZATION);
         params.put("redirect_uri", REDIRECT_URI);
-        JSONObject object = HttpWorker.sendPostRequest("https://api.dropbox.com/1/oauth2/token", params);
-        OAuth2UserData oAuth2UserData = OAuth2UserData.parseDropboxData(object);
+        JSONObject object = HttpWorker.sendPostRequest(DROPBOX_TOKEN_URL, params);
+        OAuth2UserData oAuth2UserData = parseDropboxData(object);
+        return oAuth2UserData;
+    }
+
+    public static OAuth2UserData parseDropboxData(JSONObject jsonObject){
+        OAuth2UserData oAuth2UserData = new OAuth2UserData();
+        oAuth2UserData.setAccessToken(jsonObject.getString("access_token"));
+        oAuth2UserData.setUniqueCloudId(jsonObject.getString("uid"));
         return oAuth2UserData;
     }
 }
