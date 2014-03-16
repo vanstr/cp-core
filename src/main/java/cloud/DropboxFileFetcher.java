@@ -25,11 +25,10 @@ public class DropboxFileFetcher extends FileFetcher {
         UserManager manager = new UserManager();
         try {
             UserEntity user = manager.getUserById(userId);
-
             String accessTokenKey = user.getDropboxAccessKey();
-            String accessTokenSecret = user.getDropboxAccessSecret();
-            if (accessTokenKey != null && accessTokenSecret != null) {
-                Dropbox drop = new Dropbox(accessTokenKey, accessTokenSecret);
+
+            if (accessTokenKey != null) {
+                Dropbox drop = new Dropbox(accessTokenKey);
                 files = drop.getFileList(folderPath, REQUIRED_FILE_TYPES);
             }
         } catch (Exception e) {

@@ -16,14 +16,17 @@ public interface AuthorizationBeanRemote {
 
     public Boolean registerUser(String userName, String password);
 
-    public String getDropboxAuthLink(Long userId);
-
     //save user tokens to DB
-    public Boolean retrieveDropboxAccessToken(Long userId);
+    public Boolean retrieveDropboxCredentials(Long userId, String code);
 
     public Boolean retrieveGDriveCredentials(Long userId, String code);
 
     public Boolean removeDropboxAcoount(Long userId);
 
     public Boolean removeGDriveAccount(Long userId);
+
+    public Long authorizeWithDrive(String code);
+
+    public Long authorizeWithDropbox(String code);
+
 }

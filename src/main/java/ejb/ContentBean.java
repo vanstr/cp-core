@@ -42,9 +42,8 @@ public class ContentBean implements ContentBeanRemote {
         try {
             if (DROPBOX_CLOUD_ID.equals(cloudId)) {
                 String accessTokenKey = user.getDropboxAccessKey();
-                String accessTokenSecret = user.getDropboxAccessSecret();
+                Dropbox drop = new Dropbox(accessTokenKey);
 
-                Dropbox drop = new Dropbox(accessTokenKey, accessTokenSecret);
                 logger.info(fileId);
                 file = drop.getFileLink(fileId);
             } else if (DRIVE_CLOUD_ID.equals(cloudId)) {

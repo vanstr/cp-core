@@ -55,7 +55,7 @@ public class SongTest {
 
 
 
-            dropAuth = new Dropbox(user.getDropboxAccessKey(), user.getDropboxAccessSecret());
+            dropAuth = new Dropbox(user.getDropboxAccessKey());
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             fail("error in preparing");

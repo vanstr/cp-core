@@ -1,7 +1,6 @@
 package cloudTest;
 
 import cloud.Dropbox;
-import commons.Tokens;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -43,7 +42,7 @@ public class DropboxTest {
             UserManager manager = new UserManager();
             UserEntity user = manager.getUserById(1);
 
-            dropAuth = new Dropbox(user.getDropboxAccessKey(), user.getDropboxAccessSecret());
+            dropAuth = new Dropbox(user.getDropboxAccessKey());
 
             manager.finalize();
         } catch (Exception e) {
@@ -58,7 +57,7 @@ public class DropboxTest {
     public void testDropboxFail(){
 
         try{
-            new Dropbox(null, null);
+            new Dropbox(null);
         }catch( Exception e){
             logger.info("testDropboxFail done");
             return;
@@ -67,39 +66,27 @@ public class DropboxTest {
         fail("testDropbox wrong result with NULL key pair value");
     }
 
-    @Test
-    public void testGetRequestTokens(){
 
-        Tokens res = dropUnAuth.getRequestTokens();
-        if (res.secret.isEmpty() || res.key.isEmpty()) fail("key or secret is empty");
 
-        logger.info("testGetRequestTokens done");
-    }
-
-    @Test
-    public void testGetAuthLink(){
-
-        String res = dropUnAuth.getAuthLink();
-        if (!res.contains("https://")) fail("URl doesnt contain https://");
-
-        logger.info("testGetAuthLink done");
-    }
 
     // We assume that user has requestTokens in DB
     @Test
     public void testGetUserAccessTokens(){
 
         // 1. User not provided access to his account, -> get exception in Dropbox class
+        /*
         Tokens res = dropUnAuth.getRequestTokens();
+
         Tokens accessTokens = null;
         try {
             accessTokens = dropUnAuth.getUserAccessTokens(res);
         } catch (Exception e) {
             //e.printStackTrace();
         }
+
         // accessTokens must be null because not provided access via link to account
         assertNull("AccessTokens should be NULL!", accessTokens);
-
+        */
         // 2.User has provided access to his account
         // assume that user has requestTokens in DB
         // TODO: get user requestTokens, provide access to acc via link, retrieve accessTokens, save them to DB and update dropAuth

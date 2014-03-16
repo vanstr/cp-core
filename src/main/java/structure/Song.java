@@ -16,13 +16,15 @@ public class Song implements Serializable {
     private String url;
     private long cloudId;
     private SongMetadata metadata;
+    private Long urlExipresTime;
 
-    public Song(long cloudId, String fileId, String fileName, String url) {
+    public Song(long cloudId, String fileId, String fileName, String url, Long urlExipresTime) {
 
         this.fileName = fileName;
         this.cloudId = cloudId;
         this.fileId = fileId;
         this.url = url;
+        this.urlExipresTime = urlExipresTime;
     }
 
     public String getFileId() {
@@ -67,6 +69,15 @@ public class Song implements Serializable {
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
+
+    public Long getUrlExipresTime() {
+        return urlExipresTime;
+    }
+
+    public void setUrlExipresTime(Long urlExipresTime) {
+        this.urlExipresTime = urlExipresTime;
+    }
+
 
     public String toString() {
         return "Song name:" + this.fileName + " metadata:" + this.metadata;

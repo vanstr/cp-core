@@ -2,6 +2,7 @@ package persistence.utility;
 
 import persistence.UserEntity;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,8 +34,19 @@ public class UserManager extends EntityManager<UserEntity> {
         return getEntitiesByFields(fields);
     }
 
-    public boolean addUser(final UserEntity user) {
-        return addEntity(user);
+    public List<UserEntity> getUsersByField(String key, Object value) {
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put(key, value);
+        return getEntitiesByFields(params);
+    }
+
+    public Long addUser(final UserEntity user) {
+        if(addEntity(user)){
+            // TODO: check
+            return user.getId();
+        }else{
+            return null;
+        }
     }
 
 

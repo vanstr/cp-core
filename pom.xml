@@ -69,6 +69,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-c3p0</artifactId>
+            <version>3.6.3.Final</version>
+        </dependency>
+
+        <dependency>
             <groupId>javassist</groupId>
             <artifactId>javassist</artifactId>
             <version>3.12.1.GA</version>
@@ -82,9 +88,9 @@
 
         <!-- dropbox SDK api -->
         <dependency>
-            <groupId>org.syncloud</groupId>
-            <artifactId>dropbox-client</artifactId>
-            <version>1.5.3</version>
+            <groupId>com.dropbox.core</groupId>
+            <artifactId>dropbox-core-sdk</artifactId>
+            <version>1.7.4</version>
         </dependency>
 
         <dependency>
@@ -210,6 +216,31 @@
                 <configuration>
                     <finalName>cp-core</finalName>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.4.3</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${jboss.as.home}/standalone/lib</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>target</directory>
+                                    <includes>
+                                        <include>
+                                            cp-core-client.jar</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

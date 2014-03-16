@@ -1,7 +1,5 @@
 package persistence;
 
-import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,22 +13,23 @@ import java.util.Set;
  */
 @Table(name = "user", schema = "", catalog = "cloud_player")
 @Entity
+@org.hibernate.annotations.Entity(
+        dynamicUpdate = true
+)
 public class UserEntity {
     private long id;
     private String login;
     private String password;
     private String dropboxAccessKey;
-    private String dropboxAccessSecret;
-    private String dropboxRequestKey;
-    private String dropboxRequestSecret;
     private String driveAccessToken;
     private String driveRefreshToken;
+    private String googleEmail;
+    private String dropboxUid;
+    private Long driveTokenExpires;
     private Set<SongEntity> songEntities = new HashSet<SongEntity>(0);
 
     @Id
     @Column(name = "id")
-    @GenericGenerator(name="gen",strategy="increment")
-    @GeneratedValue(generator="gen")
     public long getId() {
         return id;
     }
@@ -78,36 +77,6 @@ public class UserEntity {
         this.dropboxAccessKey = token;
     }
 
-    @javax.persistence.Column(name = "dropbox_access_secret")
-    @Basic
-    public String getDropboxAccessSecret() {
-        return dropboxAccessSecret;
-    }
-
-    public void setDropboxAccessSecret(String token) {
-        this.dropboxAccessSecret = token;
-    }
-
-    @javax.persistence.Column(name = "dropbox_request_key")
-    @Basic
-    public String getDropboxRequestKey() {
-        return dropboxRequestKey;
-    }
-
-    public void setDropboxRequestKey(String token) {
-        this.dropboxRequestKey = token;
-    }
-
-    @javax.persistence.Column(name = "dropbox_request_secret")
-    @Basic
-    public String getDropboxRequestSecret() {
-        return dropboxRequestSecret;
-    }
-
-    public void setDropboxRequestSecret(String token) {
-        this.dropboxRequestSecret = token;
-    }
-
     @javax.persistence.Column(name = "drive_access_token")
     @Basic
     public String getDriveAccessToken() {
@@ -128,9 +97,35 @@ public class UserEntity {
         this.driveRefreshToken = driveRefreshToken;
     }
 
+    @javax.persistence.Column(name = "google_email")
+    public String getGoogleEmail() {
+        return googleEmail;
+    }
+
+    public void setGoogleEmail(String googleEmail) {
+        this.googleEmail = googleEmail;
+    }
+
+    @javax.persistence.Column(name = "dropbox_uid")
+    public String getDropboxUid() {
+        return dropboxUid;
+    }
+
+    public void setDropboxUid(String dropboxUid) {
+        this.dropboxUid = dropboxUid;
+    }
+
+    @javax.persistence.Column(name = "drive_token_expires")
+    public Long getDriveTokenExpires() {
+        return driveTokenExpires;
+    }
+
+    public void setDriveTokenExpires(Long driveTokenExpires) {
+        this.driveTokenExpires = driveTokenExpires;
+    }
+
     @Override
     public String toString(){
         return "User login:" + this.getLogin();
     }
-
 }

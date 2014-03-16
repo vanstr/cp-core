@@ -57,8 +57,8 @@ public class SongMetadataPopulationTest {
 
         List<Song> data = new ArrayList<Song>();
         // existed song
-        Song trackHasMetadata = new Song(song1.getCloudId(), song1.getFileName(), song1.getFileName(), null);
-        Song trackDoesNotHasMetadata = new Song(cloudId, "NoThatSong", "", null);
+        Song trackHasMetadata = new Song(song1.getCloudId(), song1.getFileName(), song1.getFileName(), null, null);
+        Song trackDoesNotHasMetadata = new Song(cloudId, "NoThatSong", "", null, null);
         data.add(trackHasMetadata);
         data.add(trackDoesNotHasMetadata);
 
