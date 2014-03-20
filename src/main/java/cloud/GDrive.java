@@ -22,9 +22,10 @@ public class GDrive {
     private static String CLIENT_SECRET = Initializator.getLocalProperties().getProperty("drive.client.secret");
     private static String REDIRECT_URI = Initializator.getLocalProperties().getProperty("drive.redirect.uri");
     private static String DRIVE_EMAIL_URL = Initializator.getLocalProperties().getProperty("drive.email.url");
+    private static String EMAIL_SCOPE = Initializator.getLocalProperties().getProperty("drive.email.scope");
     private static String DRIVE_TOKEN_URL = Initializator.getLocalProperties().getProperty("drive.token.url");
     private static String DRIVE_FILES_URL = Initializator.getLocalProperties().getProperty("drive.files.url");
-    private static String DRIVE_SCOPE_URL = Initializator.getLocalProperties().getProperty("drive.scope.url");
+    private static String DRIVE_SCOPE = Initializator.getLocalProperties().getProperty("drive.scope.url");
     private static final String GRANT_TYPE_REFRESH = "refresh_token";
     private static final String GRANT_TYPE_AUTHORIZATION = "authorization_code";
 
@@ -74,7 +75,7 @@ public class GDrive {
         params.put("client_secret", CLIENT_SECRET);
         params.put("grant_type", GRANT_TYPE_AUTHORIZATION);
         params.put("redirect_uri", REDIRECT_URI);
-        params.put("scope", DRIVE_EMAIL_URL + "+" + DRIVE_SCOPE_URL);
+        params.put("scope", EMAIL_SCOPE + "+" + DRIVE_SCOPE);
         JSONObject object = HttpWorker.sendPostRequest(DRIVE_TOKEN_URL, params);
         OAuth2UserData oAuth2UserData = parseDriveData(object);
         return oAuth2UserData;
