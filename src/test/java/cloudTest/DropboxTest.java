@@ -1,11 +1,13 @@
 package cloudTest;
 
 import cloud.Dropbox;
-import commons.Tokens;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import persistence.UserEntity;
-import persistence.UserManager;
+import persistence.utility.UserManager;
+import structure.Song;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +25,8 @@ import static org.junit.Assert.fail;
  */
 public class DropboxTest {
 
+    final static Logger logger = LoggerFactory.getLogger(DropboxTest.class);
+
     private static Dropbox dropUnAuth = null; // un authorized dropboz session
     private static Dropbox dropAuth = null; // authorized dropboz session
 
@@ -34,60 +38,55 @@ public class DropboxTest {
         try {
             dropUnAuth = new Dropbox();
 
-
             // ATTENTION user with 1 id should be JUnit user and with access keys
             UserManager manager = new UserManager();
             UserEntity user = manager.getUserById(1);
 
-            dropAuth = new Dropbox(user.getDropboxAccessKey(), user.getDropboxAccessSecret());
+            dropAuth = new Dropbox(user.getDropboxAccessKey());
+
+            manager.finalize();
         } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            //e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             fail("error in preparing");
         }
+        logger.info("BeforeClass done");
 
     }
 
     @Test
-    public void testDropbox(){
+    public void testDropboxFail(){
 
         try{
-            new Dropbox(null, null);
+            new Dropbox(null);
         }catch( Exception e){
+            logger.info("testDropboxFail done");
             return;
         }
 
-        fail("testDropbox frong result with NULL key pair value");
+        fail("testDropbox wrong result with NULL key pair value");
     }
 
-    @Test
-    public void testGetRequestTokens(){
 
-        Tokens res = dropUnAuth.getRequestTokens();
-        if (res.secret.isEmpty() || res.key.isEmpty()) fail("key or secret is empty");
-    }
 
-    @Test
-    public void testGetAuthLink(){
-
-        String res = dropUnAuth.getAuthLink();
-        if (!res.contains("https://")) fail("URl doesnt contain https://");
-    }
 
     // We assume that user has requestTokens in DB
     @Test
     public void testGetUserAccessTokens(){
 
         // 1. User not provided access to his account, -> get exception in Dropbox class
+        /*
         Tokens res = dropUnAuth.getRequestTokens();
+
         Tokens accessTokens = null;
         try {
             accessTokens = dropUnAuth.getUserAccessTokens(res);
         } catch (Exception e) {
             //e.printStackTrace();
         }
+
         // accessTokens must be null because not provided access via link to account
         assertNull("AccessTokens should be NULL!", accessTokens);
-
+        */
         // 2.User has provided access to his account
         // assume that user has requestTokens in DB
         // TODO: get user requestTokens, provide access to acc via link, retrieve accessTokens, save them to DB and update dropAuth
@@ -107,11 +106,11 @@ public class DropboxTest {
         manager.updateUser(user);
         manager.finalize();
         */
+        logger.info("testGetUserAccessTokens done");
     }
 
     @Test
     public void testGetFileLink(){
-
 
         // 1. file exists
         String res = null; // http://dl.dropboxusercontent.com/1/view/n8cbbuw08p669ku/JUnit/music.mp3
@@ -131,6 +130,7 @@ public class DropboxTest {
         }
         assertNull("Bad file link", res2);
 
+        logger.info("testGetFileLink done");
     }
 
     @Test
@@ -141,7 +141,7 @@ public class DropboxTest {
 
         // 1. should be exception in method because dropbox session not established
         // unworked
-        List<String[]> res5 = null;
+        List<Song> res5 = null;
         try {
             res5 = dropUnAuth.getFileList("/", fileTypes);
         } catch (Exception e) {
@@ -150,7 +150,7 @@ public class DropboxTest {
         assertNull("Exception", res5);
 
         // 2.
-        List<String[]> res = null;
+        List<Song> res = null;
         try {
             res = dropAuth.getFileList("/", fileTypes);
         } catch (Exception e) {
@@ -163,11 +163,13 @@ public class DropboxTest {
 
         int resSize = res.size();
         for (int i = 0; i < resSize; i++) {
-            System.out.println(res.get(i));
-            if (correctMusicFile.equals(res.get(i)[1])) filePresents = true;
+            logger.debug(res.get(i).getFileId());
+            if (correctMusicFile.equals(res.get(i).getFileId())) filePresents = true;
         }
         assertTrue("Music file not found", filePresents);
 
+        logger.info("testGetFileList done");
     }
+
 
 }

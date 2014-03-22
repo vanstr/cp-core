@@ -1,10 +1,8 @@
 package persistence;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,7 +11,7 @@ import javax.persistence.Id;
  * Time: 16:24
  * To change this template use File | Settings | File Templates.
  */
-@javax.persistence.Table(name = "user", schema = "", catalog = "cloud_player")
+@Table(name = "user", schema = "", catalog = "cloud_player")
 @Entity
 @org.hibernate.annotations.Entity(
         dynamicUpdate = true
@@ -23,20 +21,31 @@ public class UserEntity {
     private String login;
     private String password;
     private String dropboxAccessKey;
-    private String dropboxAccessSecret;
-    private String dropboxRequestKey;
-    private String dropboxRequestSecret;
     private String driveAccessToken;
     private String driveRefreshToken;
+    private String googleEmail;
+    private String dropboxUid;
+    private Long driveTokenExpires;
+    private Set<SongEntity> songEntities = new HashSet<SongEntity>(0);
 
-    @javax.persistence.Column(name = "id")
     @Id
+    @Column(name = "id")
+    @GeneratedValue
     public long getId() {
         return id;
     }
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    @OneToMany(mappedBy = "user")
+    public Set<SongEntity> getSongEntities() {
+        return this.songEntities;
+    }
+
+    public void setSongEntities(Set<SongEntity> songEntities) {
+        this.songEntities = songEntities;
     }
 
     @javax.persistence.Column(name = "login")
@@ -69,36 +78,6 @@ public class UserEntity {
         this.dropboxAccessKey = token;
     }
 
-    @javax.persistence.Column(name = "dropbox_access_secret")
-    @Basic
-    public String getDropboxAccessSecret() {
-        return dropboxAccessSecret;
-    }
-
-    public void setDropboxAccessSecret(String token) {
-        this.dropboxAccessSecret = token;
-    }
-
-    @javax.persistence.Column(name = "dropbox_request_key")
-    @Basic
-    public String getDropboxRequestKey() {
-        return dropboxRequestKey;
-    }
-
-    public void setDropboxRequestKey(String token) {
-        this.dropboxRequestKey = token;
-    }
-
-    @javax.persistence.Column(name = "dropbox_request_secret")
-    @Basic
-    public String getDropboxRequestSecret() {
-        return dropboxRequestSecret;
-    }
-
-    public void setDropboxRequestSecret(String token) {
-        this.dropboxRequestSecret = token;
-    }
-
     @javax.persistence.Column(name = "drive_access_token")
     @Basic
     public String getDriveAccessToken() {
@@ -119,10 +98,35 @@ public class UserEntity {
         this.driveRefreshToken = driveRefreshToken;
     }
 
+    @javax.persistence.Column(name = "google_email")
+    public String getGoogleEmail() {
+        return googleEmail;
+    }
+
+    public void setGoogleEmail(String googleEmail) {
+        this.googleEmail = googleEmail;
+    }
+
+    @javax.persistence.Column(name = "dropbox_uid")
+    public String getDropboxUid() {
+        return dropboxUid;
+    }
+
+    public void setDropboxUid(String dropboxUid) {
+        this.dropboxUid = dropboxUid;
+    }
+
+    @javax.persistence.Column(name = "drive_token_expires")
+    public Long getDriveTokenExpires() {
+        return driveTokenExpires;
+    }
+
+    public void setDriveTokenExpires(Long driveTokenExpires) {
+        this.driveTokenExpires = driveTokenExpires;
+    }
+
     @Override
     public String toString(){
-
-        return ToStringBuilder.reflectionToString(this);
-
+        return "User login:" + this.getLogin();
     }
 }

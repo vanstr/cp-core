@@ -1,15 +1,24 @@
 package ejb;
 
+import cloud.DriveFileFetcher;
 import cloud.Dropbox;
+import cloud.DropboxFileFetcher;
 import cloud.GDrive;
-import com.sun.servicetag.UnauthorizedAccessException;
+import commons.FileFetcher;
+import commons.SongMetadataPopulation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import persistence.SongEntity;
 import persistence.UserEntity;
-import persistence.UserManager;
+import persistence.utility.SongManager;
+import persistence.utility.UserManager;
+import structure.PlayList;
+import structure.Song;
+import structure.SongMetadata;
 
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -24,56 +33,90 @@ import java.util.List;
 @Remote(ContentBeanRemote.class)
 public class ContentBean implements ContentBeanRemote {
 
-    class FileFetcher implements Runnable{
+    final static Logger logger = LoggerFactory.getLogger(ContentBean.class);
 
-        protected ContentBean bean;
-        protected String folderPath;
-        protected Long userId;
-        protected List<String[]> files;
+    public String getFileSrc(Long userId, Integer cloudId, String fileId) {
+        String file = null;
+        UserManager manager = new UserManager();
+        UserEntity user = manager.getUserById(userId);
+        try {
+            if (DROPBOX_CLOUD_ID.equals(cloudId)) {
+                String accessTokenKey = user.getDropboxAccessKey();
+                Dropbox drop = new Dropbox(accessTokenKey);
 
-        public FileFetcher(ContentBean bean, String folderPath, Long userId){
-            this.bean = bean;
-            this.folderPath = folderPath;
-            this.userId = userId;
+                logger.info(fileId);
+                file = drop.getFileLink(fileId);
+            } else if (DRIVE_CLOUD_ID.equals(cloudId)) {
+                GDrive gDrive = new GDrive(user.getDriveAccessToken(), user.getDriveRefreshToken());
+                file = gDrive.getFileLink(fileId);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        manager.finalize();
 
-        public void run(){}
+        return file;
 
-        public List<String[]> getFiles() {
-            return files;
-        }
     }
 
-    class DropboxFileFetcher extends FileFetcher implements Runnable{
+    @Override
+    public PlayList getPlayList(Long userId) {
 
-        public DropboxFileFetcher(ContentBean bean, String folderPath, Long userId) {
-            super(bean, folderPath, userId);
-        }
+        List<Song> data = getFiles("/", userId);
+        PlayList playList = SongMetadataPopulation.populate(data, userId);
 
-        @Override
-        public void run(){
-            files = bean.getDropboxFiles(folderPath, userId);
-        }
+        return playList;
     }
 
-    class DriveFileFetcher extends FileFetcher implements Runnable{
+    @Override
+    public boolean saveSongMetadata(Song song, Long userId) {
 
-        public DriveFileFetcher(ContentBean bean, String folderPath, Long userId) {
-            super(bean, folderPath, userId);
+        boolean res = false;
+
+        UserEntity user = new UserEntity();
+        user.setId(userId);
+
+        // get song by id
+        SongManager songManager = new SongManager();
+        logger.info("pass1" + song + " " + song.getCloudId() + " " + song.getFileName());
+        SongEntity songEntity = songManager.getSongByHash(user, song.getCloudId(), song.getFileName());
+
+        if (songEntity == null) {
+            // songEntity is empty, create new with metadata
+            songEntity = new SongEntity();
+            songEntity.setCloudId(song.getCloudId());
+            songEntity.setFileName(song.getFileName());
+            songEntity.setUser(user);
+            songEntity = setMetadata(songEntity, song);
+            res = songManager.addSong(songEntity);
+        } else {
+            // update metadata
+            songEntity = setMetadata(songEntity, song);
+            res = songManager.updateSong(songEntity);
         }
 
-        @Override
-        public void run(){
-            files = bean.getDriveFiles(folderPath, userId);
-        }
+        songManager.finalize();
+
+        return res;
     }
 
-    private List<String> fileTypes = Arrays.asList("mp3", "wav", "ogg");
+    private SongEntity setMetadata(SongEntity songEntity, Song song) {
+        SongMetadata metadata = song.getMetadata();
+        if (metadata != null) {
+            songEntity.setMetadataTitle(metadata.getTitle());
+            songEntity.setMetadataAlbum(metadata.getAlbum());
+            songEntity.setMetadataArtist(metadata.getArtist());
+            songEntity.setMetadataGenre(metadata.getGenre());
+            songEntity.setMetadataYear(metadata.getYear());
+        }
+        return songEntity;
+    }
 
-    public List<String[]> getFiles(String folderPath, Long userId) {
+    private List<Song> getFiles(String folderPath, Long userId) {
 
-        DropboxFileFetcher dropboxFetcher = new DropboxFileFetcher(this, folderPath, userId);
-        DriveFileFetcher driveFetcher = new DriveFileFetcher(this, folderPath, userId);
+        FileFetcher dropboxFetcher = new DropboxFileFetcher(folderPath, userId);
+        FileFetcher driveFetcher = new DriveFileFetcher(folderPath, userId);
         Thread dropboxThread = new Thread(dropboxFetcher);
         Thread driveThread = new Thread(driveFetcher);
         dropboxThread.start();
@@ -85,91 +128,14 @@ public class ContentBean implements ContentBeanRemote {
             e.printStackTrace();
         }
 
-        List<String[]> files = new ArrayList<String[]>();
-        if(dropboxFetcher.getFiles() != null){
+        List<Song> files = new ArrayList<Song>();
+        if (dropboxFetcher.getFiles() != null) {
             files.addAll(dropboxFetcher.getFiles());
         }
-        if(driveFetcher.getFiles() != null){
+        if (driveFetcher.getFiles() != null) {
             files.addAll(driveFetcher.getFiles());
         }
 
         return files;
-    }
-
-    public List<String[]> getDropboxFiles(String folderPath, Long userId) {
-        List<String[]> files = null;
-        try {
-            UserManager manager = new UserManager();
-            UserEntity user = manager.getUserById(userId);
-
-            String accessTokenKey = user.getDropboxAccessKey();
-            String accessTokenSecret = user.getDropboxAccessSecret();
-            if(accessTokenKey != null && accessTokenSecret != null){
-                Dropbox drop = new Dropbox(accessTokenKey, accessTokenSecret);
-                files = drop.getFileList(folderPath, fileTypes);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return files;
-    }
-
-    public List<String[]> getDriveFiles(String folderPath, Long userId){
-        List<String[]> files = null;
-        GDrive gDrive = null;
-        UserEntity user = null;
-        UserManager manager = null;
-        try{
-            manager = new UserManager();
-            user = manager.getUserById(userId);
-            String driveAccessToken = user.getDriveAccessToken();
-            String driveRefreshToken = user.getDriveRefreshToken();
-            if(driveAccessToken != null && driveRefreshToken != null){
-                gDrive = new GDrive(driveAccessToken, driveRefreshToken);
-                files = gDrive.getFileList(folderPath, fileTypes);
-            }
-        } catch (UnauthorizedAccessException e) {
-            if("401".equals(e.getMessage())){
-                gDrive.setAccessToken(gDrive.refreshToken(gDrive.getRefreshToken()));
-                try {
-                    files = gDrive.getFileList(folderPath, fileTypes);
-                    user.setDriveAccessToken(gDrive.getAccessToken());
-                    manager.updateUser(user);
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        } finally {
-            if(manager != null){
-                manager.finalize();
-            }
-        }
-        return files;
-    }
-
-    public String getFileSrc(Integer cloudId, String path, Long userId, String driveFileId) {
-        String file = null;
-        UserManager manager = new UserManager();
-        UserEntity user = manager.getUserById(userId);
-        try {
-            if (DROPBOX_CLOUD_ID.equals(cloudId)) {
-                String accessTokenKey = user.getDropboxAccessKey();
-                String accessTokenSecret = user.getDropboxAccessSecret();
-
-                Dropbox drop = new Dropbox(accessTokenKey, accessTokenSecret);
-                file = drop.getFileLink(path);
-            }else if(DRIVE_CLOUD_ID.equals(cloudId)){
-                GDrive gDrive = new GDrive(user.getDriveAccessToken(), user.getDriveRefreshToken());
-                file = gDrive.getFileLink(driveFileId);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return file;
-
     }
 }

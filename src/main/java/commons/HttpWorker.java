@@ -70,11 +70,9 @@ public class HttpWorker {
         HttpClient client = new DefaultHttpClient();
         HttpGet request = new HttpGet(url);
 
-        HttpResponse response = null;
-        StringBuffer result = null;
         JSONObject object = null;
         try {
-            response = client.execute(request);
+            HttpResponse response = client.execute(request);
             if(response.getStatusLine().getStatusCode() == 401){
                 throw new UnauthorizedAccessException("401");
             }else if(response.getStatusLine().getStatusCode() != 200){
@@ -83,8 +81,8 @@ public class HttpWorker {
             BufferedReader rd = new BufferedReader(
                     new InputStreamReader(response.getEntity().getContent()));
 
-            result = new StringBuffer();
-            String line = "";
+            StringBuffer result = new StringBuffer();
+            String line;
             while ((line = rd.readLine()) != null) {
                 result.append(line);
             }

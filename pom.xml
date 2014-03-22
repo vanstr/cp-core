@@ -88,9 +88,9 @@
 
         <!-- dropbox SDK api -->
         <dependency>
-            <groupId>org.syncloud</groupId>
-            <artifactId>dropbox-client</artifactId>
-            <version>1.5.3</version>
+            <groupId>com.dropbox.core</groupId>
+            <artifactId>dropbox-core-sdk</artifactId>
+            <version>1.7.4</version>
         </dependency>
 
         <dependency>
@@ -146,7 +146,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.8.1</version>
+            <version>4.11</version>
             <scope>test</scope>
         </dependency>
 
@@ -179,6 +179,8 @@
                 <version>${version.org.jboss.as.plugins.maven.plugin}</version>
                 <configuration>
                     <filename>${project.build.finalName}.jar</filename>
+                    <execCommands/>
+                    <execute-commands/>
                 </configuration>
             </plugin>
             <!-- Compiler plugin enforces Java 1.6 compatibility and activates annotation
@@ -214,6 +216,31 @@
                 <configuration>
                     <finalName>cp-core</finalName>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.4.3</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${jboss.as.home}/standalone/lib</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>target</directory>
+                                    <includes>
+                                        <include>
+                                            cp-core-client.jar</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

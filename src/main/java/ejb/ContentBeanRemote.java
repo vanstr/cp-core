@@ -1,7 +1,9 @@
 package ejb;
 
+import structure.PlayList;
+import structure.Song;
+
 import javax.ejb.Remote;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,8 +18,12 @@ public interface ContentBeanRemote {
 
     public static final Integer DROPBOX_CLOUD_ID = 1;
     public static final Integer DRIVE_CLOUD_ID = 2;
+    
 
-    public List<String[]> getFiles(String folderPath, Long userId);
+    public String getFileSrc(Long userId, Integer cloudId, String fileId);
 
-    public String getFileSrc(Integer cloudId, String path, Long userId, String fileId);
+    public PlayList getPlayList(Long userId);
+
+    public boolean saveSongMetadata(Song song, Long userId);
+
 }

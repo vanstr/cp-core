@@ -1,6 +1,11 @@
 package commons;
 
 
+import com.dropbox.core.DbxUrlWithExpiration;
+import org.json.JSONObject;
+
+import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -10,7 +15,51 @@ import java.util.List;
  * Time: 14:39
  * To change this template use CloudFile | Settings | CloudFile Templates.
  */
-public class CloudFile {
+public class CloudFile implements Serializable {
+
+    private Integer cloudId;
+    private String name;
+    private String url;
+    private Long expires;
+
+    public CloudFile(Integer cloudId, String path, String url, Long expires){
+        this.cloudId = cloudId;
+        this.name = path;
+        this.url = url;
+        this.expires = expires - System.currentTimeMillis();
+    }
+
+    public Integer getCloudId() {
+        return cloudId;
+    }
+
+    public void setCloudId(Integer cloudId) {
+        this.cloudId = cloudId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public Long getExpires() {
+        return expires;
+    }
+
+    public void setExpires(Long expires) {
+        this.expires = expires;
+    }
 
     public static String getExtension(String filename) {
         if (filename == null) {
@@ -52,4 +101,6 @@ public class CloudFile {
         return result;
 
     }
+
+
 }
