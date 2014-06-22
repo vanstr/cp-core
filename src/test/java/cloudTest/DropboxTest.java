@@ -1,6 +1,7 @@
 package cloudTest;
 
 import cloud.Dropbox;
+import commons.Initializator;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -30,8 +31,8 @@ public class DropboxTest {
     private static Dropbox dropUnAuth = null; // un authorized dropboz session
     private static Dropbox dropAuth = null; // authorized dropboz session
 
-    private static String incorrectMusicFile = "/balaslkdjasc.mp3";
-    private static String correctMusicFile = "/JUnit/music.mp3";
+    private static String incorrectMusicFile = Initializator.getLocalProperties().getProperty("test.drive.incorrect_file");
+    private static String correctMusicFile = Initializator.getLocalProperties().getProperty("test.drive.correct_file");
 
     @BeforeClass
     public static void method() {
