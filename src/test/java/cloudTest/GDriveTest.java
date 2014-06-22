@@ -1,19 +1,21 @@
 package cloudTest;
 
-import cloud.*;
-import commons.*;
-import junit.framework.*;
-import org.junit.*;
-import org.junit.Assert;
+import cloud.GDrive;
+import commons.Initializator;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.*;
-import persistence.*;
-import persistence.utility.*;
-import structure.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import persistence.UserEntity;
+import persistence.utility.UserManager;
+import structure.Song;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -26,7 +28,6 @@ import static org.junit.Assert.fail;
 public class GDriveTest {
 
     static final Logger logger = LoggerFactory.getLogger(GDriveTest.class);
-    private static String CORRECT_FILE = Initializator.getLocalProperties().getProperty("test.drive.correct_file");
     private static String INCORRECT_FILE = Initializator.getLocalProperties().getProperty("test.drive.incorrect_file");
     private static String FILE_ID = Initializator.getLocalProperties().getProperty("test.drive.correct_file_id");
     private static GDrive gDrive = null;
@@ -37,6 +38,11 @@ public class GDriveTest {
             UserManager manager = new UserManager();
             UserEntity user = manager.getUserById(-1);
             gDrive = new GDrive(user.getDriveAccessToken(), user.getDriveRefreshToken());
+            String newToken = gDrive.refreshToken(user.getDriveRefreshToken());
+            gDrive.setAccessToken(newToken);
+            user.setDriveAccessToken(newToken);
+            manager.updateUser(user);
+            manager.finalize();
         }catch (Exception e){
             logger.warn("Initialization failed", e);
             fail("Initialization failed");

@@ -9,11 +9,13 @@ import commons.HttpWorker;
 import commons.Initializator;
 import ejb.ContentBeanRemote;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import structure.Song;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * UserEntity: vanstr
@@ -24,21 +26,8 @@ import java.util.*;
  */
 public class Dropbox {
 
-    final static Logger logger = LoggerFactory.getLogger(Dropbox.class);
-
-    // Define application params
-    private static final String APP_KEY = Initializator.getLocalProperties().getProperty("dropbox.app.key");
-    private static final String APP_SECRET = Initializator.getLocalProperties().getProperty("dropbox.app.secret");
-    private static String REDIRECT_URI = Initializator.getLocalProperties().getProperty("dropbox.redirect.uri");
-    private static String DROPBOX_TOKEN_URL = Initializator.getLocalProperties().getProperty("dropbox.token.url");
-    private static final String GRANT_TYPE_REFRESH = "refresh_token";
     private static final String GRANT_TYPE_AUTHORIZATION = "authorization_code";
 
-    private static final String EXCEPTION_EMPTY_ACCESS_TOKENS = "EXCEPTION_EMPTY_ACCESS_TOKENS";
-    private static final String EXCEPTION_EMPTY_REQUEST_TOKENS = "EXCEPTION_EMPTY_REQUEST_TOKENS";
-    private static final String EXCEPTION_UNDEFINED_DIR = "EXCEPTION_UNDEFINED_DIR";
-
-    private String accessToken;
     private DbxRequestConfig config = new DbxRequestConfig(
             "Cloud_Player", Locale.getDefault().toString());
     private DbxClient client;
@@ -46,7 +35,6 @@ public class Dropbox {
     public Dropbox(){}
 
     public Dropbox(String accessToken) throws Exception {
-          this.accessToken = accessToken;
           this.client = new DbxClient(config, accessToken);
     }
 
@@ -91,11 +79,11 @@ public class Dropbox {
     public OAuth2UserData retrieveAccessToken(String code){
         Map<String, String> params = new HashMap<String, String>();
         params.put("code", code);
-        params.put("client_id", APP_KEY);
-        params.put("client_secret", APP_SECRET);
+        params.put("client_id", Initializator.DROPBOX_APP_KEY);
+        params.put("client_secret", Initializator.DROPBOX_APP_SECRET);
         params.put("grant_type", GRANT_TYPE_AUTHORIZATION);
-        params.put("redirect_uri", REDIRECT_URI);
-        JSONObject object = HttpWorker.sendPostRequest(DROPBOX_TOKEN_URL, params);
+        params.put("redirect_uri", Initializator.DROPBOX_REDIRECT_URI);
+        JSONObject object = HttpWorker.sendPostRequest(Initializator.DROPBOX_TOKEN_URL, params);
         OAuth2UserData oAuth2UserData = parseDropboxData(object);
         return oAuth2UserData;
     }
