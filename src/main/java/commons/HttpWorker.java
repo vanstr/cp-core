@@ -46,7 +46,7 @@ public class HttpWorker {
 
             if(con.getResponseCode() == 401){
                 throw new UnauthorizedAccessException("401");
-            }else if(con.getResponseCode() != 200){
+            }else if(con.getResponseCode() < 200 || con.getResponseCode() >= 300){
                 return null;
             }
 
