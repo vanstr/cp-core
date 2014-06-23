@@ -31,6 +31,9 @@ public class DropboxTest {
     private static Dropbox dropUnAuth = null; // un authorized dropboz session
     private static Dropbox dropAuth = null; // authorized dropboz session
 
+    private static final String CORRECT_FILE_DROPBOX = Initializator.getLocalProperties().getProperty("test.dropbox.correct_file");;
+    private static final String INCORRECT_FILE_DROPBOX = Initializator.getLocalProperties().getProperty("test.dropbox.incorrect_file");;
+
     @BeforeClass
     public static void method() {
         try {
@@ -113,17 +116,17 @@ public class DropboxTest {
         // 1. file exists
         String res = null; // http://dl.dropboxusercontent.com/1/view/n8cbbuw08p669ku/JUnit/music.mp3
         try {
-            res = dropAuth.getFileLink(Initializator.CORRECT_FILE_DROPBOX);
+            res = dropAuth.getFileLink(CORRECT_FILE_DROPBOX);
         } catch (Exception e) {
             e.printStackTrace();
             fail("Fail not found");
         }
-        if (!res.endsWith(Initializator.CORRECT_FILE_DROPBOX)) fail("Bad file link:" + res);
+        if (!res.endsWith(CORRECT_FILE_DROPBOX)) fail("Bad file link:" + res);
 
         // 2. file doesnt exist
         String res2 = null;
         try {
-            res2 = dropAuth.getFileLink(Initializator.INCORRECT_FILE_DROPBOX);
+            res2 = dropAuth.getFileLink(INCORRECT_FILE_DROPBOX);
         } catch (Exception e) {
         }
         assertNull("Bad file link", res2);
@@ -162,7 +165,7 @@ public class DropboxTest {
         int resSize = res.size();
         for (int i = 0; i < resSize; i++) {
             logger.debug(res.get(i).getFileId());
-            if (Initializator.CORRECT_FILE_DROPBOX.equals(res.get(i).getFileId())) filePresents = true;
+            if (CORRECT_FILE_DROPBOX.equals(res.get(i).getFileId())) filePresents = true;
         }
         assertTrue("Music file not found", filePresents);
 
