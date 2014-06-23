@@ -75,7 +75,7 @@ public class HttpWorker {
             HttpResponse response = client.execute(request);
             if(response.getStatusLine().getStatusCode() == 401){
                 throw new UnauthorizedAccessException("401");
-            }else if(response.getStatusLine().getStatusCode() != 200){
+            }else if(response.getStatusLine().getStatusCode() < 200 || response.getStatusLine().getStatusCode() >= 300){
                 return null;
             }
             BufferedReader rd = new BufferedReader(
