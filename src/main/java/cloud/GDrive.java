@@ -1,5 +1,6 @@
 package cloud;
 
+import cloud.oauth.OAuth2Communicator;
 import commons.CloudFile;
 import commons.HttpWorker;
 import commons.Initializator;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class GDrive {
+public class GDrive extends OAuth2Communicator {
 
     private static final String GRANT_TYPE_REFRESH = "refresh_token";
     private static final String GRANT_TYPE_AUTHORIZATION = "authorization_code";
@@ -58,19 +59,6 @@ public class GDrive {
 
     public void setTokenExpires(Long tokenExpires) {
         this.tokenExpires = tokenExpires;
-    }
-
-    public OAuth2UserData retrieveAccessToken(String code){
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("code", code);
-        params.put("client_id", Initializator.DRIVE_CLIENT_ID);
-        params.put("client_secret", Initializator.DRIVE_CLIENT_SECRET);
-        params.put("grant_type", GRANT_TYPE_AUTHORIZATION);
-        params.put("redirect_uri", Initializator.DRIVE_REDIRECT_URI);
-        params.put("scope", Initializator.DRIVE_EMAIL_SCOPE + "+" + Initializator.DRIVE_SCOPE);
-        JSONObject object = HttpWorker.sendPostRequest(Initializator.DRIVE_TOKEN_URL, params);
-        OAuth2UserData oAuth2UserData = parseDriveData(object);
-        return oAuth2UserData;
     }
 
     public PlayList getFileList(String folderPath, List<String> fileTypes){
@@ -119,7 +107,24 @@ public class GDrive {
         }
         return playList;
     }
-    
+
+    public String getFileLink(String fileId){
+        JSONObject object = HttpWorker.sendGetRequest(Initializator.DRIVE_FILES_URL
+                + fileId + "?oauth_token=" + this.accessToken);
+        String fileSrc = object.getString("downloadUrl") + "&oauth_token=" + this.accessToken;
+        return fileSrc;
+    }
+
+    @Override
+    public OAuth2UserData retrieveAccessToken(String code){
+        JSONObject object = super.retrieveAccessToken(code, Initializator.DRIVE_CLIENT_ID,
+                Initializator.DRIVE_CLIENT_SECRET, GRANT_TYPE_AUTHORIZATION, Initializator.DRIVE_REDIRECT_URI,
+                Initializator.DRIVE_EMAIL_SCOPE + "+" + Initializator.DRIVE_SCOPE, Initializator.DRIVE_TOKEN_URL);
+        OAuth2UserData oAuth2UserData = parseDriveData(object);
+        return oAuth2UserData;
+    }
+
+    @Override
     public String refreshToken(String refreshToken){
         String accessToken = null;
         try {
@@ -135,13 +140,6 @@ public class GDrive {
             e.printStackTrace();
         }
         return accessToken;
-    }
-
-    public String getFileLink(String fileId){
-        JSONObject object = HttpWorker.sendGetRequest(Initializator.DRIVE_FILES_URL
-                + fileId + "?oauth_token=" + this.accessToken);
-        String fileSrc = object.getString("downloadUrl") + "&oauth_token=" + this.accessToken;
-        return fileSrc;
     }
 
     public static OAuth2UserData parseDriveData(JSONObject jsonObject){

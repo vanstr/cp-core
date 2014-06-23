@@ -1,21 +1,19 @@
 package cloud;
 
+import cloud.oauth.OAuth2Communicator;
 import com.dropbox.core.DbxClient;
 import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.DbxUrlWithExpiration;
 import commons.CloudFile;
-import commons.HttpWorker;
 import commons.Initializator;
 import ejb.ContentBeanRemote;
 import org.json.JSONObject;
 import structure.Song;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * UserEntity: vanstr
@@ -24,7 +22,7 @@ import java.util.Map;
  * Class represent basic cloud.Dropbox API functionality
  * Like: getFileList, getFileLink
  */
-public class Dropbox {
+public class Dropbox extends OAuth2Communicator {
 
     private static final String GRANT_TYPE_AUTHORIZATION = "authorization_code";
 
@@ -76,19 +74,21 @@ public class Dropbox {
         return files;
     }
 
+    @Override
     public OAuth2UserData retrieveAccessToken(String code){
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("code", code);
-        params.put("client_id", Initializator.DROPBOX_APP_KEY);
-        params.put("client_secret", Initializator.DROPBOX_APP_SECRET);
-        params.put("grant_type", GRANT_TYPE_AUTHORIZATION);
-        params.put("redirect_uri", Initializator.DROPBOX_REDIRECT_URI);
-        JSONObject object = HttpWorker.sendPostRequest(Initializator.DROPBOX_TOKEN_URL, params);
+        JSONObject object = super.retrieveAccessToken(code, Initializator.DROPBOX_APP_KEY,
+                Initializator.DROPBOX_APP_SECRET, GRANT_TYPE_AUTHORIZATION,
+                Initializator.DROPBOX_REDIRECT_URI, null, Initializator.DROPBOX_TOKEN_URL);
         OAuth2UserData oAuth2UserData = parseDropboxData(object);
         return oAuth2UserData;
     }
 
-    public static OAuth2UserData parseDropboxData(JSONObject jsonObject){
+    @Override
+    public String refreshToken(String refreshToken) {
+        return null;
+    }
+
+    private static OAuth2UserData parseDropboxData(JSONObject jsonObject){
         OAuth2UserData oAuth2UserData = new OAuth2UserData();
         oAuth2UserData.setAccessToken(jsonObject.getString("access_token"));
         oAuth2UserData.setUniqueCloudId(jsonObject.getString("uid"));
