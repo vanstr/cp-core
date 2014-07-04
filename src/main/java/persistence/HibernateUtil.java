@@ -1,6 +1,6 @@
 package persistence;
 
-import commons.Initializator;
+import commons.SystemProperty;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
@@ -22,7 +22,7 @@ public class HibernateUtil {
         try {
             Configuration conf = new Configuration()
                     .configure()
-                    .addProperties(Initializator.getLocalProperties())
+                    .addProperties(SystemProperty.getLocalProperties())
                     .addPackage("persistence")
                     .addAnnotatedClass(UserEntity.class)
                     .addAnnotatedClass(SongEntity.class);

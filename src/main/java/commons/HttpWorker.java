@@ -46,7 +46,7 @@ public class HttpWorker {
 
             if(con.getResponseCode() == 401){
                 throw new UnauthorizedAccessException("401");
-            }else if(con.getResponseCode() != 200){
+            }else if(con.getResponseCode() < 200 || con.getResponseCode() >= 300){
                 return null;
             }
 
@@ -75,7 +75,7 @@ public class HttpWorker {
             HttpResponse response = client.execute(request);
             if(response.getStatusLine().getStatusCode() == 401){
                 throw new UnauthorizedAccessException("401");
-            }else if(response.getStatusLine().getStatusCode() != 200){
+            }else if(response.getStatusLine().getStatusCode() < 200 || response.getStatusLine().getStatusCode() >= 300){
                 return null;
             }
             BufferedReader rd = new BufferedReader(
