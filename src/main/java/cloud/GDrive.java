@@ -3,7 +3,7 @@ package cloud;
 import cloud.oauth.OAuth2Communicator;
 import commons.CloudFile;
 import commons.HttpWorker;
-import commons.Initializator;
+import commons.SystemProperty;
 import ejb.ContentBeanRemote;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -109,7 +109,7 @@ public class GDrive extends OAuth2Communicator {
     }
 
     public String getFileLink(String fileId){
-        JSONObject object = HttpWorker.sendGetRequest(Initializator.DRIVE_FILES_URL
+        JSONObject object = HttpWorker.sendGetRequest(SystemProperty.DRIVE_FILES_URL
                 + fileId + "?oauth_token=" + this.accessToken);
         String fileSrc = object.getString("downloadUrl") + "&oauth_token=" + this.accessToken;
         return fileSrc;
@@ -117,9 +117,9 @@ public class GDrive extends OAuth2Communicator {
 
     @Override
     public OAuth2UserData retrieveAccessToken(String code){
-        JSONObject object = super.retrieveAccessToken(code, Initializator.DRIVE_CLIENT_ID,
-                Initializator.DRIVE_CLIENT_SECRET, GRANT_TYPE_AUTHORIZATION, Initializator.DRIVE_REDIRECT_URI,
-                Initializator.DRIVE_EMAIL_SCOPE + "+" + Initializator.DRIVE_SCOPE, Initializator.DRIVE_TOKEN_URL);
+        JSONObject object = super.retrieveAccessToken(code, SystemProperty.DRIVE_CLIENT_ID,
+                SystemProperty.DRIVE_CLIENT_SECRET, GRANT_TYPE_AUTHORIZATION, SystemProperty.DRIVE_REDIRECT_URI,
+                SystemProperty.DRIVE_EMAIL_SCOPE + "+" + SystemProperty.DRIVE_SCOPE, SystemProperty.DRIVE_TOKEN_URL);
         OAuth2UserData oAuth2UserData = parseDriveData(object);
         return oAuth2UserData;
     }
@@ -129,11 +129,11 @@ public class GDrive extends OAuth2Communicator {
         String accessToken = null;
         try {
             Map<String, String> params = new HashMap<String, String>();
-            params.put("client_id", Initializator.DRIVE_CLIENT_ID);
-            params.put("client_secret", Initializator.DRIVE_CLIENT_SECRET);
+            params.put("client_id", SystemProperty.DRIVE_CLIENT_ID);
+            params.put("client_secret", SystemProperty.DRIVE_CLIENT_SECRET);
             params.put("grant_type", GRANT_TYPE_REFRESH);
             params.put("refresh_token", refreshToken);
-            JSONObject object = HttpWorker.sendPostRequest(Initializator.DRIVE_TOKEN_URL, params);
+            JSONObject object = HttpWorker.sendPostRequest(SystemProperty.DRIVE_TOKEN_URL, params);
             accessToken = object.getString("access_token");
             this.tokenExpires = object.getLong("expires_in")*1000 + System.currentTimeMillis();
         } catch (Exception e) {
@@ -147,7 +147,7 @@ public class GDrive extends OAuth2Communicator {
         oAuth2UserData.setAccessToken(jsonObject.getString("access_token"));
         oAuth2UserData.setRefreshToken(jsonObject.getString("refresh_token"));
         oAuth2UserData.setExpiresIn(jsonObject.getInt("expires_in"));
-        JSONObject object = HttpWorker.sendGetRequest(Initializator.DRIVE_EMAIL_URL + "?alt=json&oauth_token="
+        JSONObject object = HttpWorker.sendGetRequest(SystemProperty.DRIVE_EMAIL_URL + "?alt=json&oauth_token="
                 + oAuth2UserData.getAccessToken());
         String email = object.getJSONObject("data").get("email").toString();
         oAuth2UserData.setUniqueCloudId(email);

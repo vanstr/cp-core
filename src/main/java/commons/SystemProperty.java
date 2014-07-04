@@ -10,7 +10,7 @@ import java.util.Properties;
 
 @Startup
 @Singleton
-public class Initializator {
+public class SystemProperty {
 
     public static String APP_KEY;
     public static String APP_SECRET;
@@ -36,7 +36,7 @@ public class Initializator {
         localProperties = new Properties();
 
         try {
-            localProperties.load(Initializator.class.getClassLoader().getResourceAsStream("local.properties"));
+            localProperties.load(SystemProperty.class.getClassLoader().getResourceAsStream("local.properties"));
             APP_KEY = localProperties.getProperty("app.key");
             APP_SECRET = localProperties.getProperty("app.secret");
             INCORRECT_FILE_DROPBOX = localProperties.getProperty("test.drive.incorrect_file");
@@ -65,7 +65,7 @@ public class Initializator {
 
     public static Properties getLocalProperties() {
         if(localProperties == null){
-            Initializator initializator = new Initializator();
+            SystemProperty initializator = new SystemProperty();
             initializator.atStartup();
             return initializator.getProperties();
         }

@@ -1,7 +1,7 @@
 package cloudTest;
 
 import cloud.GDrive;
-import commons.Initializator;
+import commons.SystemProperty;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -28,8 +28,8 @@ import static org.junit.Assert.fail;
 public class GDriveTest {
 
     static final Logger logger = LoggerFactory.getLogger(GDriveTest.class);
-    private static String INCORRECT_FILE = Initializator.getLocalProperties().getProperty("test.drive.incorrect_file");
-    private static String FILE_ID = Initializator.getLocalProperties().getProperty("test.drive.correct_file_id");
+    private static String INCORRECT_FILE = SystemProperty.getLocalProperties().getProperty("test.drive.incorrect_file");
+    private static String FILE_ID = SystemProperty.getLocalProperties().getProperty("test.drive.correct_file_id");
     private static GDrive gDrive = null;
 
     @BeforeClass

@@ -1,7 +1,7 @@
 package cloudTest;
 
 import cloud.Dropbox;
-import commons.Initializator;
+import commons.SystemProperty;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -31,8 +31,8 @@ public class DropboxTest {
     private static Dropbox dropUnAuth = null; // un authorized dropboz session
     private static Dropbox dropAuth = null; // authorized dropboz session
 
-    private static final String CORRECT_FILE_DROPBOX = Initializator.getLocalProperties().getProperty("test.dropbox.correct_file");;
-    private static final String INCORRECT_FILE_DROPBOX = Initializator.getLocalProperties().getProperty("test.dropbox.incorrect_file");;
+    private static final String CORRECT_FILE_DROPBOX = SystemProperty.getLocalProperties().getProperty("test.dropbox.correct_file");;
+    private static final String INCORRECT_FILE_DROPBOX = SystemProperty.getLocalProperties().getProperty("test.dropbox.incorrect_file");;
 
     @BeforeClass
     public static void method() {

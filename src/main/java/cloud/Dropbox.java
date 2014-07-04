@@ -6,7 +6,7 @@ import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.DbxUrlWithExpiration;
 import commons.CloudFile;
-import commons.Initializator;
+import commons.SystemProperty;
 import ejb.ContentBeanRemote;
 import org.json.JSONObject;
 import structure.Song;
@@ -76,9 +76,9 @@ public class Dropbox extends OAuth2Communicator {
 
     @Override
     public OAuth2UserData retrieveAccessToken(String code){
-        JSONObject object = super.retrieveAccessToken(code, Initializator.DROPBOX_APP_KEY,
-                Initializator.DROPBOX_APP_SECRET, GRANT_TYPE_AUTHORIZATION,
-                Initializator.DROPBOX_REDIRECT_URI, null, Initializator.DROPBOX_TOKEN_URL);
+        JSONObject object = super.retrieveAccessToken(code, SystemProperty.DROPBOX_APP_KEY,
+                SystemProperty.DROPBOX_APP_SECRET, GRANT_TYPE_AUTHORIZATION,
+                SystemProperty.DROPBOX_REDIRECT_URI, null, SystemProperty.DROPBOX_TOKEN_URL);
         OAuth2UserData oAuth2UserData = parseDropboxData(object);
         return oAuth2UserData;
     }
