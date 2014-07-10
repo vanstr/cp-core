@@ -8,8 +8,10 @@ import commons.FileFetcher;
 import commons.SongMetadataPopulation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import persistence.PlayListEntity;
 import persistence.SongEntity;
 import persistence.UserEntity;
+import persistence.utility.PlayListManager;
 import persistence.utility.SongManager;
 import persistence.utility.UserManager;
 import structure.PlayList;
@@ -18,6 +20,7 @@ import structure.SongMetadata;
 
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,7 +77,7 @@ public class ContentBean implements ContentBeanRemote {
 
         boolean res = false;
 
-        UserEntity user = new UserEntity();
+        UserEntity user = new UserEntity(); //TODO not correct!
         user.setId(userId);
 
         // get song by id
@@ -99,6 +102,26 @@ public class ContentBean implements ContentBeanRemote {
         songManager.finalize();
 
         return res;
+    }
+
+    @Override
+    public long addPlayList(Long userId, String name) {
+        long playListId = -1;
+
+        UserManager userManager = new UserManager();
+        PlayListManager playListManager = new PlayListManager();
+        UserEntity user = userManager.getUserById(userId);
+
+        PlayListEntity playListEntity = new PlayListEntity();
+        playListEntity.setName(name);
+        playListEntity.setUser(user);
+        playListEntity.setCreated(new Timestamp(System.currentTimeMillis()));
+        playListEntity.setUpdated(new Timestamp(System.currentTimeMillis()));
+        playListId = playListManager.addPlayList(playListEntity);
+
+        playListManager.finalize();
+
+        return playListId;
     }
 
     private SongEntity setMetadata(SongEntity songEntity, Song song) {
