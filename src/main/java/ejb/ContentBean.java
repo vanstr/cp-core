@@ -22,7 +22,9 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -89,6 +91,7 @@ public class ContentBean implements ContentBeanRemote {
             // songEntity is empty, create new with metadata
             songEntity = new SongEntity();
             songEntity.setCloudId(song.getCloudId());
+            songEntity.setFileId(song.getFileId());
             songEntity.setFileName(song.getFileName());
             songEntity.setUser(user);
             songEntity = setMetadata(songEntity, song);
@@ -122,6 +125,35 @@ public class ContentBean implements ContentBeanRemote {
         playListManager.finalize();
 
         return playListId;
+    }
+
+    @Override
+    public List<PlayList> getPlayLists(Long userId) {
+        PlayListManager playListManager = new PlayListManager();
+        Map<String, Object> fields = new HashMap<String, Object>();
+        fields.put("user_id", userId);
+        List<PlayListEntity> entities = playListManager.getEntitiesByFields(fields);
+        List<PlayList> playLists = new ArrayList<PlayList>();
+        for(PlayListEntity entity : entities){
+            playLists.add(new PlayList(entity.getId(), entity.getName()));
+        }
+        return playLists;
+    }
+
+    @Override
+    public PlayList getPlayList(Long userId, Long playListId) {
+
+        PlayListManager playListManager = new PlayListManager();
+        PlayListEntity playListEntity = playListManager.getEntityById(PlayListEntity.class, playListId);
+
+        PlayList playList = new PlayList(playListId, playListEntity.getName());
+        for(SongEntity songEntity : playListEntity.getSongs()){
+            //TODO why do we duplicate the code?
+            playList.add(new Song(songEntity.getCloudId(), songEntity.getFileId(), songEntity.getFileName(), "", 0l));
+        }
+        playListManager.finalize();
+
+        return playList;
     }
 
     private SongEntity setMetadata(SongEntity songEntity, Song song) {

@@ -22,6 +22,7 @@ public class SongEntity {
 
     private long id;
     private long cloudId;
+    private String fileId;
     private Timestamp lastTimeAccessed;
     private String fileName;
     private long fileSize;
@@ -53,6 +54,15 @@ public class SongEntity {
 
     public void setCloudId(long cloud_id) {
         this.cloudId = cloud_id;
+    }
+
+    @Column(name = "file_id")
+    public String getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(String fileId) {
+        this.fileId = fileId;
     }
 
     @Column(name = "last_time_accessed")

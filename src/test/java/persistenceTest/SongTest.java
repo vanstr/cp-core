@@ -70,6 +70,7 @@ public class SongTest {
         song1 = new SongEntity();
         song1.setUser(user);
         song1.setCloudId(1);
+        song1.setFileId("Saga.mp3");
         song1.setFileName("Saga.mp3");
         song1.setFileSize(6666666);
         song1.setMetadataTitle("Basldlsa dasdas");

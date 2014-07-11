@@ -44,6 +44,7 @@ public class SongMetadataPopulationTest {
         song1 = new SongEntity();
         song1.setUser(user);
         song1.setCloudId(cloudId);
+        song1.setFileId("MyJunitTest.mp3");
         song1.setFileName("MyJunitTest.mp3");
         song1.setFileSize(1111);
         song1.setMetadataTitle("JUnitTests");

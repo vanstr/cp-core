@@ -1,5 +1,7 @@
 package structure;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 import java.io.Serializable;
 
 /**
@@ -9,6 +11,8 @@ import java.io.Serializable;
  * Time: 19:04
  * To change this template use File | Settings | File Templates.
  */
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Song implements Serializable {
 
     private String fileId;
@@ -16,15 +20,16 @@ public class Song implements Serializable {
     private String url;
     private long cloudId;
     private SongMetadata metadata;
-    private Long urlExipresTime;
+    private Long urlExpiresTime;
 
-    public Song(long cloudId, String fileId, String fileName, String url, Long urlExipresTime) {
+    public Song(){}
 
+    public Song(long cloudId, String fileId, String fileName, String url, Long urlExpiresTime) {
         this.fileName = fileName;
         this.cloudId = cloudId;
         this.fileId = fileId;
         this.url = url;
-        this.urlExipresTime = urlExipresTime;
+        this.urlExpiresTime = urlExpiresTime;
     }
 
     public String getFileId() {
@@ -70,14 +75,13 @@ public class Song implements Serializable {
         this.fileName = fileName;
     }
 
-    public Long getUrlExipresTime() {
-        return urlExipresTime;
+    public Long getUrlExpiresTime() {
+        return urlExpiresTime;
     }
 
-    public void setUrlExipresTime(Long urlExipresTime) {
-        this.urlExipresTime = urlExipresTime;
+    public void setUrlExpiresTime(Long urlExpiresTime) {
+        this.urlExpiresTime = urlExpiresTime;
     }
-
 
     public String toString() {
         return "Song name:" + this.fileName + " metadata:" + this.metadata;

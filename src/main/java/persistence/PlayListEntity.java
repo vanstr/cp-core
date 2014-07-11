@@ -1,14 +1,18 @@
 package persistence;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.sql.Timestamp;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,6 +34,7 @@ public class PlayListEntity {
     private String name;
     private Timestamp created;
     private Timestamp updated;
+    private Set<SongEntity> songs;
 
     @Id
     @Column(name = "id")
@@ -77,5 +82,17 @@ public class PlayListEntity {
 
     public void setUpdated(Timestamp updated) {
         this.updated = updated;
+    }
+
+    @ManyToMany(cascade = {CascadeType.ALL})
+    @JoinTable(name="playlist_song",
+            joinColumns={@JoinColumn(name="playlist_id")},
+            inverseJoinColumns={@JoinColumn(name="song_id")})
+    public Set<SongEntity> getSongs() {
+        return songs;
+    }
+
+    public void setSongs(Set<SongEntity> songs) {
+        this.songs = songs;
     }
 }
