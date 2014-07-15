@@ -55,7 +55,7 @@ public class GDriveTest {
         List<String> fileTypes = new ArrayList<String>();
         fileTypes.add("mp3");
         try {
-            List<Song> songList = gDrive.getFileList("/", fileTypes);
+            List<Song> songList = gDrive.getFileList("/", fileTypes).getSongs();
             assertNotNull(songList);
             boolean isFilePresent = false;
             for(Song song : songList){

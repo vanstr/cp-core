@@ -65,16 +65,16 @@ public class SongMetadataPopulationTest {
 
         PlayList playList = SongMetadataPopulation.populate(data, userId);
 
-        logger.debug("Songs in playlist:" + playList.size());
+        logger.debug("Songs in playlist:" + playList.getSongs().size());
         try {
 
-            for (Song song : playList) {
+            for (Song song : playList.getSongs()) {
                 if (song.getFileName().equals(song1.getFileName())) {
                     logger.debug("song:" + song.getMetadata().getTitle());
                     assertTrue("Incorrect authors", song.getMetadata().getTitle().equals(song1.getMetadataTitle()));
                 } else {
                     logger.debug("line " + song.getMetadata());
-                    assertNull("Methodata should not present", song.getMetadata());
+                    assertNull("Metadata should not present", song.getMetadata());
                 }
                 logger.info(song.toString());
             }

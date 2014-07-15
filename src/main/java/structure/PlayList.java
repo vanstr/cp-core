@@ -10,16 +10,19 @@ import java.util.ArrayList;
  * Time: 22:03
  * To change this template use File | Settings | File Templates.
  */
-public class PlayList extends ArrayList<Song> implements Serializable{
-
+public class PlayList implements Serializable{
     private long id;
     private String name;
+    private ArrayList<Song> songs;
 
-    public PlayList(){}
+    public PlayList(){
+        this.songs = new ArrayList<Song>();
+    }
 
     public PlayList(long id, String name){
         this.id = id;
         this.name = name;
+        this.songs = new ArrayList<Song>();
     }
 
     public long getId() {
@@ -36,5 +39,17 @@ public class PlayList extends ArrayList<Song> implements Serializable{
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public ArrayList<Song> getSongs() {
+        return songs;
+    }
+
+    public void setSongs(ArrayList<Song> songs) {
+        this.songs = songs;
+    }
+
+    public void add(Song song){
+        this.songs.add(song);
     }
 }
