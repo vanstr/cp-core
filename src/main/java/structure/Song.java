@@ -1,6 +1,7 @@
 package structure;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import persistence.SongEntity;
 
 import java.io.Serializable;
 
@@ -30,6 +31,17 @@ public class Song implements Serializable {
         this.fileId = fileId;
         this.url = url;
         this.urlExpiresTime = urlExpiresTime;
+    }
+
+    public Song(SongEntity entity){
+        this.fileName = entity.getFileName();
+        this.cloudId = entity.getCloudId();
+        this.fileId = entity.getFileId();
+        //TODO maybe not needed
+        SongMetadata metadata = new SongMetadata(entity.getMetadataTitle(), entity.getMetadataArtist(),
+                entity.getMetadataAlbum(), entity.getMetadataLengthSeconds(),
+                entity.getMetadataYear(), entity.getMetadataGenre());
+        this.metadata = metadata;
     }
 
     public String getFileId() {

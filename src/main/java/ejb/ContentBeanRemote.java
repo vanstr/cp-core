@@ -27,7 +27,7 @@ public interface ContentBeanRemote {
 
     public boolean saveSongMetadata(Song song, Long userId);
 
-    public long addPlayList(Long userId, String name);
+    public long addPlayList(Long userId, PlayList playList);
 
     public List<PlayList> getPlayLists(Long userId);
 
