@@ -33,4 +33,6 @@ public interface ContentBeanRemote {
 
     public PlayList getPlayList(Long userId, Long playListId);
 
+    public boolean deletePlayList(Long playListId);
+
 }

@@ -141,6 +141,30 @@ public abstract class EntityManager<T> {
         });
     }
 
+    public boolean deleteEntitiesByFields(Map<String, Object> fields) {
+
+        boolean result = false;
+        if (fields != null && fields.size() > 0) {
+
+            String queryString = "delete " + table + " where";
+            String andSeparator = " ";
+            for (String key : fields.keySet()) {
+                queryString += andSeparator + key + "=:" + key;
+                andSeparator = " AND ";
+            }
+
+            final Query query = session.createQuery(queryString);
+            query.setProperties(fields);
+            result = transactionWrapper.run(session, new AbstractExecutor() {
+                @Override
+                public void execute() {
+                    query.executeUpdate();
+                }
+            });
+        }
+
+        return result;
+    }
 
     public boolean updateEntity(final T entity) {
 

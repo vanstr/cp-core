@@ -24,6 +24,7 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -203,6 +204,26 @@ public class ContentBean implements ContentBeanRemote {
         playListManager.finalize();
 
         return playList;
+    }
+
+    @Override
+    public boolean deletePlayList(Long playListId) {
+        boolean result = false;
+        PlaylistSongManager playlistSongManager = new PlaylistSongManager();
+
+        Map<String, Object> fields = new HashMap<String, Object>();
+        fields.put("playlist_id", playListId);
+
+        if(playlistSongManager.deleteEntitiesByFields(fields)){
+            playlistSongManager.finalize();
+            PlayListManager playListManager = new PlayListManager();
+            if(playListManager.deleteEntityByIDs(Arrays.asList(playListId))){
+                playListManager.finalize();
+                result = true;
+            }
+        }
+
+        return result;
     }
 
     private SongEntity setMetadata(SongEntity songEntity, Song song) {
