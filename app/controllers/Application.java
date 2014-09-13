@@ -14,6 +14,7 @@ public class Application extends Controller {
         UserEntity song = UserEntity.find.byId(1l);
         Logger.debug("my user: " + song);
         return ok(index.render("Your new application is ready."));
+        // test commit
     }
 
 }
