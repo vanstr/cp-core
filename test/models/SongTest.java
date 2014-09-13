@@ -48,7 +48,6 @@ public class SongTest extends BaseModelTest {
       fail("error in preparing");
     }
 
-    Logger.info("BeforeClass done");
   }
 
   @Test

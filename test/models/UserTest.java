@@ -2,7 +2,6 @@ package models;
 
 import app.BaseModelTest;
 import clouds.Dropbox;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -41,8 +40,6 @@ public class UserTest extends BaseModelTest{
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             fail("error in preparing");
         }
-        Logger.info("BeforeClass done");
-
     }
 
   @Test
@@ -64,11 +61,5 @@ public class UserTest extends BaseModelTest{
   public void test1SaveUser(){
     //TODO
   }
-
-    @AfterClass
-    public static void end() {
-
-        Logger.info("AfterClass done");
-    }
 
 }
