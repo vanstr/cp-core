@@ -66,4 +66,61 @@ public class SongEntity extends Model {
 
     return song;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+
+    SongEntity that = (SongEntity) o;
+
+    if (cloudId != that.cloudId) {
+      return false;
+    }
+    if (fileSize != that.fileSize) {
+      return false;
+    }
+    if (id != that.id) {
+      return false;
+    }
+    if (metadataLengthSeconds != that.metadataLengthSeconds) {
+      return false;
+    }
+    if (fileName != null ? !fileName.equals(that.fileName) : that.fileName != null) {
+      return false;
+    }
+    if (metadataAlbum != null ? !metadataAlbum.equals(that.metadataAlbum) : that.metadataAlbum != null) {
+      return false;
+    }
+    if (metadataArtist != null ? !metadataArtist.equals(that.metadataArtist) : that.metadataArtist != null) {
+      return false;
+    }
+    if (metadataGenre != null ? !metadataGenre.equals(that.metadataGenre) : that.metadataGenre != null) {
+      return false;
+    }
+    if (metadataTitle != null ? !metadataTitle.equals(that.metadataTitle) : that.metadataTitle != null) {
+      return false;
+    }
+    if (metadataYear != null ? !metadataYear.equals(that.metadataYear) : that.metadataYear != null) {
+      return false;
+    }
+
+    return true;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (int) (id ^ (id >>> 32));
+    result = 31 * result + (int) (cloudId ^ (cloudId >>> 32));
+    result = 31 * result + (int) (fileSize ^ (fileSize >>> 32));
+    return result;
+  }
 }

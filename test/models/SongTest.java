@@ -29,17 +29,19 @@ public class SongTest extends BaseModelTest {
 
   private static Dropbox dropUnAuth = null; // un authorized dropboz session
   private static Dropbox dropAuth = null; // authorized dropboz session
-  private static UserEntity user = null;
-  private static SongEntity song1 = null;
+
+  private static SongEntity originLocalSong = null;
 
   @BeforeClass
   public static void method() {
+
+
     try {
       dropUnAuth = new Dropbox();
 
-      user = UserEntity.getUserById(1l);
+      originUser = UserEntity.getUserByField("login", "test");
 
-      dropAuth = new Dropbox(user.dropboxAccessKey);
+      dropAuth = new Dropbox(originUser.dropboxAccessKey);
     }
     catch (Exception e) {
       e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -51,28 +53,31 @@ public class SongTest extends BaseModelTest {
 
   @Test
   public void test1SaveSongs() {
-    song1 = new SongEntity();
-    song1.user = user;
-    song1.cloudId = 1;
-    song1.fileName = "Saga.mp3";
-    song1.fileSize = 66666;
-    song1.metadataTitle = "Basldlsa dasdas";
-    song1.save();
+    originLocalSong = new SongEntity();
+    originLocalSong.user = originUser;
+    originLocalSong.cloudId = 1;
+    originLocalSong.fileName = "Saga.mp3";
+    originLocalSong.fileSize = 66666;
+    originLocalSong.metadataTitle = "Basldlsa dasdas";
+    originLocalSong.save();
 
-    assertThat(song1).isNotNull();
+    SongEntity testSong = SongEntity.find.byId(originLocalSong.id);
+    assertThat(testSong).isNotNull();
+    assertThat(testSong).isEqualTo(originLocalSong);
 
     Logger.info("test1SaveSongs done");
   }
 
   @Test
-  public void test2GetSongs() {
+  public void test2GetSongByFields() {
 
     Map<String, Object> whereClause = new HashMap<String, Object>();
-    whereClause.put("id", song1.id);
-    //whereClause.put("user", user);
+    whereClause.put("id", originSong.id);
+    //whereClause.put("originUser", originUser);
     List<SongEntity> list = SongEntity.getSongsByFields(whereClause);
     Logger.debug("list: " + list);
     assertNotNull(list);
+    assertThat(list.contains(originSong)).isTrue();
 
     Logger.info("test2GetSongs done");
   }
@@ -81,12 +86,9 @@ public class SongTest extends BaseModelTest {
   public void test3RemoveSongsById() {
 
     List<Long> ids = new ArrayList<Long>();
-    ids.add(song1.id);
+    ids.add(originLocalSong.id);
     SongEntity.deleteSongsByID(ids);
-    SongEntity deletedSong = SongEntity.find.byId(song1.id);
-    assertNull(deletedSong);
-
-
+    SongEntity deletedSong = SongEntity.find.byId(originLocalSong.id);
     assertNull("Created song not removed", deletedSong);
 
     Logger.info("test3RemoveSongsById done");
