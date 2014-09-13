@@ -1,6 +1,6 @@
 package cloudTest;
 
-import cloud.Dropbox;
+import clouds.Dropbox;
 import commons.SystemProperty;
 import org.junit.BeforeClass;
 import org.junit.Test;

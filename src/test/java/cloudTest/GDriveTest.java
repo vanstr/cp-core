@@ -1,6 +1,6 @@
 package cloudTest;
 
-import cloud.GDrive;
+import clouds.GDrive;
 import commons.SystemProperty;
 import org.junit.BeforeClass;
 import org.junit.Test;

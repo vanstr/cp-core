@@ -1,6 +1,6 @@
 package persistenceTest;
 
-import cloud.Dropbox;
+import clouds.Dropbox;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;

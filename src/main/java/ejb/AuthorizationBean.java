@@ -1,8 +1,8 @@
 package ejb;
 
-import cloud.Dropbox;
-import cloud.GDrive;
-import cloud.OAuth2UserData;
+import clouds.Dropbox;
+import clouds.GDrive;
+import clouds.OAuth2UserData;
 import persistence.UserEntity;
 import persistence.utility.UserManager;
 

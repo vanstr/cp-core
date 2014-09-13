@@ -6,10 +6,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -47,11 +44,18 @@ public class UserEntity extends Model {
   public static Model.Finder<Long, UserEntity> find = new Model.Finder<Long, UserEntity>(Long.class, UserEntity.class);
 
   public static List<UserEntity> getUsersByFields(Map<String, Object> fields) {
-    List<UserEntity> songs = null;
+    List<UserEntity> users = null;
     if (fields != null && fields.size() > 0) {
-      songs = find.where().allEq(fields).findList();
+      users = find.where().allEq(fields).findList();
     }
-    return songs;
+    return users;
+  }
+
+  public static UserEntity getUserByField(String propertyName, Object value) {
+    Map<String, Object> fieldMap = new HashMap<String, Object>();
+    fieldMap.put(propertyName, value);
+    return getUserByFields(fieldMap);
+
   }
 
   public static UserEntity getUserByFields(Map<String, Object> fields) {
@@ -66,5 +70,9 @@ public class UserEntity extends Model {
   public static void deleteUserByID(Long id) {
     UserEntity user = find.where().eq("id", id).findUnique();
     user.delete();
+  }
+
+  public static UserEntity getUserById(Long userId) {
+    return find.byId(userId);
   }
 }

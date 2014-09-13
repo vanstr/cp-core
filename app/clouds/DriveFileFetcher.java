@@ -1,9 +1,8 @@
 package clouds;
 
-import com.sun.servicetag.UnauthorizedAccessException;
 import commons.FileFetcher;
-import persistence.UserEntity;
-import persistence.utility.UserManager;
+import commons.exceptions.UnauthorizedAccessException;
+import models.UserEntity;
 import structure.Song;
 
 import java.util.List;
@@ -25,11 +24,11 @@ public class DriveFileFetcher extends FileFetcher{
         List<Song> files = null;
         GDrive gDrive = null;
 
-        UserManager manager = new UserManager();
-        UserEntity user = manager.getUserById(userId);
+
+        UserEntity user = UserEntity.getUserById(userId);
         try{
-            String driveAccessToken = user.getDriveAccessToken();
-            String driveRefreshToken = user.getDriveRefreshToken();
+            String driveAccessToken = user.driveAccessToken;
+            String driveRefreshToken = user.driveRefreshToken;
             if(driveAccessToken != null && driveRefreshToken != null){
                 gDrive = new GDrive(driveAccessToken, driveRefreshToken);
                 files = gDrive.getFileList(folderPath, REQUIRED_FILE_TYPES);
@@ -39,16 +38,14 @@ public class DriveFileFetcher extends FileFetcher{
                 gDrive.setAccessToken(gDrive.refreshToken(gDrive.getRefreshToken()));
                 try {
                     files = gDrive.getFileList(folderPath, REQUIRED_FILE_TYPES);
-                    user.setDriveAccessToken(gDrive.getAccessToken());
-                    manager.updateUser(user);
+                    user.driveAccessToken = gDrive.getAccessToken();
+                    user.update();
                 } catch (Exception e1) {
                     e1.printStackTrace();
                 }
             }
         } catch (Exception e){
             e.printStackTrace();
-        } finally {
-            manager.finalize();
         }
         return files;
     }

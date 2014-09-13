@@ -1,9 +1,9 @@
 package ejb;
 
-import cloud.DriveFileFetcher;
-import cloud.Dropbox;
-import cloud.DropboxFileFetcher;
-import cloud.GDrive;
+import clouds.DriveFileFetcher;
+import clouds.Dropbox;
+import clouds.DropboxFileFetcher;
+import clouds.GDrive;
 import commons.FileFetcher;
 import commons.SongMetadataPopulation;
 import org.slf4j.Logger;

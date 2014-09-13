@@ -1,9 +1,5 @@
 package clouds;
 
-import commons.HttpWorker;
-import org.codehaus.jackson.map.util.JSONPObject;
-import org.json.JSONObject;
-
 /**
  * Created with IntelliJ IDEA.
  * User: alex

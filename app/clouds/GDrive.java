@@ -4,8 +4,8 @@ import clouds.oauth.OAuth2Communicator;
 import commons.CloudFile;
 import commons.HttpWorker;
 import commons.SystemProperty;
-import ejb.ContentBeanRemote;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import structure.PlayList;
 import structure.Song;
@@ -65,12 +65,12 @@ public class GDrive extends OAuth2Communicator {
         PlayList files = null;
         try {
             files = retrieveAllFiles();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+          e.printStackTrace();
         }
 
 
-        Iterator<Song> i = files.iterator();
+      Iterator<Song> i = files.iterator();
         while (i.hasNext()) {
             Song track = i.next();
             if ( !CloudFile.checkFileType(track.getFileName(), fileTypes) ) {
@@ -81,7 +81,7 @@ public class GDrive extends OAuth2Communicator {
     }
 
 
-    public PlayList retrieveAllFiles() throws IOException {
+    public PlayList retrieveAllFiles() throws IOException, JSONException {
         PlayList playList = new PlayList();
         String url = "https://www.googleapis.com/drive/v2/files?oauth_token=" + accessToken;
         JSONObject object = HttpWorker.sendGetRequest(url);
@@ -96,7 +96,7 @@ public class GDrive extends OAuth2Communicator {
                     && fileArray.getJSONObject(i).has("downloadUrl")){
 
                 Song song = new Song(
-                        (long)(ContentBeanRemote.DRIVE_CLOUD_ID),
+                        (long)(SystemProperty.DRIVE_CLOUD_ID),
                         fileArray.getJSONObject(i).getString("id"),
                         fileArray.getJSONObject(i).getString("title"),
                         fileArray.getJSONObject(i).getString("downloadUrl") + "&oauth_token=" + this.accessToken,
@@ -111,8 +111,14 @@ public class GDrive extends OAuth2Communicator {
     public String getFileLink(String fileId){
         JSONObject object = HttpWorker.sendGetRequest(SystemProperty.DRIVE_FILES_URL
                 + fileId + "?oauth_token=" + this.accessToken);
-        String fileSrc = object.getString("downloadUrl") + "&oauth_token=" + this.accessToken;
-        return fileSrc;
+      String fileSrc = null;
+      try {
+        fileSrc = object.getString("downloadUrl") + "&oauth_token=" + this.accessToken;
+      }
+      catch (JSONException e) {
+        e.printStackTrace();
+      }
+      return fileSrc;
     }
 
     @Override
@@ -120,8 +126,14 @@ public class GDrive extends OAuth2Communicator {
         JSONObject object = super.retrieveAccessToken(code, SystemProperty.DRIVE_CLIENT_ID,
                 SystemProperty.DRIVE_CLIENT_SECRET, GRANT_TYPE_AUTHORIZATION, SystemProperty.DRIVE_REDIRECT_URI,
                 SystemProperty.DRIVE_EMAIL_SCOPE + "+" + SystemProperty.DRIVE_SCOPE, SystemProperty.DRIVE_TOKEN_URL);
-        OAuth2UserData oAuth2UserData = parseDriveData(object);
-        return oAuth2UserData;
+      OAuth2UserData oAuth2UserData = null;
+      try {
+        oAuth2UserData = parseDriveData(object);
+      }
+      catch (JSONException e) {
+        e.printStackTrace();
+      }
+      return oAuth2UserData;
     }
 
     @Override
@@ -142,7 +154,7 @@ public class GDrive extends OAuth2Communicator {
         return accessToken;
     }
 
-    public static OAuth2UserData parseDriveData(JSONObject jsonObject){
+    public static OAuth2UserData parseDriveData(JSONObject jsonObject) throws JSONException {
         OAuth2UserData oAuth2UserData = new OAuth2UserData();
         oAuth2UserData.setAccessToken(jsonObject.getString("access_token"));
         oAuth2UserData.setRefreshToken(jsonObject.getString("refresh_token"));

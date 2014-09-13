@@ -7,7 +7,7 @@ import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.DbxUrlWithExpiration;
 import commons.CloudFile;
 import commons.SystemProperty;
-import ejb.ContentBeanRemote;
+import org.json.JSONException;
 import org.json.JSONObject;
 import structure.Song;
 
@@ -61,7 +61,7 @@ public class Dropbox extends OAuth2Communicator {
                 if(entry.isFile() && CloudFile.checkFileType(entry.asFile().name, requestedFileTypes)){
                     DbxUrlWithExpiration urlWithExpiration = client.createTemporaryDirectUrl(entry.path);
 
-                    files.add(new Song( ContentBeanRemote.DROPBOX_CLOUD_ID,
+                    files.add(new Song( SystemProperty.DROPBOX_CLOUD_ID,
                             entry.path,
                             getFileNameFromFilePath(entry.path),
                             urlWithExpiration.url,
@@ -79,8 +79,14 @@ public class Dropbox extends OAuth2Communicator {
         JSONObject object = super.retrieveAccessToken(code, SystemProperty.DROPBOX_APP_KEY,
                 SystemProperty.DROPBOX_APP_SECRET, GRANT_TYPE_AUTHORIZATION,
                 SystemProperty.DROPBOX_REDIRECT_URI, null, SystemProperty.DROPBOX_TOKEN_URL);
-        OAuth2UserData oAuth2UserData = parseDropboxData(object);
-        return oAuth2UserData;
+      OAuth2UserData oAuth2UserData = null;
+      try {
+        oAuth2UserData = parseDropboxData(object);
+      }
+      catch (JSONException e) {
+        e.printStackTrace();
+      }
+      return oAuth2UserData;
     }
 
     @Override
@@ -88,7 +94,7 @@ public class Dropbox extends OAuth2Communicator {
         return null;
     }
 
-    private static OAuth2UserData parseDropboxData(JSONObject jsonObject){
+    private static OAuth2UserData parseDropboxData(JSONObject jsonObject) throws JSONException {
         OAuth2UserData oAuth2UserData = new OAuth2UserData();
         oAuth2UserData.setAccessToken(jsonObject.getString("access_token"));
         oAuth2UserData.setUniqueCloudId(jsonObject.getString("uid"));
