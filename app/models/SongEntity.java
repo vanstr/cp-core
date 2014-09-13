@@ -61,7 +61,7 @@ public class SongEntity extends Model {
     Map<String, Object> fieldMap = new HashMap<String, Object>();
     fieldMap.put("cloudId", cloudId);
     fieldMap.put("fileName", fileName);
-    fieldMap.put("user", user);
+    fieldMap.put("user.id", user.id);
     SongEntity song = getSongByFields(fieldMap);
 
     return song;

@@ -43,6 +43,7 @@ public class BaseModelTest {
     song.cloudId = SystemProperty.DROPBOX_CLOUD_ID;
     song.fileName = "Shots.mp3";
     song.fileSize = 0;
+    song.metadataTitle = "Song title";
     song.save();
     return song;
   }
