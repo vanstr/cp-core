@@ -75,4 +75,45 @@ public class UserEntity extends Model {
   public static UserEntity getUserById(Long userId) {
     return find.byId(userId);
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+
+    UserEntity that = (UserEntity) o;
+
+    if (id != that.id) {
+      return false;
+    }
+    if (dropboxUid != null ? !dropboxUid.equals(that.dropboxUid) : that.dropboxUid != null) {
+      return false;
+    }
+    if (googleEmail != null ? !googleEmail.equals(that.googleEmail) : that.googleEmail != null) {
+      return false;
+    }
+    if (login != null ? !login.equals(that.login) : that.login != null) {
+      return false;
+    }
+    if (password != null ? !password.equals(that.password) : that.password != null) {
+      return false;
+    }
+
+    return true;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (int) (id ^ (id >>> 32));
+    result = 31 * result + (login != null ? login.hashCode() : 0);
+    return result;
+  }
 }

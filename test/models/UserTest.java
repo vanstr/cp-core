@@ -1,16 +1,19 @@
-package persistenceTest;
+package models;
 
+import app.BaseModelTest;
 import clouds.Dropbox;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import persistence.UserEntity;
-import persistence.utility.UserManager;
+import play.Logger;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 /**
@@ -21,15 +24,11 @@ import static org.junit.Assert.fail;
  * To change this template use File | Settings | File Templates.
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class UserTest {
-
-    final static Logger logger = LoggerFactory.getLogger(UserTest.class);
-
+public class UserTest extends BaseModelTest{
 
     private static Dropbox dropUnAuth = null; // un authorized dropboz session
     private static Dropbox dropAuth = null; // authorized dropboz session
-    private static UserManager userManager = null;
-    private static UserEntity user  = null;
+
 
 
     @BeforeClass
@@ -37,31 +36,39 @@ public class UserTest {
         try {
             dropUnAuth = new Dropbox();
 
-            // ATTENTION user with 1 id should be JUnit user and with access keys
-            userManager = new UserManager();
-
-            user = userManager.getUserById(1);
-
-            logger.debug(userManager.getSessionStatistic());
-
-            dropAuth = new Dropbox(user.getDropboxAccessKey());
+            dropAuth = new Dropbox(originUser.dropboxAccessKey);
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             fail("error in preparing");
         }
-        logger.info("BeforeClass done");
+        Logger.info("BeforeClass done");
 
     }
 
-    @Test
-    public void test1SaveUser(){
-        //TODO
-    }
+  @Test
+  public void test1GetUserByFields(){
+    Map<String, Object> whereClause = new HashMap<String, Object>();
+    whereClause.put("login", originUser.login);
+    whereClause.put("password", originUser.password);
+
+    UserEntity testUser = UserEntity.getUserByFields(whereClause);
+
+    assertNotNull(testUser);
+    assertThat(testUser).isEqualTo(originUser);
+
+    Logger.info("test1GetUserByFields done");
+  }
+
+
+  @Test
+  public void test1SaveUser(){
+    //TODO
+  }
 
     @AfterClass
     public static void end() {
-        userManager.finalize();
-        logger.info("AfterClass done");
+
+        Logger.info("AfterClass done");
     }
 
 }

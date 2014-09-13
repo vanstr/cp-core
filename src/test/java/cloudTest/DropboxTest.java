@@ -26,7 +26,6 @@ import static org.junit.Assert.fail;
  */
 public class DropboxTest {
 
-    final static Logger logger = LoggerFactory.getLogger(DropboxTest.class);
 
     private static Dropbox dropUnAuth = null; // un authorized dropboz session
     private static Dropbox dropAuth = null; // authorized dropboz session
@@ -60,7 +59,7 @@ public class DropboxTest {
         try{
             new Dropbox(null);
         }catch( Exception e){
-            logger.info("testDropboxFail done");
+            Logger.info("testDropboxFail done");
             return;
         }
 

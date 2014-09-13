@@ -38,13 +38,13 @@ public class BaseModelTest {
   }
 
   private static SongEntity createSong(long id) {
-    originSong = new SongEntity();
-    originSong.user = originUser;
-    originSong.cloudId = SystemProperty.DROPBOX_CLOUD_ID;
-    originSong.fileName = "Shots.mp3";
-    originSong.fileSize = 0;
-    originSong.save();
-    return originSong;
+    SongEntity song = new SongEntity();
+    song.user = originUser;
+    song.cloudId = SystemProperty.DROPBOX_CLOUD_ID;
+    song.fileName = "Shots.mp3";
+    song.fileSize = 0;
+    song.save();
+    return song;
   }
 
   private static UserEntity createUser() {
@@ -61,8 +61,10 @@ public class BaseModelTest {
   @AfterClass
   public static void stopApp() {
     // delete originXXX
-    originSong.delete();
-    originUser.delete();
+//    originSong.delete();
+
+
+ //   originUser.delete();
 
     Helpers.stop(testServer);
   }
