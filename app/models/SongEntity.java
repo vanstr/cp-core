@@ -41,6 +41,11 @@ public class SongEntity extends Model {
     }
     return songs;
   }
+  public static SongEntity getSongByFields(Map<String, Object> fields) {
+    SongEntity song = find.where().allEq(fields).findUnique();
+
+    return song;
+  }
 
 
   public static void deleteSongsByID(List<Long> ids) {
@@ -57,7 +62,7 @@ public class SongEntity extends Model {
     fieldMap.put("cloudId", cloudId);
     fieldMap.put("fileName", fileName);
     fieldMap.put("user", user);
-    SongEntity song = find.where().allEq(fieldMap).findUnique();
+    SongEntity song = getSongByFields(fieldMap);
 
     return song;
   }
