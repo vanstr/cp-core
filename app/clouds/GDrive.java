@@ -113,7 +113,9 @@ public class GDrive extends OAuth2Communicator {
                 + fileId + "?oauth_token=" + this.accessToken);
       String fileSrc = null;
       try {
-        fileSrc = object.getString("downloadUrl") + "&oauth_token=" + this.accessToken;
+        fileSrc = object.getString("downloadUrl")
+            + "&oauth_token="
+            + this.accessToken;
       }
       catch (JSONException e) {
         e.printStackTrace();

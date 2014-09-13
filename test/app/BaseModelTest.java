@@ -52,6 +52,8 @@ public class BaseModelTest {
     UserEntity newUser = new UserEntity();
     newUser.dropboxAccessKey = "BAus-dLEjW8AAAAAAAAAAVDysztTsSGkiwlJV7Fm6lvHYxbp0-QdBsyE_Hb_7dYd";
     newUser.dropboxUid = "192670402";
+    newUser.driveAccessToken = "7hlztwsgm4v8l2f";
+    newUser.driveRefreshToken = "C6jC5Vm8aiRDiNwy";
     newUser.login = "test";
     newUser.password = "123";
     newUser.save();
