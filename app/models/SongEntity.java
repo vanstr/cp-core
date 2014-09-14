@@ -1,5 +1,8 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import play.db.ebean.Model;
 
 import javax.persistence.Entity;
@@ -26,7 +29,10 @@ public class SongEntity extends Model {
   public String metadataGenre;
   public int metadataLengthSeconds;
 
+
   @ManyToOne
+  @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
+  @JsonIdentityReference(alwaysAsId=true)
   public UserEntity user;
 
 

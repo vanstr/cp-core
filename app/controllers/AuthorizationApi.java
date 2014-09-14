@@ -3,8 +3,9 @@ package controllers;
 import clouds.Dropbox;
 import clouds.GDrive;
 import clouds.OAuth2UserData;
+import com.fasterxml.jackson.databind.JsonNode;
 import models.UserEntity;
-import play.mvc.Controller;
+import play.mvc.Result;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,30 +18,43 @@ import java.util.Map;
  * Time: 20:48
  * To change this template use File | Settings | File Templates.
  */
-public class AuthorizationApi extends Controller {
+public class AuthorizationApi extends BaseController {
 
-  public Long login(String login, String password) {
-    Long result = null;
+  // { "login": "user", "password" : "changeme" }
+  public static Result login() {
+    JsonNode receivedJson = request().body().asJson();
+    String login = receivedJson.findPath("login").asText();
+    String password = receivedJson.findPath("password").asText();
 
     Map<String, Object> fieldMap = new HashMap<String, Object>();
     fieldMap.put("login", login);
     fieldMap.put("password", password);
     List<UserEntity> list = UserEntity.getUsersByFields(fieldMap);
     if (list != null && list.size() > 0) {
-      result = list.get(0).id;
+      UserEntity user = list.get(0);
+      return returnInJsonOk(user);
+    }else {
+      return badRequest("user not found");
     }
-    return result;
   }
 
+  // { "login": "user", "password" : "changeme" }
+  public static Result registerUser() {
+    JsonNode receivedJson = request().body().asJson();
+    String login = receivedJson.findPath("login").asText();
+    String password = receivedJson.findPath("password").asText();
 
-  public Boolean registerUser(String login, String password) {
+    UserEntity checingkUser = UserEntity.getUserByField("login", login);
+    if(checingkUser != null){
+      return badRequest("Login already exists");
+    }
 
     UserEntity newUser = new UserEntity();
     newUser.login = login;
     newUser.password = password;
     newUser.save();
 
-    return newUser.id > 0;
+    return returnInJsonOk(newUser);
   }
 
   /**

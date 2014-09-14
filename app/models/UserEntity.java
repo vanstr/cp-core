@@ -1,5 +1,9 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import play.db.ebean.Model;
 
 import javax.persistence.CascadeType;
@@ -24,12 +28,13 @@ public class UserEntity extends Model {
 
   public String login;
 
+  @JsonIgnore
   public String password;
-
+  @JsonIgnore
   public String dropboxAccessKey;
-
+  @JsonIgnore
   public String driveAccessToken;
-
+  @JsonIgnore
   public String driveRefreshToken;
 
   public String googleEmail;
@@ -38,6 +43,8 @@ public class UserEntity extends Model {
 
   public Long driveTokenExpires;
 
+  @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
+  @JsonIdentityReference(alwaysAsId=true)
   @OneToMany(cascade = CascadeType.ALL)
   private Set<SongEntity> songEntities = new HashSet<SongEntity>(0);
 
