@@ -1,2 +1,14 @@
-/.idea/
-*.iml
+/.idea
+/.idea_modules
+/logs
+/project/project
+/project/target
+/target
+/tmp
+.history
+/*.iml
+/out
+/.classpath
+/.project
+/RUNNING_PID
+/.settings
