@@ -1,8 +1,8 @@
 package app;
 
 import commons.SystemProperty;
-import models.SongEntity;
-import models.UserEntity;
+import models.Song;
+import models.User;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import play.test.FakeApplication;
@@ -20,8 +20,8 @@ public class BaseModelTest {
   public static String testServerHost = "http://localhost:" + port;
 
 
-  public static UserEntity originUser = null;
-  public static SongEntity originSong = null;
+  public static User originUser = null;
+  public static Song originSong = null;
 
   @BeforeClass
   public static void startApp() {
@@ -37,8 +37,8 @@ public class BaseModelTest {
     originSong = createSong(originUser.id);
   }
 
-  private static SongEntity createSong(long id) {
-    SongEntity song = new SongEntity();
+  private static Song createSong(long id) {
+    Song song = new Song();
     song.user = originUser;
     song.cloudId = SystemProperty.DROPBOX_CLOUD_ID;
     song.fileName = "Shots.mp3";
@@ -48,8 +48,8 @@ public class BaseModelTest {
     return song;
   }
 
-  private static UserEntity createUser() {
-    UserEntity newUser = new UserEntity();
+  private static User createUser() {
+    User newUser = new User();
     newUser.dropboxAccessKey = "BAus-dLEjW8AAAAAAAAAAVDysztTsSGkiwlJV7Fm6lvHYxbp0-QdBsyE_Hb_7dYd";
     newUser.dropboxUid = "192670402";
     newUser.driveAccessToken = "7hlztwsgm4v8l2f";

@@ -3,7 +3,7 @@ package cloudTest;
 import app.BaseModelTest;
 import clouds.GDrive;
 import commons.SystemProperty;
-import models.UserEntity;
+import models.User;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import play.Logger;
@@ -12,7 +12,11 @@ import structure.Song;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,7 +36,7 @@ public class GDriveTest extends BaseModelTest {
   public static void method() {
     try {
 
-      UserEntity user = UserEntity.getUserById(-1l);
+      User user = User.getUserById(-1l);
       gDrive = new GDrive(user.driveAccessToken, user.driveRefreshToken);
       String newToken = gDrive.refreshToken(user.driveRefreshToken);
       gDrive.setAccessToken(newToken);

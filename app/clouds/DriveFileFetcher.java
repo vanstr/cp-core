@@ -2,7 +2,7 @@ package clouds;
 
 import commons.FileFetcher;
 import commons.exceptions.UnauthorizedAccessException;
-import models.UserEntity;
+import models.User;
 import structure.Song;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public class DriveFileFetcher extends FileFetcher{
         GDrive gDrive = null;
 
 
-        UserEntity user = UserEntity.getUserById(userId);
+        User user = User.getUserById(userId);
         try{
             String driveAccessToken = user.driveAccessToken;
             String driveRefreshToken = user.driveRefreshToken;

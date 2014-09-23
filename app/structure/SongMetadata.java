@@ -1,8 +1,6 @@
 package structure;
 
 
-import models.SongEntity;
-
 import java.io.Serializable;
 
 /**
@@ -21,14 +19,14 @@ public class SongMetadata implements Serializable{
     private String genre;
 
 
-    public SongMetadata(SongEntity songEntity) {
-        if (songEntity != null) {
-            this.title = songEntity.metadataTitle;
-            this.album = songEntity.metadataAlbum;
-            this.artist = songEntity.metadataArtist;
-            this.year = songEntity.metadataYear;
-            this.genre = songEntity.metadataGenre;
-            this.lengthSeconds = songEntity.metadataLengthSeconds;
+    public SongMetadata(models.Song song) {
+        if (song != null) {
+            this.title = song.metadataTitle;
+            this.album = song.metadataAlbum;
+            this.artist = song.metadataArtist;
+            this.year = song.metadataYear;
+            this.genre = song.metadataGenre;
+            this.lengthSeconds = song.metadataLengthSeconds;
         }
     }
 

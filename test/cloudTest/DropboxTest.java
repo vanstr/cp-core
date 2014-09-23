@@ -85,7 +85,7 @@ public class DropboxTest extends BaseModelTest {
     // Problem: user should refer to URL and provide access
         /*
         UserManager manager = new UserManager();
-        UserEntity user = manager.getUserById(1);
+        User user = manager.getUserById(1);
 
         Tokens res1 = new Tokens(user.getDropboxRequestKey(), user.getDropboxRequestSecret());
         Tokens accessTokens1 = dropAuth.getUserAccessTokens(res1);

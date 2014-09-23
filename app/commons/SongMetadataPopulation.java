@@ -1,9 +1,8 @@
 package commons;
 
-import models.SongEntity;
-import models.UserEntity;
+import models.Song;
+import models.User;
 import structure.PlayList;
-import structure.Song;
 import structure.SongMetadata;
 
 import java.util.List;
@@ -17,17 +16,17 @@ import java.util.List;
  */
 public class SongMetadataPopulation {
 
-    public static PlayList populate(List<Song> data, long userId) {
+    public static PlayList populate(List<structure.Song> data, long userId) {
 
-        UserEntity userEntity = UserEntity.getUserById(userId);
+        User user = User.getUserById(userId);
 
         PlayList playList = new PlayList();
 
         int size = data.size();
         for (int i = 0; i < size; i++) {
-            Song song = data.get(i);
+            structure.Song song = data.get(i);
 
-            SongEntity songEntity = SongEntity.getSongByHash(userEntity, song.getCloudId(), song.getFileName());
+            Song songEntity = Song.getSongByHash(user, song.getCloudId(), song.getFileName());
             if (songEntity != null) {
                 SongMetadata metadata = new SongMetadata(songEntity);
                 song.setMetadata(metadata);

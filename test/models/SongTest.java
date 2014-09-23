@@ -13,8 +13,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static junit.framework.Assert.assertNull;
 import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,7 +32,7 @@ public class SongTest extends BaseModelTest {
   private static Dropbox dropUnAuth = null; // un authorized dropboz session
   private static Dropbox dropAuth = null; // authorized dropboz session
 
-  private static SongEntity originLocalSong = null;
+  private static Song originLocalSong = null;
 
   @BeforeClass
   public static void method() {
@@ -39,7 +41,7 @@ public class SongTest extends BaseModelTest {
     try {
       dropUnAuth = new Dropbox();
 
-      originUser = UserEntity.getUserByField("login", "test");
+      originUser = User.getUserByField("login", "test");
 
       dropAuth = new Dropbox(originUser.dropboxAccessKey);
     }
@@ -52,7 +54,7 @@ public class SongTest extends BaseModelTest {
 
   @Test
   public void test1SaveSongs() {
-    originLocalSong = new SongEntity();
+    originLocalSong = new Song();
     originLocalSong.user = originUser;
     originLocalSong.cloudId = 1;
     originLocalSong.fileName = "Saga.mp3";
@@ -60,7 +62,7 @@ public class SongTest extends BaseModelTest {
     originLocalSong.metadataTitle = "Basldlsa dasdas";
     originLocalSong.save();
 
-    SongEntity testSong = SongEntity.find.byId(originLocalSong.id);
+    Song testSong = Song.find.byId(originLocalSong.id);
     assertThat(testSong).isNotNull();
     assertThat(testSong).isEqualTo(originLocalSong);
 
@@ -73,7 +75,7 @@ public class SongTest extends BaseModelTest {
     Map<String, Object> whereClause = new HashMap<String, Object>();
     whereClause.put("id", originSong.id);
     //whereClause.put("originUser", originUser);
-    List<SongEntity> list = SongEntity.getSongsByFields(whereClause);
+    List<Song> list = Song.getSongsByFields(whereClause);
     Logger.debug("list: " + list);
     assertNotNull(list);
     assertThat(list.contains(originSong)).isTrue();
@@ -86,8 +88,8 @@ public class SongTest extends BaseModelTest {
 
     List<Long> ids = new ArrayList<Long>();
     ids.add(originLocalSong.id);
-    SongEntity.deleteSongsByID(ids);
-    SongEntity deletedSong = SongEntity.find.byId(originLocalSong.id);
+    Song.deleteSongsByID(ids);
+    Song deletedSong = Song.find.byId(originLocalSong.id);
     assertNull("Created song not removed", deletedSong);
 
     Logger.info("test3RemoveSongsById done");

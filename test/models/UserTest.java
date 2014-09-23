@@ -48,7 +48,7 @@ public class UserTest extends BaseModelTest{
     whereClause.put("login", originUser.login);
     whereClause.put("password", originUser.password);
 
-    UserEntity testUser = UserEntity.getUserByFields(whereClause);
+    User testUser = User.getUserByFields(whereClause);
 
     assertNotNull(testUser);
     assertThat(testUser).isEqualTo(originUser);
