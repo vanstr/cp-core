@@ -10,11 +10,14 @@ import commons.SystemProperty;
 import models.Song;
 import models.User;
 import play.Logger;
+import play.mvc.Result;
 import structure.PlayList;
 import structure.SongMetadata;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static play.mvc.Controller.session;
 
 /**
  * Created by imi on 13.09.2014..
@@ -112,5 +115,24 @@ public class ContentApi extends SecuredController {
         return files;
     }
 
+    public static Result removeDrive(){
+        Long userId = Long.parseLong(session("user"));
+        User user = User.getUserById(userId);
+        user.driveAccessToken = null;
+        user.driveRefreshToken = null;
+        user.googleEmail = null;
+        user.driveTokenExpires = null;
+        user.update();
+        return ok();
+    }
+
+    public static Result removeDropbox(){
+        Long userId = Long.parseLong(session("user"));
+        User user = User.getUserById(userId);
+        user.dropboxAccessKey = null;
+        user.dropboxUid = null;
+        user.update();
+        return ok();
+    }
 
 }

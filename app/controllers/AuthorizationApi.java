@@ -123,23 +123,4 @@ public class AuthorizationApi extends BaseController {
         return redirect("/");
     }
 
-    public static Result removeDrive(){
-        Long userId = Long.parseLong(session("user"));
-        User user = User.getUserById(userId);
-        user.driveAccessToken = null;
-        user.driveRefreshToken = null;
-        user.googleEmail = null;
-        user.driveTokenExpires = null;
-        user.update();
-        return ok();
-    }
-
-    public static Result removeDropbox(){
-        Long userId = Long.parseLong(session("user"));
-        User user = User.getUserById(userId);
-        user.dropboxAccessKey = null;
-        user.dropboxUid = null;
-        user.update();
-        return ok();
-    }
 }
