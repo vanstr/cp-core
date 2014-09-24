@@ -7,7 +7,7 @@ import play.mvc.Security;
 /**
  * Created by alex on 9/23/14.
  */
-public class SecuredController extends Security.Authenticator {
+public class Secured extends Security.Authenticator {
 
     @Override
     public String getUsername(Http.Context context) {
@@ -16,6 +16,6 @@ public class SecuredController extends Security.Authenticator {
 
     @Override
     public Result onUnauthorized(Http.Context context) {
-        return badRequest("unauthorized");
+        return unauthorized();
     }
 }

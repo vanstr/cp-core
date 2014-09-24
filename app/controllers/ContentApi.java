@@ -11,18 +11,18 @@ import models.Song;
 import models.User;
 import play.Logger;
 import play.mvc.Result;
+import play.mvc.Security;
 import structure.PlayList;
 import structure.SongMetadata;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static play.mvc.Controller.session;
-
 /**
  * Created by imi on 13.09.2014..
  */
-public class ContentApi extends SecuredController {
+@Security.Authenticated(Secured.class)
+public class ContentApi extends BaseController {
 
     public String getFileSrc(Long userId, Integer cloudId, String fileId) {
         String file = null;
