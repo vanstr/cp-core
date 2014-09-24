@@ -1,5 +1,7 @@
 package models;
 
+import play.db.ebean.Model;
+
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
@@ -14,13 +16,15 @@ import java.util.Set;
 /**
  * Created by alex on 9/23/14.
  */
-public class PlayList {
+public class PlayListEntity extends Model {
     private long id;
-    private User user;
+    private UserEntity userEntity;
     private String name;
     private Timestamp created;
     private Timestamp updated;
-    private Set<Song> songs = new HashSet<Song>(0);
+    private Set<SongEntity> songEntities = new HashSet<SongEntity>(0);
+
+    public static Model.Finder<Long, PlayListEntity> find = new Model.Finder<Long, PlayListEntity>(Long.class, PlayListEntity.class);
 
     @Id
     public long getId() {
@@ -33,12 +37,12 @@ public class PlayList {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    public User getUser() {
-        return user;
+    public UserEntity getUserEntity() {
+        return userEntity;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserEntity(UserEntity userEntity) {
+        this.userEntity = userEntity;
     }
 
     public String getName() {
@@ -69,11 +73,15 @@ public class PlayList {
     @JoinTable(name="playlist_song",
             joinColumns={@JoinColumn(name="playlist_id")},
             inverseJoinColumns={@JoinColumn(name="song_id")})
-    public Set<Song> getSongs() {
-        return songs;
+    public Set<SongEntity> getSongEntities() {
+        return songEntities;
     }
 
-    public void setSongs(Set<Song> songs) {
-        this.songs = songs;
+    public void setSongEntities(Set<SongEntity> songEntities) {
+        this.songEntities = songEntities;
+    }
+
+    public static PlayListEntity getUserById(Long playListId) {
+        return find.byId(playListId);
     }
 }

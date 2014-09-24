@@ -1,7 +1,7 @@
 package clouds;
 
 import commons.FileFetcher;
-import models.User;
+import models.UserEntity;
 import structure.Song;
 
 import java.util.List;
@@ -22,8 +22,8 @@ public class DropboxFileFetcher extends FileFetcher {
     public List<Song> getCloudFiles(String folderPath, Long userId) {
         List<Song> files = null;
         try {
-            User user = User.getUserById(userId);
-            String accessTokenKey = user.dropboxAccessKey;
+            UserEntity userEntity = UserEntity.getUserById(userId);
+            String accessTokenKey = userEntity.dropboxAccessKey;
 
             if (accessTokenKey != null) {
                 Dropbox drop = new Dropbox(accessTokenKey);

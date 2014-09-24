@@ -38,7 +38,7 @@ public class DropboxTest extends BaseModelTest {
     try {
       dropUnAuth = new Dropbox();
 
-      dropAuth = new Dropbox(originUser.dropboxAccessKey);
+      dropAuth = new Dropbox(originUserEntity.dropboxAccessKey);
     }
     catch (Exception e) {
       fail("error in preparing" + e);

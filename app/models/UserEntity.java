@@ -26,7 +26,7 @@ import java.util.Set;
  */
 
 @Entity
-public class User extends Model {
+public class UserEntity extends Model {
 
     @Id
     public Long id;
@@ -51,40 +51,120 @@ public class User extends Model {
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JsonIdentityReference(alwaysAsId=true)
     @OneToMany(cascade = CascadeType.ALL)
-    private Set<Song> songEntities = new HashSet<Song>(0);
+    private Set<SongEntity> songEntityEntities = new HashSet<SongEntity>(0);
 
-    public static Model.Finder<Long, User> find = new Model.Finder<Long, User>(Long.class, User.class);
+    public static Model.Finder<Long, UserEntity> find = new Model.Finder<Long, UserEntity>(Long.class, UserEntity.class);
 
-    public static List<User> getUsersByFields(Map<String, Object> fields) {
-        List<User> users = null;
-        if (fields != null && fields.size() > 0) {
-            users = find.where().allEq(fields).findList();
-        }
-        return users;
+    public Long getId() {
+        return id;
     }
 
-    public static User getUserByField(String propertyName, Object value) {
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getDropboxAccessKey() {
+        return dropboxAccessKey;
+    }
+
+    public void setDropboxAccessKey(String dropboxAccessKey) {
+        this.dropboxAccessKey = dropboxAccessKey;
+    }
+
+    public String getDriveAccessToken() {
+        return driveAccessToken;
+    }
+
+    public void setDriveAccessToken(String driveAccessToken) {
+        this.driveAccessToken = driveAccessToken;
+    }
+
+    public String getDriveRefreshToken() {
+        return driveRefreshToken;
+    }
+
+    public void setDriveRefreshToken(String driveRefreshToken) {
+        this.driveRefreshToken = driveRefreshToken;
+    }
+
+    public String getGoogleEmail() {
+        return googleEmail;
+    }
+
+    public void setGoogleEmail(String googleEmail) {
+        this.googleEmail = googleEmail;
+    }
+
+    public String getDropboxUid() {
+        return dropboxUid;
+    }
+
+    public void setDropboxUid(String dropboxUid) {
+        this.dropboxUid = dropboxUid;
+    }
+
+    public Long getDriveTokenExpires() {
+        return driveTokenExpires;
+    }
+
+    public void setDriveTokenExpires(Long driveTokenExpires) {
+        this.driveTokenExpires = driveTokenExpires;
+    }
+
+    public Set<SongEntity> getSongEntityEntities() {
+        return songEntityEntities;
+    }
+
+    public void setSongEntityEntities(Set<SongEntity> songEntityEntities) {
+        this.songEntityEntities = songEntityEntities;
+    }
+
+    public static List<UserEntity> getUsersByFields(Map<String, Object> fields) {
+        List<UserEntity> userEntities = null;
+        if (fields != null && fields.size() > 0) {
+            userEntities = find.where().allEq(fields).findList();
+        }
+        return userEntities;
+    }
+
+    public static UserEntity getUserByField(String propertyName, Object value) {
         Map<String, Object> fieldMap = new HashMap<String, Object>();
         fieldMap.put(propertyName, value);
         return getUserByFields(fieldMap);
 
     }
 
-    public static User getUserByFields(Map<String, Object> fields) {
-        User user = null;
+    public static UserEntity getUserByFields(Map<String, Object> fields) {
+        UserEntity userEntity = null;
         if (fields != null && fields.size() > 0) {
-            user = find.where().allEq(fields).findUnique();
+            userEntity = find.where().allEq(fields).findUnique();
         }
-        return user;
+        return userEntity;
     }
 
 
     public static void deleteUserByID(Long id) {
-        User user = find.where().eq("id", id).findUnique();
-        user.delete();
+        UserEntity userEntity = find.where().eq("id", id).findUnique();
+        userEntity.delete();
     }
 
-    public static User getUserById(Long userId) {
+    public static UserEntity getUserById(Long userId) {
         return find.byId(userId);
     }
 
@@ -100,7 +180,7 @@ public class User extends Model {
             return false;
         }
 
-        User that = (User) o;
+        UserEntity that = (UserEntity) o;
 
         if (id != that.id) {
             return false;

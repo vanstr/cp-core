@@ -4,7 +4,7 @@ import clouds.Dropbox;
 import clouds.GDrive;
 import clouds.OAuth2UserData;
 import com.fasterxml.jackson.databind.JsonNode;
-import models.User;
+import models.UserEntity;
 import play.mvc.Result;
 
 import java.util.HashMap;
@@ -29,12 +29,12 @@ public class AuthorizationApi extends BaseController {
         Map<String, Object> fieldMap = new HashMap<String, Object>();
         fieldMap.put("login", login);
         fieldMap.put("password", password);
-        List<User> list = User.getUsersByFields(fieldMap);
+        List<UserEntity> list = UserEntity.getUsersByFields(fieldMap);
         if (list != null && list.size() > 0) {
-            User user = list.get(0);
+            UserEntity userEntity = list.get(0);
             session().clear();
-            session("user", user.id.toString());
-            return returnInJsonOk(user);
+            session("user", userEntity.id.toString());
+            return returnInJsonOk(userEntity);
         }
 
         flash("errorMessage", "Failed to log in");
@@ -52,17 +52,17 @@ public class AuthorizationApi extends BaseController {
         String login = receivedJson.findPath("login").asText();
         String password = receivedJson.findPath("password").asText();
 
-        User checingkUser = User.getUserByField("login", login);
-        if (checingkUser != null){
+        UserEntity checingkUserEntity = UserEntity.getUserByField("login", login);
+        if (checingkUserEntity != null){
             return badRequest("Login already exists");
         }
 
-        User newUser = new User();
-        newUser.login = login;
-        newUser.password = password;
-        newUser.save();
+        UserEntity newUserEntity = new UserEntity();
+        newUserEntity.login = login;
+        newUserEntity.password = password;
+        newUserEntity.save();
 
-        return returnInJsonOk(newUser);
+        return returnInJsonOk(newUserEntity);
     }
 
     public static Result driveAuthComplete(String code) {
@@ -70,25 +70,25 @@ public class AuthorizationApi extends BaseController {
         GDrive gDrive = new GDrive(null, null, null);
         OAuth2UserData oAuth2UserData = gDrive.retrieveAccessToken(code);
 
-        User user = User.getUserByField("google_email", oAuth2UserData.getUniqueCloudId());
-        if (user == null) {
-            user = new User();
-            user.driveAccessToken = oAuth2UserData.getAccessToken();
-            user.driveRefreshToken = oAuth2UserData.getRefreshToken();
-            user.googleEmail = oAuth2UserData.getUniqueCloudId();
-            user.driveTokenExpires = oAuth2UserData.getExpiresIn() * 1000 + System.currentTimeMillis();
-            user.save();
+        UserEntity userEntity = UserEntity.getUserByField("google_email", oAuth2UserData.getUniqueCloudId());
+        if (userEntity == null) {
+            userEntity = new UserEntity();
+            userEntity.driveAccessToken = oAuth2UserData.getAccessToken();
+            userEntity.driveRefreshToken = oAuth2UserData.getRefreshToken();
+            userEntity.googleEmail = oAuth2UserData.getUniqueCloudId();
+            userEntity.driveTokenExpires = oAuth2UserData.getExpiresIn() * 1000 + System.currentTimeMillis();
+            userEntity.save();
         } else {
-            user.driveAccessToken = oAuth2UserData.getAccessToken();
-            user.driveRefreshToken = oAuth2UserData.getRefreshToken();
-            user.driveTokenExpires = oAuth2UserData.getExpiresIn() * 1000 + System.currentTimeMillis();
-            user.update();
+            userEntity.driveAccessToken = oAuth2UserData.getAccessToken();
+            userEntity.driveRefreshToken = oAuth2UserData.getRefreshToken();
+            userEntity.driveTokenExpires = oAuth2UserData.getExpiresIn() * 1000 + System.currentTimeMillis();
+            userEntity.update();
         }
         String userId = session("user");
         if (userId == null) {
             session().clear();
-            session("user", user.id.toString());
-        }else if(Long.parseLong(userId) != user.id){
+            session("user", userEntity.id.toString());
+        }else if(Long.parseLong(userId) != userEntity.id){
             //TODO redirect with error message
             return badRequest("This GDrive account is already used");
         }
@@ -101,21 +101,21 @@ public class AuthorizationApi extends BaseController {
         Dropbox dropbox = new Dropbox();
         OAuth2UserData oAuth2UserData = dropbox.retrieveAccessToken(code);
 
-        User user = User.getUserByField("dropbox_uid", oAuth2UserData.getUniqueCloudId());
-        if (user == null) {
-            user = new User();
-            user.dropboxAccessKey = oAuth2UserData.getAccessToken();
-            user.dropboxUid = oAuth2UserData.getUniqueCloudId();
-            user.save();
+        UserEntity userEntity = UserEntity.getUserByField("dropbox_uid", oAuth2UserData.getUniqueCloudId());
+        if (userEntity == null) {
+            userEntity = new UserEntity();
+            userEntity.dropboxAccessKey = oAuth2UserData.getAccessToken();
+            userEntity.dropboxUid = oAuth2UserData.getUniqueCloudId();
+            userEntity.save();
         } else {
-            user.dropboxAccessKey = oAuth2UserData.getAccessToken();
-            user.update();
+            userEntity.dropboxAccessKey = oAuth2UserData.getAccessToken();
+            userEntity.update();
         }
         String userId = session("user");
         if (userId == null) {
             session().clear();
-            session("user", user.id.toString());
-        }else if(Long.parseLong(userId) != user.id){
+            session("user", userEntity.id.toString());
+        }else if(Long.parseLong(userId) != userEntity.id){
             //TODO redirect with error message
             return badRequest("This Dropbox account is already used");
         }

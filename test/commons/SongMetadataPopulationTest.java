@@ -25,7 +25,6 @@ public class SongMetadataPopulationTest extends BaseModelTest {
 
   @BeforeClass
   public static void method() {
-
     Logger.info("BeforeClass done");
   }
 
@@ -34,20 +33,20 @@ public class SongMetadataPopulationTest extends BaseModelTest {
 
     List<Song> data = new ArrayList<Song>();
 
-    Song trackHasMetadata = new Song(originSong.cloudId, originSong.fileName, originSong.fileName, null, null);
+    Song trackHasMetadata = new Song(originSongEntity.cloudId, originSongEntity.fileName, originSongEntity.fileName, null, null);
     Song trackDoesNotHasMetadata = new Song(1, "NoThatSong", "", null, null);
     data.add(trackHasMetadata);
     data.add(trackDoesNotHasMetadata);
 
-    PlayList playList = SongMetadataPopulation.populate(data, originUser.id);
+    PlayList playList = SongMetadataPopulation.populate(data, originUserEntity.id);
 
-    Logger.debug("Songs in playlist:" + playList.size());
+    Logger.debug("Songs in playlist:" + playList.getSongs().size());
     try {
 
-      for (Song song : playList) {
-        if (song.getFileName().equals(originSong.fileName)) {
+      for (Song song : playList.getSongs()) {
+        if (song.getFileName().equals(originSongEntity.fileName)) {
           Logger.debug("song:" + song.getMetadata().getTitle());
-          assertTrue("Incorrect authors", song.getMetadata().getTitle().equals(originSong.metadataTitle));
+          assertTrue("Incorrect authors", song.getMetadata().getTitle().equals(originSongEntity.metadataTitle));
         }
         else {
           Logger.debug("line " + song.getMetadata());

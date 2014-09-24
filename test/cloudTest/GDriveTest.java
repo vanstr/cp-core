@@ -3,7 +3,7 @@ package cloudTest;
 import app.BaseModelTest;
 import clouds.GDrive;
 import commons.SystemProperty;
-import models.User;
+import models.UserEntity;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import play.Logger;
@@ -36,12 +36,12 @@ public class GDriveTest extends BaseModelTest {
   public static void method() {
     try {
 
-      User user = User.getUserById(-1l);
-      gDrive = new GDrive(user.driveAccessToken, user.driveRefreshToken);
-      String newToken = gDrive.refreshToken(user.driveRefreshToken);
+      UserEntity userEntity = UserEntity.getUserById(-1l);
+      gDrive = new GDrive(userEntity.driveAccessToken, userEntity.driveRefreshToken);
+      String newToken = gDrive.refreshToken(userEntity.driveRefreshToken);
       gDrive.setAccessToken(newToken);
-      user.driveAccessToken = newToken;
-      user.update();
+      userEntity.driveAccessToken = newToken;
+      userEntity.update();
     }
     catch (Exception e) {
       Logger.warn("Initialization failed", e);
@@ -55,7 +55,7 @@ public class GDriveTest extends BaseModelTest {
     List<String> fileTypes = new ArrayList<String>();
     fileTypes.add("mp3");
     try {
-      List<Song> songList = gDrive.getFileList("/", fileTypes);
+      List<Song> songList = gDrive.getFileList("/", fileTypes).getSongs();
       assertNotNull(songList);
       boolean isFilePresent = false;
       for (Song song : songList) {

@@ -23,7 +23,7 @@ import static org.junit.Assert.fail;
  * To change this template use File | Settings | File Templates.
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class UserTest extends BaseModelTest{
+public class UserEntityTest extends BaseModelTest{
 
     private static Dropbox dropUnAuth = null; // un authorized dropboz session
     private static Dropbox dropAuth = null; // authorized dropboz session
@@ -35,7 +35,7 @@ public class UserTest extends BaseModelTest{
         try {
             dropUnAuth = new Dropbox();
 
-            dropAuth = new Dropbox(originUser.dropboxAccessKey);
+            dropAuth = new Dropbox(originUserEntity.dropboxAccessKey);
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             fail("error in preparing");
@@ -45,13 +45,13 @@ public class UserTest extends BaseModelTest{
   @Test
   public void test1GetUserByFields(){
     Map<String, Object> whereClause = new HashMap<String, Object>();
-    whereClause.put("login", originUser.login);
-    whereClause.put("password", originUser.password);
+    whereClause.put("login", originUserEntity.login);
+    whereClause.put("password", originUserEntity.password);
 
-    User testUser = User.getUserByFields(whereClause);
+    UserEntity testUserEntity = UserEntity.getUserByFields(whereClause);
 
-    assertNotNull(testUser);
-    assertThat(testUser).isEqualTo(originUser);
+    assertNotNull(testUserEntity);
+    assertThat(testUserEntity).isEqualTo(originUserEntity);
 
     Logger.info("test1GetUserByFields done");
   }
