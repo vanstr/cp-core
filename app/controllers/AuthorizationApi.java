@@ -84,10 +84,16 @@ public class AuthorizationApi extends BaseController {
             user.driveTokenExpires = oAuth2UserData.getExpiresIn() * 1000 + System.currentTimeMillis();
             user.update();
         }
+        String userId = session("user");
+        if (userId == null) {
+            session().clear();
+            session("user", user.id.toString());
+        }else if(Long.parseLong(userId) != user.id){
+            //TODO redirect with error message
+            return badRequest("This GDrive account is already used");
+        }
 
-        session().clear();
-        session("user", "authDrive " + user.id.toString());
-        return ok();
+        return redirect("/");
     }
 
 
@@ -105,9 +111,15 @@ public class AuthorizationApi extends BaseController {
             user.dropboxAccessKey = oAuth2UserData.getAccessToken();
             user.update();
         }
+        String userId = session("user");
+        if (userId == null) {
+            session().clear();
+            session("user", user.id.toString());
+        }else if(Long.parseLong(userId) != user.id){
+            //TODO redirect with error message
+            return badRequest("This Dropbox account is already used");
+        }
 
-        session().clear();
-        session("user", user.id.toString());
-        return ok();
+        return redirect("/");
     }
 }
