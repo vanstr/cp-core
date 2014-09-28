@@ -5,11 +5,13 @@ import clouds.GDrive;
 import clouds.OAuth2UserData;
 import com.fasterxml.jackson.databind.JsonNode;
 import models.User;
+import play.Logger;
 import play.mvc.Result;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,7 +27,7 @@ public class AuthorizationApi extends BaseController {
         JsonNode receivedJson = request().body().asJson();
         String login = receivedJson.findPath("login").asText();
         String password = receivedJson.findPath("password").asText();
-
+        Logger.debug("json:" +  receivedJson);
         Map<String, Object> fieldMap = new HashMap<String, Object>();
         fieldMap.put("login", login);
         fieldMap.put("password", password);
@@ -33,7 +35,8 @@ public class AuthorizationApi extends BaseController {
         if (list != null && list.size() > 0) {
             User user = list.get(0);
             session().clear();
-            session("user", user.id.toString());
+            session("userId", user.id.toString());
+            session("username", user.login);
             return returnInJsonOk(user);
         }
 
@@ -87,7 +90,8 @@ public class AuthorizationApi extends BaseController {
         String userId = session("user");
         if (userId == null) {
             session().clear();
-            session("user", user.id.toString());
+            session("userId", user.id.toString());
+            session("username", user.login);
         }else if(Long.parseLong(userId) != user.id){
             //TODO redirect with error message
             return badRequest("This GDrive account is already used");
@@ -114,7 +118,8 @@ public class AuthorizationApi extends BaseController {
         String userId = session("user");
         if (userId == null) {
             session().clear();
-            session("user", user.id.toString());
+            session("userId", user.id.toString());
+            session("username", user.login);
         }else if(Long.parseLong(userId) != user.id){
             //TODO redirect with error message
             return badRequest("This Dropbox account is already used");

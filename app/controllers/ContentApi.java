@@ -116,7 +116,7 @@ public class ContentApi extends BaseController {
     }
 
     public static Result removeDrive(){
-        Long userId = Long.parseLong(session("user"));
+        Long userId = Long.parseLong(session("userId"));
         User user = User.getUserById(userId);
         user.driveAccessToken = null;
         user.driveRefreshToken = null;
@@ -127,7 +127,7 @@ public class ContentApi extends BaseController {
     }
 
     public static Result removeDropbox(){
-        Long userId = Long.parseLong(session("user"));
+        Long userId = Long.parseLong(session("userId"));
         User user = User.getUserById(userId);
         user.dropboxAccessKey = null;
         user.dropboxUid = null;
