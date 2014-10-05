@@ -5,6 +5,7 @@ import clouds.GDrive;
 import clouds.OAuth2UserData;
 import com.fasterxml.jackson.databind.JsonNode;
 import models.UserEntity;
+import play.Logger;
 import play.mvc.Result;
 
 import java.util.HashMap;
@@ -25,7 +26,7 @@ public class AuthorizationApi extends BaseController {
         JsonNode receivedJson = request().body().asJson();
         String login = receivedJson.findPath("login").asText();
         String password = receivedJson.findPath("password").asText();
-
+        Logger.debug("json:" + receivedJson);
         Map<String, Object> fieldMap = new HashMap<String, Object>();
         fieldMap.put("login", login);
         fieldMap.put("password", password);
@@ -33,8 +34,9 @@ public class AuthorizationApi extends BaseController {
         if (list != null && list.size() > 0) {
             UserEntity userEntity = list.get(0);
             session().clear();
-            session("user", userEntity.getId().toString());
-            return ok();
+            session("userId", userEntity.getId().toString());
+            session("username", userEntity.getLogin());
+            return returnInJsonOk(userEntity);
         }
 
         flash("errorMessage", "Failed to log in");
@@ -93,7 +95,8 @@ public class AuthorizationApi extends BaseController {
         String userId = session("user");
         if (userId == null) {
             session().clear();
-            session("user", userEntity.getId().toString());
+            session("userId", userEntity.getId().toString());
+            session("username", userEntity.getLogin());
         }else if(Long.parseLong(userId) != userEntity.getId()){
             //TODO redirect with error message
             return badRequest("This GDrive account is already used");
@@ -120,7 +123,8 @@ public class AuthorizationApi extends BaseController {
         String userId = session("user");
         if (userId == null) {
             session().clear();
-            session("user", userEntity.getId().toString());
+            session("userId", userEntity.getId().toString());
+            session("username", userEntity.getLogin());
         }else if(Long.parseLong(userId) != userEntity.getId()){
             //TODO redirect with error message
             return badRequest("This Dropbox account is already used");
