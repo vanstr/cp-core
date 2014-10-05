@@ -13,15 +13,15 @@ GET           /driveAuthComplete           controllers.AuthorizationApi.driveAut
 GET           /removeDropbox               controllers.ContentApi.removeDropbox()
 GET           /removeDrive                 controllers.ContentApi.removeDrive()
 
-  GET           /api/getLink                 controllers.ContentApi.getFileSrc(cloudId: Integer, fileId: String)
-  GET           /api/getPlayList             controllers.ContentApi.getPlayList()
+GET           /api/getLink                 controllers.ContentApi.getFileSrc(cloudId: Integer, fileId: String)
+GET           /api/getPlayList             controllers.ContentApi.getPlayList()
 #TODO change signature
-  GET           /api/getPlayListById         controllers.ContentApi.getPlayListById(playListId: Long)
+GET           /api/getPlayListById         controllers.ContentApi.getPlayListById(playListId: Long)
 GET           /api/getPlayLists            controllers.ContentApi.getPlayLists()
 DELETE        /api/deletePlayList          controllers.ContentApi.deletePlayList(playListId: Long)
 
 POST          /api/saveSongMetadata        controllers.ContentApi.saveSongMetadata()
-  POST          /api/addPlayList             controllers.ContentApi.addPlayList()
+POST          /api/addPlayList             controllers.ContentApi.addPlayList()
 
 # Map static resources from the /public folder to the /assets URL path
 GET           /assets/*file                controllers.Assets.at(path="/public", file)
