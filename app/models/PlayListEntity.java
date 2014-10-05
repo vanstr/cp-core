@@ -30,7 +30,7 @@ public class PlayListEntity extends Model implements Serializable {
     @Id
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(targetEntity=UserEntity.class, optional = false)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private UserEntity userEntity;
 

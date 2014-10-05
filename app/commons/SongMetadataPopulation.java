@@ -25,11 +25,11 @@ public class SongMetadataPopulation {
 
         int size = data.size();
         for (int i = 0; i < size; i++) {
-            structure.Song song = data.get(i);
+            Song song = data.get(i);
 
-            SongEntity songEntityEntity = SongEntity.getSongByHash(userEntity, song.getCloudId(), song.getFileName());
-            if (songEntityEntity != null) {
-                SongMetadata metadata = new SongMetadata(songEntityEntity);
+            SongEntity songEntity = SongEntity.getSongByHash(userEntity, song.getCloudId(), song.getFileName());
+            if (songEntity != null) {
+                SongMetadata metadata = new SongMetadata(songEntity);
                 song.setMetadata(metadata);
             }
 

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import play.db.ebean.Model;
+import structure.Song;
+import structure.SongMetadata;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -37,19 +39,19 @@ public class SongEntity extends Model implements Serializable {
     private UserEntity user;
 
     @Column(nullable = false)
-    private long cloudId;
+    private Long cloudId;
 
     @Column(nullable = false)
     private String fileId;
 
     @Column(nullable = false)
     private String fileName;
-    private long fileSize;
+    private Long fileSize;
     private Date lastTimeAccessed;
     private String metadataAlbum;
     private String metadataArtist;
     private String metadataGenre;
-    private int metadataLengthSeconds;
+    private Long metadataLengthSeconds;
     private String metadataTitle;
     private String metadataYear;
 
@@ -60,6 +62,14 @@ public class SongEntity extends Model implements Serializable {
     public static Model.Finder<Long, SongEntity> find = new Model.Finder<Long, SongEntity>(Long.class, SongEntity.class);
 
     public SongEntity(){}
+
+    public SongEntity(Song song){
+        this.setCloudId(song.getCloudId());
+        this.setFileId(song.getFileId());
+        this.setFileName(song.getFileName());
+        this.setFileSize(song.getFileSize());
+        this.setMetadata(song);
+    }
 
     public SongEntity(UserEntity user, Long cloudId, String fileId, String fileName, boolean hasMetadata){
         this.setUser(user);
@@ -85,11 +95,11 @@ public class SongEntity extends Model implements Serializable {
         this.user = user;
     }
 
-    public long getCloudId() {
+    public Long getCloudId() {
         return cloudId;
     }
 
-    public void setCloudId(long cloudId) {
+    public void setCloudId(Long cloudId) {
         this.cloudId = cloudId;
     }
 
@@ -109,11 +119,11 @@ public class SongEntity extends Model implements Serializable {
         this.fileName = fileName;
     }
 
-    public long getFileSize() {
+    public Long getFileSize() {
         return fileSize;
     }
 
-    public void setFileSize(long fileSize) {
+    public void setFileSize(Long fileSize) {
         this.fileSize = fileSize;
     }
 
@@ -149,11 +159,11 @@ public class SongEntity extends Model implements Serializable {
         this.metadataGenre = metadataGenre;
     }
 
-    public int getMetadataLengthSeconds() {
+    public Long getMetadataLengthSeconds() {
         return metadataLengthSeconds;
     }
 
-    public void setMetadataLengthSeconds(int metadataLengthSeconds) {
+    public void setMetadataLengthSeconds(Long metadataLengthSeconds) {
         this.metadataLengthSeconds = metadataLengthSeconds;
     }
 
@@ -213,10 +223,10 @@ public class SongEntity extends Model implements Serializable {
     }
 
 
-    public static SongEntity getSongByHash(UserEntity userEntity, long cloudId, String fileName) {
+    public static SongEntity getSongByHash(UserEntity userEntity, Long cloudId, String fileId) {
         Map<String, Object> fieldMap = new HashMap<String, Object>();
-        fieldMap.put("cloudId", cloudId);
-        fieldMap.put("fileName", fileName);
+        fieldMap.put("cloud_id", cloudId);
+        fieldMap.put("file_id", fileId);
         fieldMap.put("user_id", userEntity.getId());
         SongEntity songEntity = getSongByFields(fieldMap);
 
@@ -230,6 +240,21 @@ public class SongEntity extends Model implements Serializable {
             result.addAll(getSongsByFields(entry));
         }
         return result;
+    }
+
+    public void setMetadata(Song song) {
+        SongMetadata metadata = song.getMetadata();
+        if (metadata != null) {
+            this.setMetadataTitle(metadata.getTitle());
+            this.setMetadataAlbum(metadata.getAlbum());
+            this.setMetadataArtist(metadata.getArtist());
+            this.setMetadataGenre(metadata.getGenre());
+            this.setMetadataYear(metadata.getYear());
+            this.setMetadataLengthSeconds(metadata.getLengthSeconds());
+            this.setHasMetadata(true);
+        } else {
+            this.setHasMetadata(false);
+        }
     }
 
     @Override
@@ -285,7 +310,6 @@ public class SongEntity extends Model implements Serializable {
         int result = super.hashCode();
         result = 31 * result + (int) (id ^ (id >>> 32));
         result = 31 * result + (int) (cloudId ^ (cloudId >>> 32));
-        result = 31 * result + (int) (fileSize ^ (fileSize >>> 32));
         return result;
     }
 }

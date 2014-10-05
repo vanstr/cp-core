@@ -52,7 +52,7 @@ public class BaseModelTest {
         songEntity.setCloudId(SystemProperty.DROPBOX_CLOUD_ID);
         songEntity.setFileId("Shots.mp3");
         songEntity.setFileName("Shots.mp3");
-        songEntity.setFileSize(0);
+        songEntity.setFileSize(0L);
         songEntity.setMetadataTitle("Song title");
         songEntity.setHasMetadata(true);
         songEntity.save();

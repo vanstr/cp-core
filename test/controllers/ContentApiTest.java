@@ -1,11 +1,13 @@
 package controllers;
 
 import app.BaseModelTest;
+import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.PlayListEntity;
 import models.SongEntity;
+import models.UserEntity;
 import org.junit.Test;
 import play.Logger;
 import play.mvc.Result;
@@ -13,6 +15,7 @@ import play.test.FakeRequest;
 
 import static junit.framework.TestCase.assertNotNull;
 import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static play.mvc.Http.Status.OK;
 import static play.test.Helpers.contentAsString;
@@ -48,9 +51,6 @@ public class ContentApiTest extends BaseModelTest {
         SongEntity song1 = new SongEntity(originUserEntity, 1L, "/songs/song1.mp3", "song1.mp3", false);
         song1.save();
 
-        SongEntity song2 = new SongEntity(originUserEntity, 2L, "QWERTY123", "song2.mp3", false);
-        song2.save();
-
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         node.put("id", (byte[]) null);
         node.put("name", "playlist1");
@@ -65,7 +65,10 @@ public class ContentApiTest extends BaseModelTest {
 
         ObjectNode child3 = JsonNodeFactory.instance.objectNode();
         child3.put("fileId", "QWERTY123");
+        child3.put("fileName", "QWERTY123");
         child3.put("cloudId", 2);
+        child3.put("url", "QWERTY123");
+        child3.put("hasMetadata", false);
 
         array.add(child1);
         array.add(child2);
@@ -74,7 +77,7 @@ public class ContentApiTest extends BaseModelTest {
         node.put("songs", array);
 
         FakeRequest request = new FakeRequest("POST", "/api/addPlayList")
-                .withSession("user", "1");
+                .withSession("user", originUserEntity.getId().toString());
         request.withJsonBody(node);
 
         Result result = route(request);
@@ -98,6 +101,88 @@ public class ContentApiTest extends BaseModelTest {
 
     @Test
     public void testGetPlayLists(){
+        FakeRequest request = new FakeRequest("GET", "/api/getPlayLists")
+                .withSession("user", "1");
+        Result result = route(request);
+        assertNotNull(contentAsString(result));
+        Logger.info("Get playlists test done");
+    }
 
+    @Test
+    public void testSaveSongMetadata(){
+        FakeRequest request = new FakeRequest("POST", "/api/saveSongMetadata")
+                .withSession("user", "1");
+        ObjectNode node = JsonNodeFactory.instance.objectNode();
+        node.put("fileId", "/songs/song1.mp3");
+        node.put("fileName", "song1.mp3");
+        node.put("cloudId", 1L);
+        ObjectNode metadataNode = JsonNodeFactory.instance.objectNode();
+        metadataNode.put("title", "Song 1");
+        metadataNode.put("artist", "Artist 1");
+        metadataNode.put("album", "Album 1");
+        metadataNode.put("lengthSeconds", 100);
+        metadataNode.put("year", "1");
+        metadataNode.put("genre", "Genre 1");
+        node.put("metadata", metadataNode);
+        node.put("urlExpiresTime", 0L);
+        node.put("url", "mockUrl");
+
+        request.withJsonBody(node);
+        Result result = route(request);
+        assertThat(status(result)).isEqualTo(OK);
+        SongEntity songEntity = SongEntity.getSongByHash(UserEntity.getUserById(1L), 1L, "/songs/song1.mp3");
+
+        assertThat(songEntity.getMetadataTitle()).isEqualTo("Song 1");
+        assertThat(songEntity.getMetadataArtist()).isEqualTo("Artist 1");
+        assertThat(songEntity.getMetadataAlbum()).isEqualTo("Album 1");
+        assertThat(songEntity.getMetadataLengthSeconds()).isEqualTo(100);
+        assertThat(songEntity.getMetadataYear()).isEqualTo("1");
+        assertThat(songEntity.getMetadataGenre()).isEqualTo("Genre 1");
+        Logger.info("Save metadata test done");
+    }
+
+    @Test
+    public void testDeletePlayList(){
+        testPlayListEntity = new PlayListEntity();
+        testPlayListEntity.setName("name");
+        testPlayListEntity.setUserEntity(originUserEntity);
+        testPlayListEntity.save();
+        Long playListId = testPlayListEntity.getId();
+        FakeRequest request = new FakeRequest("DELETE", "/api/deletePlayList?playListId=" + playListId)
+                .withSession("user", originUserEntity.getId().toString());
+
+        Result result = route(request);
+        assertThat(status(result)).isEqualTo(OK);
+        assertNull(PlayListEntity.getPlayListById(playListId));
+        Logger.info("Delete playlist test done");
+    }
+
+    @Test
+    public void testRemoveDropbox(){
+        UserEntity dropboxUser = UserEntity.getUserByField("login", "dropbox");
+        FakeRequest request = new FakeRequest("GET", "/removeDropbox")
+                .withSession("user", dropboxUser.getId().toString());
+
+        Result result = route(request);
+        assertThat(status(result)).isEqualTo(OK);
+        Ebean.refresh(dropboxUser);
+        assertNull(dropboxUser.getDropboxAccessKey());
+        assertNull(dropboxUser.getDropboxUid());
+        Logger.info("Remove Dropbox test done");
+    }
+
+    @Test
+    public void testRemoveGDrive(){
+        UserEntity gDriveuser = UserEntity.getUserByField("login", "gdrive");
+        FakeRequest request = new FakeRequest("GET", "/removeDrive")
+                .withSession("user", gDriveuser.getId().toString());
+
+        Result result = route(request);
+        assertThat(status(result)).isEqualTo(OK);
+        Ebean.refresh(gDriveuser);
+        assertNull(gDriveuser.getDriveAccessToken());
+        assertNull(gDriveuser.getDriveRefreshToken());
+        assertNull(gDriveuser.getGoogleEmail());
+        Logger.info("Remove GDrive test done");
     }
 }

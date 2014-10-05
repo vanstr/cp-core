@@ -23,8 +23,8 @@ public class SystemProperty {
     public static String DRIVE_FILES_URL;
     public static String DRIVE_SCOPE;
 
-    public final static Integer DROPBOX_CLOUD_ID = 1;
-    public final static Integer DRIVE_CLOUD_ID = 2;
+    public final static Long DROPBOX_CLOUD_ID = 1L;
+    public final static Long DRIVE_CLOUD_ID = 2L;
 
     private static Properties localProperties;
 

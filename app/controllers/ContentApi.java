@@ -18,14 +18,12 @@ import play.mvc.Result;
 import play.mvc.Security;
 import structure.PlayList;
 import structure.Song;
-import structure.SongMetadata;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -34,7 +32,7 @@ import java.util.Set;
 @Security.Authenticated(Secured.class)
 public class ContentApi extends BaseController {
 
-    public static Result getFileSrc(Integer cloudId, String fileId) {
+    public static Result getFileSrc(Long cloudId, String fileId) {
         String file = null;
         try {
             UserEntity userEntity = UserEntity.getUserById(Long.parseLong(session("user")));
@@ -86,32 +84,16 @@ public class ContentApi extends BaseController {
 
         if (songEntity == null) {
             // songEntity is empty, create new with metadata
-            songEntity = new SongEntity();
-            songEntity.setCloudId(song.getCloudId());
-            songEntity.setFileName(song.getFileName());
+            songEntity = new SongEntity(song);
             songEntity.setUser(userEntity);
-            songEntity = setMetadata(songEntity, song);
             songEntity.save();
         } else {
             // update metadata
-            songEntity = setMetadata(songEntity, song);
+            songEntity.setMetadata(song);
             songEntity.update();
         }
 
         return ok();
-    }
-
-    private static SongEntity setMetadata(SongEntity songEntity, Song song) {
-        SongMetadata metadata = song.getMetadata();
-        if (metadata != null) {
-            songEntity.setMetadataTitle(metadata.getTitle());
-            songEntity.setMetadataAlbum(metadata.getAlbum());
-            songEntity.setMetadataArtist(metadata.getArtist());
-            songEntity.setMetadataGenre(metadata.getGenre());
-            songEntity.setMetadataYear(metadata.getYear());
-        }
-
-        return songEntity;
     }
 
     private static List<Song> getFiles(String folderPath, Long userId) {
@@ -167,16 +149,10 @@ public class ContentApi extends BaseController {
 
         Set<SongEntity> songs = new HashSet<SongEntity>();
         if(playList.getSongs() != null){
-            List<Object> fileIds = new ArrayList<Object>();
-            List<Object> cloudIds = new ArrayList<Object>();
+            List<Song> songsToAdd = new ArrayList<Song>(playList.getSongs());
 
-            for(int i = 0; i < playList.getSongs().size(); i++){
-                fileIds.add(i, playList.getSongs().get(i).getFileId());
-                cloudIds.add(i, playList.getSongs().get(i).getCloudId());
-            }
-
-            songs.addAll(addExistingSongs(fileIds, cloudIds));
-            songs.addAll(addNewSongs(fileIds, cloudIds, user));
+            songs.addAll(addExistingSongs(songsToAdd, user));
+            songs.addAll(addNewSongs(songsToAdd, user));
         }
 
         PlayListEntity playListEntity = new PlayListEntity();
@@ -213,37 +189,28 @@ public class ContentApi extends BaseController {
         return ok();
     }
 
-    private static Set<SongEntity> addExistingSongs(List<Object> fileIds, List<Object> cloudIds){
+    private static Set<SongEntity> addExistingSongs(List<Song> songList, UserEntity user){
         Set<SongEntity> songs = new HashSet<SongEntity>();
-        List<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
-        for(int i = 0; i < fileIds.size(); i++){
-            Map<String, Object> map = new HashMap<String, Object>();
-            map.put("fileId", fileIds.get(i));
-            map.put("cloudId", cloudIds.get(i));
-            fields.add(map);
-        }
-        List<SongEntity> songList = SongEntity.getSongsByMultipleFields(fields);
-
-        if(songList != null){
-            for(SongEntity songEntity : songList){
-                fileIds.remove(songEntity.getFileId());
-                cloudIds.remove(songEntity.getCloudId());
+        Iterator<Song> iterator = songList.iterator();
+        while(iterator.hasNext()){
+            Song currentSong = iterator.next();
+            SongEntity songEntity = SongEntity.getSongByHash(user, currentSong.getCloudId(),
+                    currentSong.getFileId());
+            if(songEntity != null){
                 songs.add(songEntity);
+                iterator.remove();
             }
         }
 
         return songs;
     }
 
-    private static Set<SongEntity> addNewSongs(List<Object> fileIds, List<Object> cloudIds, UserEntity user){
+    private static Set<SongEntity> addNewSongs(List<Song> songList, UserEntity user){
         Set<SongEntity> songs = new HashSet<SongEntity>();
 
-        for(int i = 0; i < fileIds.size(); i++){
-            SongEntity songEntity = new SongEntity();
+        for(int i = 0; i < songList.size(); i++){
+            SongEntity songEntity = new SongEntity(songList.get(i));
             songEntity.setUser(user);
-            songEntity.setFileId((String) fileIds.get(i));
-            songEntity.setCloudId((Long) cloudIds.get(i));
-            songEntity.setHasMetadata(false);
             songEntity.save();
             songs.add(songEntity);
         }

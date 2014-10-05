@@ -56,10 +56,10 @@ public class SongEntityTest extends BaseModelTest {
     public void test1SaveSongs() {
         originLocalSongEntity = new SongEntity();
         originLocalSongEntity.setUser(originUserEntity);
-        originLocalSongEntity.setCloudId(1);
+        originLocalSongEntity.setCloudId(1L);
         originLocalSongEntity.setFileName("Saga.mp3");
         originLocalSongEntity.setFileId("Saga.mp3");
-        originLocalSongEntity.setFileSize(66666);
+        originLocalSongEntity.setFileSize(66666L);
         originLocalSongEntity.setMetadataTitle("Basldlsa dasdas");
         originLocalSongEntity.setHasMetadata(true);
         originLocalSongEntity.save();
@@ -117,7 +117,6 @@ public class SongEntityTest extends BaseModelTest {
         map2.put("fileId", "QWERTY123456");
         fields.add(map2);
         assertNotNull(SongEntity.getSongsByMultipleFields(fields));
-        System.out.println("SIZE IS " + SongEntity.getSongsByMultipleFields(fields).size());
         Ebean.delete(song1);
         Ebean.delete(song2);
         Logger.info("test5GetSongsByMultipleFields done");

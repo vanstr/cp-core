@@ -15,9 +15,11 @@ public class Song implements Serializable {
     private String fileId;
     private String fileName;
     private String url;
-    private long cloudId;
+    private Long cloudId;
     private SongMetadata metadata;
     private Long urlExpiresTime;
+    private Long fileSize;
+    private Boolean hasMetadata;
 
     public Song(){}
 
@@ -47,11 +49,11 @@ public class Song implements Serializable {
     }
 
 
-    public long getCloudId() {
+    public Long getCloudId() {
         return cloudId;
     }
 
-    public void setCloudId(long cloudId) {
+    public void setCloudId(Long cloudId) {
         this.cloudId = cloudId;
     }
 
@@ -87,6 +89,22 @@ public class Song implements Serializable {
 
     public void setUrlExpiresTime(Long urlExpiresTime) {
         this.urlExpiresTime = urlExpiresTime;
+    }
+
+    public Long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(Long fileSize) {
+        this.fileSize = fileSize;
+    }
+
+    public Boolean isHasMetadata() {
+        return hasMetadata;
+    }
+
+    public void setHasMetadata(Boolean hasMetadata) {
+        this.hasMetadata = hasMetadata;
     }
 
     public String toString() {
