@@ -1,20 +1,22 @@
 package models;
 
+import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import play.db.ebean.Model;
 
-import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -26,34 +28,42 @@ import java.util.Set;
  */
 
 @Entity
-public class UserEntity extends Model {
+@Table(name = "user")
+public class UserEntity extends Model implements Serializable {
 
     @Id
-    public Long id;
+    private Long id;
 
-    public String login;
+    @Column(nullable = false, columnDefinition="varchar(255) NOT NULL")
+    private String login;
 
     @JsonIgnore
-    public String password;
-    @JsonIgnore
-    public String dropboxAccessKey;
-    @JsonIgnore
-    public String driveAccessToken;
-    @JsonIgnore
-    public String driveRefreshToken;
+    @Column(nullable = false, columnDefinition="varchar(255) NOT NULL")
+    private String password;
 
-    public String googleEmail;
+    @JsonIgnore
+    private String dropboxAccessKey;
 
-    public String dropboxUid;
+    @JsonIgnore
+    private String driveAccessToken;
 
-    public Long driveTokenExpires;
+    @JsonIgnore
+    private String driveRefreshToken;
+
+    private String googleEmail;
+
+    private String dropboxUid;
+
+    private Long driveTokenExpires;
 
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JsonIdentityReference(alwaysAsId=true)
-    @OneToMany(cascade = CascadeType.ALL)
-    private Set<SongEntity> songEntityEntities = new HashSet<SongEntity>(0);
+    @OneToMany(mappedBy = "user")
+    private List<SongEntity> songEntities = new ArrayList<SongEntity>(0);
 
     public static Model.Finder<Long, UserEntity> find = new Model.Finder<Long, UserEntity>(Long.class, UserEntity.class);
+
+    public UserEntity(){}
 
     public Long getId() {
         return id;
@@ -127,12 +137,16 @@ public class UserEntity extends Model {
         this.driveTokenExpires = driveTokenExpires;
     }
 
-    public Set<SongEntity> getSongEntityEntities() {
-        return songEntityEntities;
+    public List<SongEntity> getSongEntities() {
+        return songEntities;
     }
 
-    public void setSongEntityEntities(Set<SongEntity> songEntityEntities) {
-        this.songEntityEntities = songEntityEntities;
+    public void addSongEntity(SongEntity songEntity) {
+        this.songEntities.add(songEntity);
+        if(!songEntity.getUser().equals(this)){
+            songEntity.setUser(this);
+            songEntity.update();
+        }
     }
 
     public static List<UserEntity> getUsersByFields(Map<String, Object> fields) {
@@ -158,14 +172,16 @@ public class UserEntity extends Model {
         return userEntity;
     }
 
-
-    public static void deleteUserByID(Long id) {
-        UserEntity userEntity = find.where().eq("id", id).findUnique();
-        userEntity.delete();
-    }
-
     public static UserEntity getUserById(Long userId) {
         return find.byId(userId);
+    }
+
+    public static void deleteUserById(Long userId){
+        Map<String, Object> fields = new HashMap<String, Object>();
+        fields.put("user_id", userId);
+        Ebean.delete(PlayListEntity.getSongsByFields(fields));
+        Ebean.delete(SongEntity.getSongsByFields(fields));
+        Ebean.delete(UserEntity.getUserById(userId));
     }
 
     @Override

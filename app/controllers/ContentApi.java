@@ -22,6 +22,7 @@ import structure.SongMetadata;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -38,13 +39,13 @@ public class ContentApi extends BaseController {
         try {
             UserEntity userEntity = UserEntity.getUserById(Long.parseLong(session("user")));
             if (SystemProperty.DROPBOX_CLOUD_ID.equals(cloudId)) {
-                String accessTokenKey = userEntity.dropboxAccessKey;
+                String accessTokenKey = userEntity.getDropboxAccessKey();
                 Dropbox drop = new Dropbox(accessTokenKey);
 
                 Logger.info(fileId);
                 file = drop.getFileLink(fileId);
             } else if (SystemProperty.DRIVE_CLOUD_ID.equals(cloudId)) {
-                GDrive gDrive = new GDrive(userEntity.driveAccessToken, userEntity.driveRefreshToken);
+                GDrive gDrive = new GDrive(userEntity.getDriveAccessToken(), userEntity.getDriveRefreshToken());
                 file = gDrive.getFileLink(fileId);
             }
         } catch (Exception e) {
@@ -62,11 +63,11 @@ public class ContentApi extends BaseController {
         return returnInJsonOk(playList);
     }
 
-    public static Result getPlayList(Long playListId) {
-        PlayListEntity playListEntity = PlayListEntity.getUserById(playListId);
+    public static Result getPlayListById(Long playListId) {
+        PlayListEntity playListEntity = PlayListEntity.getPlayListById(playListId);
 
         PlayList playList = new PlayList(playListId, playListEntity.getName());
-        for(SongEntity songEntity : playListEntity.getSongEntities()){
+        for(SongEntity songEntity : playListEntity.getSongs()){
             playList.add(new Song(songEntity));
         }
 
@@ -86,9 +87,9 @@ public class ContentApi extends BaseController {
         if (songEntity == null) {
             // songEntity is empty, create new with metadata
             songEntity = new SongEntity();
-            songEntity.cloudId = song.getCloudId();
-            songEntity.fileName = song.getFileName();
-            songEntity.userEntity = userEntity;
+            songEntity.setCloudId(song.getCloudId());
+            songEntity.setFileName(song.getFileName());
+            songEntity.setUser(userEntity);
             songEntity = setMetadata(songEntity, song);
             songEntity.save();
         } else {
@@ -100,20 +101,20 @@ public class ContentApi extends BaseController {
         return ok();
     }
 
-    private static SongEntity setMetadata(SongEntity songEntity, structure.Song song) {
+    private static SongEntity setMetadata(SongEntity songEntity, Song song) {
         SongMetadata metadata = song.getMetadata();
         if (metadata != null) {
-            songEntity.metadataTitle = metadata.getTitle();
-            songEntity.metadataAlbum = metadata.getAlbum();
-            songEntity.metadataArtist = metadata.getArtist();
-            songEntity.metadataGenre = metadata.getGenre();
-            songEntity.metadataYear = metadata.getYear();
+            songEntity.setMetadataTitle(metadata.getTitle());
+            songEntity.setMetadataAlbum(metadata.getAlbum());
+            songEntity.setMetadataArtist(metadata.getArtist());
+            songEntity.setMetadataGenre(metadata.getGenre());
+            songEntity.setMetadataYear(metadata.getYear());
         }
 
         return songEntity;
     }
 
-    private static List<structure.Song> getFiles(String folderPath, Long userId) {
+    private static List<Song> getFiles(String folderPath, Long userId) {
         FileFetcher dropboxFetcher = new DropboxFileFetcher(folderPath, userId);
         FileFetcher driveFetcher = new DriveFileFetcher(folderPath, userId);
         Thread dropboxThread = new Thread(dropboxFetcher);
@@ -141,10 +142,10 @@ public class ContentApi extends BaseController {
     public static Result removeDrive(){
         Long userId = Long.parseLong(session("user"));
         UserEntity userEntity = UserEntity.getUserById(userId);
-        userEntity.driveAccessToken = null;
-        userEntity.driveRefreshToken = null;
-        userEntity.googleEmail = null;
-        userEntity.driveTokenExpires = null;
+        userEntity.setDriveAccessToken(null);
+        userEntity.setDriveRefreshToken(null);
+        userEntity.setGoogleEmail(null);
+        userEntity.setDriveTokenExpires(null);
         userEntity.update();
         return ok();
     }
@@ -152,8 +153,8 @@ public class ContentApi extends BaseController {
     public static Result removeDropbox(){
         Long userId = Long.parseLong(session("user"));
         UserEntity userEntity = UserEntity.getUserById(userId);
-        userEntity.dropboxAccessKey = null;
-        userEntity.dropboxUid = null;
+        userEntity.setDropboxAccessKey(null);
+        userEntity.setDropboxUid(null);
         userEntity.update();
         return ok();
     }
@@ -183,7 +184,9 @@ public class ContentApi extends BaseController {
         playListEntity.setUserEntity(user);
         playListEntity.setCreated(new Timestamp(System.currentTimeMillis()));
         playListEntity.setUpdated(new Timestamp(System.currentTimeMillis()));
-        playListEntity.setSongEntities(songs);
+        for(SongEntity songEntity : songs) {
+            playListEntity.addSongEntity(songEntity);
+        }
 
         playListEntity.save();
 
@@ -213,6 +216,12 @@ public class ContentApi extends BaseController {
     private static Set<SongEntity> addExistingSongs(List<Object> fileIds, List<Object> cloudIds){
         Set<SongEntity> songs = new HashSet<SongEntity>();
         List<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
+        for(int i = 0; i < fileIds.size(); i++){
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("fileId", fileIds.get(i));
+            map.put("cloudId", cloudIds.get(i));
+            fields.add(map);
+        }
         List<SongEntity> songList = SongEntity.getSongsByMultipleFields(fields);
 
         if(songList != null){
@@ -231,7 +240,7 @@ public class ContentApi extends BaseController {
 
         for(int i = 0; i < fileIds.size(); i++){
             SongEntity songEntity = new SongEntity();
-            songEntity.setUserEntity(user);
+            songEntity.setUser(user);
             songEntity.setFileId((String) fileIds.get(i));
             songEntity.setCloudId((Long) cloudIds.get(i));
             songEntity.setHasMetadata(false);

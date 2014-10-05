@@ -23,12 +23,12 @@ public class SongMetadata implements Serializable{
 
     public SongMetadata(SongEntity songEntity) {
         if (songEntity != null) {
-            this.title = songEntity.metadataTitle;
-            this.album = songEntity.metadataAlbum;
-            this.artist = songEntity.metadataArtist;
-            this.year = songEntity.metadataYear;
-            this.genre = songEntity.metadataGenre;
-            this.lengthSeconds = songEntity.metadataLengthSeconds;
+            this.title = songEntity.getMetadataTitle();
+            this.album = songEntity.getMetadataAlbum();
+            this.artist = songEntity.getMetadataArtist();
+            this.year = songEntity.getMetadataYear();
+            this.genre = songEntity.getMetadataGenre();
+            this.lengthSeconds = songEntity.getMetadataLengthSeconds();
         }
     }
 

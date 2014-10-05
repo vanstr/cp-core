@@ -1,62 +1,88 @@
 package models;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Expr;
-import com.avaje.ebean.Junction;
-import com.avaje.ebean.Query;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import play.db.ebean.Model;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import java.io.Serializable;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Entity
-public class SongEntity extends Model {
+@Table(name = "song")
+public class SongEntity extends Model implements Serializable {
 
     @Id
-    public long id;
+    private Long id;
 
-    @ManyToOne
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JsonIdentityReference(alwaysAsId=true)
-    public UserEntity userEntity;
+    @ManyToOne(targetEntity=UserEntity.class, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 
-    public long cloudId;
-    public String fileId;
-    public String fileName;
-    public long fileSize;
-    public Date lastTimeAccessed;
-    public String metadataAlbum;
-    public String metadataArtist;
-    public String metadataGenre;
-    public int metadataLengthSeconds;
-    public String metadataTitle;
-    public String metadataYear;
-    public Boolean hasMetadata;
+    @Column(nullable = false)
+    private long cloudId;
+
+    @Column(nullable = false)
+    private String fileId;
+
+    @Column(nullable = false)
+    private String fileName;
+    private long fileSize;
+    private Date lastTimeAccessed;
+    private String metadataAlbum;
+    private String metadataArtist;
+    private String metadataGenre;
+    private int metadataLengthSeconds;
+    private String metadataTitle;
+    private String metadataYear;
+
+    @Column(nullable = false, columnDefinition="tinyint(1) NOT NULL DEFAULT '0'")
+    private Boolean hasMetadata;
+    private Set<PlayListEntity> playLists = new HashSet<PlayListEntity>(0);
 
     public static Model.Finder<Long, SongEntity> find = new Model.Finder<Long, SongEntity>(Long.class, SongEntity.class);
 
-    public long getId() {
+    public SongEntity(){}
+
+    public SongEntity(UserEntity user, Long cloudId, String fileId, String fileName, boolean hasMetadata){
+        this.setUser(user);
+        this.setCloudId(cloudId);
+        this.setFileId(fileId);
+        this.setFileName(fileName);
+        this.setHasMetadata(hasMetadata);
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public UserEntity getUserEntity() {
-        return userEntity;
+    public UserEntity getUser() {
+        return user;
     }
 
-    public void setUserEntity(UserEntity userEntity) {
-        this.userEntity = userEntity;
+    public void setUser(UserEntity user) {
+        this.user = user;
     }
 
     public long getCloudId() {
@@ -155,14 +181,23 @@ public class SongEntity extends Model {
         this.hasMetadata = hasMetadata;
     }
 
-    public static List<SongEntity> getSongsByFields(Map<String, Object> fields) {
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "songs", cascade = CascadeType.ALL)
+    public Set<PlayListEntity> getPlayLists() {
+        return playLists;
+    }
 
+    public void addPlayList(PlayListEntity playList) {
+        this.playLists.add(playList);
+    }
+
+    public static List<SongEntity> getSongsByFields(Map<String, Object> fields) {
         List<SongEntity> songEntities = null;
         if (fields != null && fields.size() > 0) {
             songEntities = find.where().allEq(fields).findList();
         }
         return songEntities;
     }
+
     public static SongEntity getSongByFields(Map<String, Object> fields) {
         SongEntity songEntity = find.where().allEq(fields).findUnique();
 
@@ -182,20 +217,18 @@ public class SongEntity extends Model {
         Map<String, Object> fieldMap = new HashMap<String, Object>();
         fieldMap.put("cloudId", cloudId);
         fieldMap.put("fileName", fileName);
-        fieldMap.put("user_id", userEntity.id);
+        fieldMap.put("user_id", userEntity.getId());
         SongEntity songEntity = getSongByFields(fieldMap);
 
         return songEntity;
     }
 
     public static List<SongEntity> getSongsByMultipleFields(List<Map<String, Object>> fields){
-        List<SongEntity> result = null;
-        Query query = Ebean.createQuery(SongEntity.class);
-        Junction junction = query.where().disjunction();
+        //TODO with 1 query
+        List<SongEntity> result = new ArrayList<SongEntity>();
         for(Map<String, Object> entry : fields){
-            junction.add(Expr.allEq(entry));
+            result.addAll(getSongsByFields(entry));
         }
-        result = junction.endJunction().findList();
         return result;
     }
 

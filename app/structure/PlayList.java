@@ -34,7 +34,7 @@ public class PlayList implements Serializable{
         this.id = entity.getId();
         this.name = entity.getName();
         this.songs = new ArrayList<Song>();
-        for(SongEntity songEntity : entity.getSongEntities()){
+        for(SongEntity songEntity : entity.getSongs()){
             this.songs.add(new Song(songEntity));
         }
     }

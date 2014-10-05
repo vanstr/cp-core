@@ -11,8 +11,10 @@ import play.Logger;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -35,31 +37,61 @@ public class UserEntityTest extends BaseModelTest{
         try {
             dropUnAuth = new Dropbox();
 
-            dropAuth = new Dropbox(originUserEntity.dropboxAccessKey);
+            dropAuth = new Dropbox(originUserEntity.getDropboxAccessKey());
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             fail("error in preparing");
         }
     }
 
-  @Test
-  public void test1GetUserByFields(){
-    Map<String, Object> whereClause = new HashMap<String, Object>();
-    whereClause.put("login", originUserEntity.login);
-    whereClause.put("password", originUserEntity.password);
+    @Test
+    public void test1CreateUser(){
+        UserEntity user = new UserEntity();
+        user.setLogin("testUser");
+        user.setPassword("qwerty123");
+        user.save();
+        UserEntity testUser = UserEntity.getUserByField("login", "testUser");
+        assertNotNull(testUser);
+        Logger.info("Create user test done");
+    }
 
-    UserEntity testUserEntity = UserEntity.getUserByFields(whereClause);
+    @Test
+    public void test2UpdateUser(){
+        UserEntity user = UserEntity.getUserByField("login", "testUser");
+        user.addSongEntity(SongEntity.find.all().get(0));
+        user.update();
+        UserEntity testUser = UserEntity.getUserByField("login", "testUser");
+        assertNotNull(testUser.getSongEntities());
+        assertFalse(testUser.getSongEntities().isEmpty());
+        Logger.info("Update user test done");
+    }
 
-    assertNotNull(testUserEntity);
-    assertThat(testUserEntity).isEqualTo(originUserEntity);
+    @Test
+    public void test3DeleteUser(){
+        UserEntity user = UserEntity.getUserByField("login", "testUser");
+        UserEntity.deleteUserById(user.getId());
+        assertNull(UserEntity.getUserByField("login", "testUser"));
+        Logger.info("Delete user test done");
+    }
 
-    Logger.info("test1GetUserByFields done");
-  }
+    @Test
+    public void test1GetUserByFields(){
+        Map<String, Object> whereClause = new HashMap<String, Object>();
+        whereClause.put("login", originUserEntity.getLogin());
+        whereClause.put("password", originUserEntity.getPassword());
+
+        UserEntity testUserEntity = UserEntity.getUserByFields(whereClause);
+
+        assertNotNull(testUserEntity);
+        assertTrue(testUserEntity.equals(originUserEntity));
+        Logger.info("test1GetUserByFields done");
+    }
 
 
-  @Test
-  public void test1SaveUser(){
-    //TODO
-  }
+    @Test
+    public void test1SaveUser(){
+        //TODO
+        Logger.info("Save user test done");
+    }
 
 }

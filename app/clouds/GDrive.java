@@ -30,7 +30,7 @@ public class GDrive extends OAuth2Communicator {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
     }
-    
+
     public GDrive(String accessToken, String refreshToken, Long tokenExpires){
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
@@ -66,11 +66,11 @@ public class GDrive extends OAuth2Communicator {
         try {
             files = retrieveAllFiles();
         } catch (Exception e) {
-          e.printStackTrace();
+            e.printStackTrace();
         }
 
 
-      Iterator<Song> i = files.iterator();
+        Iterator<Song> i = files.getSongs().iterator();
         while (i.hasNext()) {
             Song track = i.next();
             if ( !CloudFile.checkFileType(track.getFileName(), fileTypes) ) {
@@ -111,16 +111,15 @@ public class GDrive extends OAuth2Communicator {
     public String getFileLink(String fileId){
         JSONObject object = HttpWorker.sendGetRequest(SystemProperty.DRIVE_FILES_URL
                 + fileId + "?oauth_token=" + this.accessToken);
-      String fileSrc = null;
-      try {
-        fileSrc = object.getString("downloadUrl")
-            + "&oauth_token="
-            + this.accessToken;
-      }
-      catch (JSONException e) {
-        e.printStackTrace();
-      }
-      return fileSrc;
+        String fileSrc = null;
+        try {
+            fileSrc = object.getString("downloadUrl")
+                    + "&oauth_token="
+                    + this.accessToken;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return fileSrc;
     }
 
     @Override
@@ -128,14 +127,13 @@ public class GDrive extends OAuth2Communicator {
         JSONObject object = super.retrieveAccessToken(code, SystemProperty.DRIVE_CLIENT_ID,
                 SystemProperty.DRIVE_CLIENT_SECRET, GRANT_TYPE_AUTHORIZATION, SystemProperty.DRIVE_REDIRECT_URI,
                 SystemProperty.DRIVE_EMAIL_SCOPE + "+" + SystemProperty.DRIVE_SCOPE, SystemProperty.DRIVE_TOKEN_URL);
-      OAuth2UserData oAuth2UserData = null;
-      try {
-        oAuth2UserData = parseDriveData(object);
-      }
-      catch (JSONException e) {
-        e.printStackTrace();
-      }
-      return oAuth2UserData;
+        OAuth2UserData oAuth2UserData = null;
+        try {
+            oAuth2UserData = parseDriveData(object);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return oAuth2UserData;
     }
 
     @Override

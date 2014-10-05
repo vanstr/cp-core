@@ -3,6 +3,7 @@ package commons;
 import models.SongEntity;
 import models.UserEntity;
 import structure.PlayList;
+import structure.Song;
 import structure.SongMetadata;
 
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.List;
  */
 public class SongMetadataPopulation {
 
-    public static PlayList populate(List<structure.Song> data, long userId) {
+    public static PlayList populate(List<Song> data, long userId) {
 
         UserEntity userEntity = UserEntity.getUserById(userId);
 

@@ -23,7 +23,7 @@ public class DropboxFileFetcher extends FileFetcher {
         List<Song> files = null;
         try {
             UserEntity userEntity = UserEntity.getUserById(userId);
-            String accessTokenKey = userEntity.dropboxAccessKey;
+            String accessTokenKey = userEntity.getDropboxAccessKey();
 
             if (accessTokenKey != null) {
                 Dropbox drop = new Dropbox(accessTokenKey);

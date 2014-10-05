@@ -2,24 +2,26 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-POST        /login                       controllers.AuthorizationApi.login()
-POST        /user                        controllers.AuthorizationApi.registerUser()
-GET         /logout                      controllers.AuthorizationApi.logout()
+POST          /login                       controllers.AuthorizationApi.login()
+POST          /user                        controllers.AuthorizationApi.registerUser()
+DELETE        /user                        controllers.AuthorizationApi.removeAccount()
+GET           /logout                      controllers.AuthorizationApi.logout()
 
-GET         /dropboxAuthComplete         controllers.AuthorizationApi.dropboxAuthComplete(code: String)
-GET         /driveAuthComplete           controllers.AuthorizationApi.driveAuthComplete(code: String)
+GET           /dropboxAuthComplete         controllers.AuthorizationApi.dropboxAuthComplete(code: String)
+GET           /driveAuthComplete           controllers.AuthorizationApi.driveAuthComplete(code: String)
 
-GET         /removeDropbox               controllers.ContentApi.removeDropbox()
-GET         /removeDrive                 controllers.ContentApi.removeDrive()
+GET           /removeDropbox               controllers.ContentApi.removeDropbox()
+GET           /removeDrive                 controllers.ContentApi.removeDrive()
 
-GET         /api/getLink                 controllers.ContentApi.getFileSrc(cloudId: Integer, fileId: String)
-GET         /api/getPlayList             controllers.ContentApi.getPlayList()
-GET         /api/getPlayList             controllers.ContentApi.getPlayList(id: Integer)
-GET         /api/getPlayLists            controllers.ContentApi.getPlayLists()
-DELETE      /api/deletePlayList          controllers.ContentApi.deletePlayList(playListId: Long)
+  GET           /api/getLink                 controllers.ContentApi.getFileSrc(cloudId: Integer, fileId: String)
+  GET           /api/getPlayList             controllers.ContentApi.getPlayList()
+#TODO change signature
+  GET           /api/getPlayListById         controllers.ContentApi.getPlayListById(playListId: Long)
+GET           /api/getPlayLists            controllers.ContentApi.getPlayLists()
+DELETE        /api/deletePlayList          controllers.ContentApi.deletePlayList(playListId: Long)
 
-POST        /api/saveSongMetadata        controllers.ContentApi.saveSongMetadata()
-POST        /api/addPlayList             controllers.ContentApi.addPlayList()
+POST          /api/saveSongMetadata        controllers.ContentApi.saveSongMetadata()
+  POST          /api/addPlayList             controllers.ContentApi.addPlayList()
 
 # Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file                controllers.Assets.at(path="/public", file)
+GET           /assets/*file                controllers.Assets.at(path="/public", file)
