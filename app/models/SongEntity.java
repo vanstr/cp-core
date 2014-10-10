@@ -1,5 +1,6 @@
 package models;
 
+import com.avaje.ebean.ExpressionList;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -209,7 +210,11 @@ public class SongEntity extends Model implements Serializable {
     }
 
     public static SongEntity getSongByFields(Map<String, Object> fields) {
-        SongEntity songEntity = find.where().allEq(fields).findUnique();
+        ExpressionList<SongEntity> expressionList = find.where().allEq(fields);
+        SongEntity songEntity = null;
+        if(expressionList != null){
+            songEntity = expressionList.findUnique();
+        }
 
         return songEntity;
     }

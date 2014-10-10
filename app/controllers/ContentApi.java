@@ -21,9 +21,11 @@ import structure.Song;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -62,11 +64,18 @@ public class ContentApi extends BaseController {
     }
 
     public static Result getPlayListById(Long playListId) {
-        PlayListEntity playListEntity = PlayListEntity.getPlayListById(playListId);
+        Map<String, Object> fields = new HashMap<String, Object>();
+        fields.put("id", playListId);
+        fields.put("user_id", Long.parseLong(session("user")));
+        List<PlayListEntity> list = PlayListEntity.getPlayListsByFields(fields);
 
-        PlayList playList = new PlayList(playListId, playListEntity.getName());
-        for(SongEntity songEntity : playListEntity.getSongs()){
-            playList.add(new Song(songEntity));
+        PlayList playList = null;
+        if(list != null && !list.isEmpty()) {
+            PlayListEntity playListEntity = list.get(0);
+            playList = new PlayList(playListId, playListEntity.getName());
+            for (SongEntity songEntity : playListEntity.getSongs()) {
+                playList.add(new Song(songEntity));
+            }
         }
 
         return returnInJsonOk(playList);
@@ -93,7 +102,7 @@ public class ContentApi extends BaseController {
             songEntity.update();
         }
 
-        return ok();
+        return returnInJsonOk(songEntity.getId());
     }
 
     private static List<Song> getFiles(String folderPath, Long userId) {
@@ -183,8 +192,16 @@ public class ContentApi extends BaseController {
     }
 
     public static Result deletePlayList(Long playListId) {
-        PlayListEntity playListEntity = Ebean.find(PlayListEntity.class, playListId);
-        Ebean.delete(playListEntity);
+        Map<String, Object> fields = new HashMap<String, Object>();
+        fields.put("id", playListId);
+        fields.put("user_id", Long.parseLong(session("user")));
+        List<PlayListEntity> list = PlayListEntity.getPlayListsByFields(fields);
+        if(fields != null && !fields.isEmpty()) {
+            PlayListEntity playListEntity = list.get(0);
+            Ebean.delete(playListEntity);
+        } else {
+            return badRequest();
+        }
 
         return ok();
     }

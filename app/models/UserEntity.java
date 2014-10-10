@@ -179,7 +179,7 @@ public class UserEntity extends Model implements Serializable {
     public static void deleteUserById(Long userId){
         Map<String, Object> fields = new HashMap<String, Object>();
         fields.put("user_id", userId);
-        Ebean.delete(PlayListEntity.getSongsByFields(fields));
+        Ebean.delete(PlayListEntity.getPlayListsByFields(fields));
         Ebean.delete(SongEntity.getSongsByFields(fields));
         Ebean.delete(UserEntity.getUserById(userId));
     }

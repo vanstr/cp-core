@@ -104,7 +104,7 @@ public class PlayListEntity extends Model implements Serializable {
         return find.byId(playListId);
     }
 
-    public static List<PlayListEntity> getSongsByFields(Map<String, Object> fields) {
+    public static List<PlayListEntity> getPlayListsByFields(Map<String, Object> fields) {
         List<PlayListEntity> songEntities = null;
         if (fields != null && fields.size() > 0) {
             songEntities = find.where().allEq(fields).findList();

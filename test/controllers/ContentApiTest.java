@@ -30,19 +30,21 @@ public class ContentApiTest extends BaseModelTest {
     private static PlayListEntity testPlayListEntity = null;
     @Test
     public void testGetFileSrc(){
-        FakeRequest request = new FakeRequest("GET", "/api/getLink?cloudId=1&fileId=/JUnit/music.mp3")
+        FakeRequest request = new FakeRequest("GET", "/api/link?cloudId=1&fileId=/JUnit/music.mp3")
                 .withSession("user", "1");
         Result result = route(request);
         assertNotNull(contentAsString(result));
+        System.out.println(contentAsString(result));
         Logger.info("Get file src test done");
     }
 
     @Test
     public void testGetPlayList(){
-        FakeRequest request = new FakeRequest("GET", "/api/getPlayList")
+        FakeRequest request = new FakeRequest("GET", "/api/playList")
                 .withSession("user", "1");
         Result result = route(request);
         assertNotNull(contentAsString(result));
+        System.out.println(contentAsString(result));
         Logger.info("Get playlist test done");
     }
 
@@ -76,35 +78,49 @@ public class ContentApiTest extends BaseModelTest {
 
         node.put("songs", array);
 
-        FakeRequest request = new FakeRequest("POST", "/api/addPlayList")
+        FakeRequest request = new FakeRequest("POST", "/api/playList")
                 .withSession("user", originUserEntity.getId().toString());
         request.withJsonBody(node);
 
         Result result = route(request);
         assertNotNull(contentAsString(result));
+        System.out.println(contentAsString(result));
         testPlayListEntity = PlayListEntity.getPlayListById(Long.parseLong(contentAsString(result)));
         assertThat(status(result)).isEqualTo(OK);
         assertNotNull(PlayListEntity.find.all());
-        assertTrue(PlayListEntity.find.all().get(0).getSongs().size() == 3);
+        assertTrue(testPlayListEntity.getSongs().size() == 3);
 
         Logger.info("Add playlist test done");
     }
 
     @Test
     public void testGetPlayListById(){
-        FakeRequest request = new FakeRequest("GET", "/api/getPlayListById?playListId=" + testPlayListEntity.getId())
-                .withSession("user", "1");
+        FakeRequest request = new FakeRequest("GET", "/api/playList/" + testPlayListEntity.getId())
+                .withSession("user", originUserEntity.getId().toString());
         Result result = route(request);
+
+        assertThat(status(result)).isEqualTo(OK);
         assertNotNull(contentAsString(result));
+        System.out.println(contentAsString(result));
         Logger.info("Get playlist by id test done");
     }
 
     @Test
     public void testGetPlayLists(){
-        FakeRequest request = new FakeRequest("GET", "/api/getPlayLists")
-                .withSession("user", "1");
+        PlayListEntity playListEntity = new PlayListEntity();
+        playListEntity.setUserEntity(originUserEntity);
+        playListEntity.setName("playlist2");
+        for(SongEntity songEntity : SongEntity.find.all()){
+            playListEntity.addSongEntity(songEntity);
+        }
+        playListEntity.save();
+        FakeRequest request = new FakeRequest("GET", "/api/playLists")
+                .withSession("user", originUserEntity.getId().toString());
         Result result = route(request);
+
+        assertThat(status(result)).isEqualTo(OK);
         assertNotNull(contentAsString(result));
+        System.out.println(contentAsString(result));
         Logger.info("Get playlists test done");
     }
 
@@ -130,6 +146,7 @@ public class ContentApiTest extends BaseModelTest {
         request.withJsonBody(node);
         Result result = route(request);
         assertThat(status(result)).isEqualTo(OK);
+        System.out.println(contentAsString(result));
         SongEntity songEntity = SongEntity.getSongByHash(UserEntity.getUserById(1L), 1L, "/songs/song1.mp3");
 
         assertThat(songEntity.getMetadataTitle()).isEqualTo("Song 1");
@@ -148,7 +165,7 @@ public class ContentApiTest extends BaseModelTest {
         testPlayListEntity.setUserEntity(originUserEntity);
         testPlayListEntity.save();
         Long playListId = testPlayListEntity.getId();
-        FakeRequest request = new FakeRequest("DELETE", "/api/deletePlayList?playListId=" + playListId)
+        FakeRequest request = new FakeRequest("DELETE", "/api/playList/" + playListId)
                 .withSession("user", originUserEntity.getId().toString());
 
         Result result = route(request);
