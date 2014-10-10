@@ -1,6 +1,8 @@
 package app;
 
+import com.avaje.ebean.Ebean;
 import commons.SystemProperty;
+import models.PlayListEntity;
 import models.SongEntity;
 import models.UserEntity;
 import org.junit.AfterClass;
@@ -9,66 +11,101 @@ import play.test.FakeApplication;
 import play.test.Helpers;
 import play.test.TestServer;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by imi on 22.08.2014..
  */
 public class BaseModelTest {
-  //public static FakeApplication app;
+    //public static FakeApplication app;
 
-  public static TestServer testServer;
-  public static int port = 3333;
-  public static String testServerHost = "http://localhost:" + port;
-
-
-  public static UserEntity originUser = null;
-  public static SongEntity originSong = null;
-
-  @BeforeClass
-  public static void startApp() {
-
-    FakeApplication app = Helpers.fakeApplication(Helpers.inMemoryDatabase());
-
-    testServer = Helpers.testServer(port, app);
-
-    Helpers.start(testServer);
+    public static TestServer testServer;
+    public static int port = 3333;
+    public static String testServerHost = "http://localhost:" + port;
 
 
-    originUser = createUser();
-    originSong = createSong(originUser.id);
-  }
+    public static UserEntity originUserEntity = null;
+    public static SongEntity originSongEntity = null;
 
-  private static SongEntity createSong(long id) {
-    SongEntity song = new SongEntity();
-    song.user = originUser;
-    song.cloudId = SystemProperty.DROPBOX_CLOUD_ID;
-    song.fileName = "Shots.mp3";
-    song.fileSize = 0;
-    song.metadataTitle = "Song title";
-    song.save();
-    return song;
-  }
+    @BeforeClass
+    public static void startApp() {
 
-  private static UserEntity createUser() {
-    UserEntity newUser = new UserEntity();
-    newUser.dropboxAccessKey = "BAus-dLEjW8AAAAAAAAAAVDysztTsSGkiwlJV7Fm6lvHYxbp0-QdBsyE_Hb_7dYd";
-    newUser.dropboxUid = "192670402";
-    newUser.driveAccessToken = "7hlztwsgm4v8l2f";
-    newUser.driveRefreshToken = "C6jC5Vm8aiRDiNwy";
-    newUser.login = "test";
-    newUser.password = "123";
-    newUser.save();
+        Map<String, String> settings = new HashMap<String, String>();
+        settings.put("db.default.url", "jdbc:mysql://localhost:3306/cloud_player_test");
+        settings.put("db.default.user", "admin");
+        settings.put("db.default.password", "123");
+        settings.put("db.default.jndiName", "DefaultDS");
+        FakeApplication app = Helpers.fakeApplication(settings);
 
-    return newUser;
-  }
+        testServer = Helpers.testServer(port, app);
 
-  @AfterClass
-  public static void stopApp() {
-    // delete originXXX
+        Helpers.start(testServer);
+        prepareDB();
+        originUserEntity = createUsers();
+        originSongEntity = createSong(originUserEntity.getId());
+    }
+
+    private static SongEntity createSong(long id) {
+        SongEntity songEntity = new SongEntity();
+        songEntity.setUser(originUserEntity);
+        songEntity.setCloudId(SystemProperty.DROPBOX_CLOUD_ID);
+        songEntity.setFileId("Shots.mp3");
+        songEntity.setFileName("Shots.mp3");
+        songEntity.setFileSize(0L);
+        songEntity.setMetadataTitle("Song title");
+        songEntity.setHasMetadata(true);
+        songEntity.save();
+        return songEntity;
+    }
+
+    private static UserEntity createUsers() {
+//        Ebean.delete(PlayListEntity.find.all());
+        UserEntity dropboxUser = new UserEntity();
+        dropboxUser.setId(1L);
+        dropboxUser.setLogin("dropbox");
+        dropboxUser.setPassword("123456");
+        dropboxUser.setDropboxAccessKey("uDdND44fHTAAAAAAAAAADG8zqeAjiSUyJz949D7c00gXz9rQPgh51yv-cnmLJlHW");
+        dropboxUser.setDropboxUid("192670402");
+        dropboxUser.save();
+
+        UserEntity gDriveUser = new UserEntity();
+        gDriveUser.setId(2L);
+        gDriveUser.setLogin("gdrive");
+        gDriveUser.setPassword("123456");
+        gDriveUser.setDriveAccessToken("ya29.hADeLWkw9ImDLr7p7hivANfWYhI8fJcfNBESB9pBJ9y3S5VyhyuJdQLY");
+        gDriveUser.setDriveRefreshToken("1/sTej2wr_j-D3XYL0yVkrWoyBNuRyZn9N7qlMWZRnuPk");
+        gDriveUser.setGoogleEmail("cp.cloudplayer@gmail.com");
+        gDriveUser.setDriveTokenExpires(1403469638767L);
+        gDriveUser.save();
+
+        UserEntity newUserEntity = new UserEntity();
+        newUserEntity.setId(3L);
+        newUserEntity.setDropboxAccessKey("BAus-dLEjW8AAAAAAAAAAVDysztTsSGkiwlJV7Fm6lvHYxbp0-QdBsyE_Hb_7dYd");
+        newUserEntity.setDropboxUid("192670402");
+        newUserEntity.setDriveAccessToken("7hlztwsgm4v8l2f");
+        newUserEntity.setDriveRefreshToken("C6jC5Vm8aiRDiNwy");
+        newUserEntity.setLogin("test");
+        newUserEntity.setPassword("123");
+        newUserEntity.save();
+
+        return newUserEntity;
+    }
+
+    private static void prepareDB(){
+        Ebean.delete(SongEntity.find.all());
+        Ebean.delete(PlayListEntity.find.all());
+        Ebean.delete(UserEntity.find.all());
+    }
+
+    @AfterClass
+    public static void stopApp() {
+        // delete originXXX
 //    originSong.delete();
 
 
- //   originUser.delete();
+        //   originUser.delete();
 
-    Helpers.stop(testServer);
-  }
+        Helpers.stop(testServer);
+    }
 }

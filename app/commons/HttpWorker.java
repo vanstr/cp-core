@@ -24,77 +24,77 @@ import java.util.Map;
  */
 public class HttpWorker {
 
-  public static JSONObject sendPostRequest(String url, Map<String, String> params) {
-    URL obj = null;
-    JSONObject object = null;
-    try {
-      String urlParameters = "";
-      for (Map.Entry<String, String> entry : params.entrySet()) {
-        urlParameters += entry.getKey() + "=" + entry.getValue() + "&";
-      }
+    public static JSONObject sendPostRequest(String url, Map<String, String> params) {
+        URL obj = null;
+        JSONObject object = null;
+        try {
+            String urlParameters = "";
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                urlParameters += entry.getKey() + "=" + entry.getValue() + "&";
+            }
 
-      obj = new URL(url + "?" + urlParameters);
+            obj = new URL(url + "?" + urlParameters);
 
-      HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
-      con.setRequestMethod("POST");
+            HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
+            con.setRequestMethod("POST");
 
-      con.setDoOutput(true);
-      DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-      wr.writeBytes(urlParameters);
-      wr.flush();
-      wr.close();
+            con.setDoOutput(true);
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+            wr.writeBytes(urlParameters);
+            wr.flush();
+            wr.close();
 
-      if (con.getResponseCode() == 401) {
-        throw new UnauthorizedAccessException("401");
-      }
-      else if (con.getResponseCode() < 200 || con.getResponseCode() >= 300) {
-        return null;
-      }
+            if (con.getResponseCode() == 401) {
+                throw new UnauthorizedAccessException("401");
+            }
+            else if (con.getResponseCode() < 200 || con.getResponseCode() >= 300) {
+                return null;
+            }
 
-      BufferedReader in = new BufferedReader(
-          new InputStreamReader(con.getInputStream()));
-      String inputLine;
-      StringBuffer response = new StringBuffer();
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
 
-      while ((inputLine = in.readLine()) != null) {
-        response.append(inputLine);
-      }
-      in.close();
-      object = new JSONObject(response.toString());
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            object = new JSONObject(response.toString());
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return object;
     }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
-    return object;
-  }
 
-  public static JSONObject sendGetRequest(String url) {
-    HttpClient client = new DefaultHttpClient();
-    HttpGet request = new HttpGet(url);
+    public static JSONObject sendGetRequest(String url) {
+        HttpClient client = new DefaultHttpClient();
+        HttpGet request = new HttpGet(url);
 
-    JSONObject object = null;
-    try {
-      HttpResponse response = client.execute(request);
-      if (response.getStatusLine().getStatusCode() == 401) {
-        throw new UnauthorizedAccessException("401");
-      }
-      else if (response.getStatusLine().getStatusCode() < 200 || response.getStatusLine().getStatusCode() >= 300) {
-        return null;
-      }
-      BufferedReader rd = new BufferedReader(
-          new InputStreamReader(response.getEntity().getContent()));
+        JSONObject object = null;
+        try {
+            HttpResponse response = client.execute(request);
+            if (response.getStatusLine().getStatusCode() == 401) {
+                throw new UnauthorizedAccessException("401");
+            }
+            else if (response.getStatusLine().getStatusCode() < 200 || response.getStatusLine().getStatusCode() >= 300) {
+                return null;
+            }
+            BufferedReader rd = new BufferedReader(
+                    new InputStreamReader(response.getEntity().getContent()));
 
-      StringBuffer result = new StringBuffer();
-      String line;
-      while ((line = rd.readLine()) != null) {
-        result.append(line);
-      }
-      rd.close();
-      object = new JSONObject(result.toString());
+            StringBuffer result = new StringBuffer();
+            String line;
+            while ((line = rd.readLine()) != null) {
+                result.append(line);
+            }
+            rd.close();
+            object = new JSONObject(result.toString());
+        }
+        catch (Exception e) {
+            Logger.error("Exception:" + e);
+        }
+        return object;
     }
-    catch (Exception e) {
-      Logger.error("Exception:" + e);
-    }
-    return object;
-  }
 }

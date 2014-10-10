@@ -16,19 +16,20 @@ public class SongMetadata implements Serializable{
     private String title;
     private String artist;
     private String album;
-    private long lengthSeconds;
+    private Long lengthSeconds;
     private String year;
     private String genre;
 
+    public SongMetadata(){}
 
     public SongMetadata(SongEntity songEntity) {
         if (songEntity != null) {
-            this.title = songEntity.metadataTitle;
-            this.album = songEntity.metadataAlbum;
-            this.artist = songEntity.metadataArtist;
-            this.year = songEntity.metadataYear;
-            this.genre = songEntity.metadataGenre;
-            this.lengthSeconds = songEntity.metadataLengthSeconds;
+            this.title = songEntity.getMetadataTitle();
+            this.album = songEntity.getMetadataAlbum();
+            this.artist = songEntity.getMetadataArtist();
+            this.year = songEntity.getMetadataYear();
+            this.genre = songEntity.getMetadataGenre();
+            this.lengthSeconds = songEntity.getMetadataLengthSeconds();
         }
     }
 
@@ -56,11 +57,11 @@ public class SongMetadata implements Serializable{
         this.album = album;
     }
 
-    public long getLengthSeconds() {
+    public Long getLengthSeconds() {
         return lengthSeconds;
     }
 
-    public void setLengthSeconds(long lengthSeconds) {
+    public void setLengthSeconds(Long lengthSeconds) {
         this.lengthSeconds = lengthSeconds;
     }
 

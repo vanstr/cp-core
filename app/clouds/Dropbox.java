@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * UserEntity: vanstr
+ * User: vanstr
  * Date: 13.29.6
  * Time: 20:55
  * Class represent basic cloud.Dropbox API functionality
@@ -33,7 +33,7 @@ public class Dropbox extends OAuth2Communicator {
     public Dropbox(){}
 
     public Dropbox(String accessToken) throws Exception {
-          this.client = new DbxClient(config, accessToken);
+        this.client = new DbxClient(config, accessToken);
     }
 
     /**
@@ -62,10 +62,10 @@ public class Dropbox extends OAuth2Communicator {
                     DbxUrlWithExpiration urlWithExpiration = client.createTemporaryDirectUrl(entry.path);
 
                     files.add(new Song( SystemProperty.DROPBOX_CLOUD_ID,
-                            entry.path,
-                            getFileNameFromFilePath(entry.path),
-                            urlWithExpiration.url,
-                            urlWithExpiration.expires.getTime())
+                                    entry.path,
+                                    getFileNameFromFilePath(entry.path),
+                                    urlWithExpiration.url,
+                                    urlWithExpiration.expires.getTime())
                     );
                 }
             }
@@ -79,14 +79,14 @@ public class Dropbox extends OAuth2Communicator {
         JSONObject object = super.retrieveAccessToken(code, SystemProperty.DROPBOX_APP_KEY,
                 SystemProperty.DROPBOX_APP_SECRET, GRANT_TYPE_AUTHORIZATION,
                 SystemProperty.DROPBOX_REDIRECT_URI, null, SystemProperty.DROPBOX_TOKEN_URL);
-      OAuth2UserData oAuth2UserData = null;
-      try {
-        oAuth2UserData = parseDropboxData(object);
-      }
-      catch (JSONException e) {
-        e.printStackTrace();
-      }
-      return oAuth2UserData;
+        OAuth2UserData oAuth2UserData = null;
+        try {
+            oAuth2UserData = parseDropboxData(object);
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return oAuth2UserData;
     }
 
     @Override

@@ -24,22 +24,21 @@ public class DriveFileFetcher extends FileFetcher{
         List<Song> files = null;
         GDrive gDrive = null;
 
-
-        UserEntity user = UserEntity.getUserById(userId);
+        UserEntity userEntity = UserEntity.getUserById(userId);
         try{
-            String driveAccessToken = user.driveAccessToken;
-            String driveRefreshToken = user.driveRefreshToken;
+            String driveAccessToken = userEntity.getDriveAccessToken();
+            String driveRefreshToken = userEntity.getDriveRefreshToken();
             if(driveAccessToken != null && driveRefreshToken != null){
                 gDrive = new GDrive(driveAccessToken, driveRefreshToken);
-                files = gDrive.getFileList(folderPath, REQUIRED_FILE_TYPES);
+                files = gDrive.getFileList(folderPath, REQUIRED_FILE_TYPES).getSongs();
             }
         } catch (UnauthorizedAccessException e) {
             if("401".equals(e.getMessage())){
                 gDrive.setAccessToken(gDrive.refreshToken(gDrive.getRefreshToken()));
                 try {
-                    files = gDrive.getFileList(folderPath, REQUIRED_FILE_TYPES);
-                    user.driveAccessToken = gDrive.getAccessToken();
-                    user.update();
+                    files = gDrive.getFileList(folderPath, REQUIRED_FILE_TYPES).getSongs();
+                    userEntity.setDriveAccessToken(gDrive.getAccessToken());
+                    userEntity.update();
                 } catch (Exception e1) {
                     e1.printStackTrace();
                 }

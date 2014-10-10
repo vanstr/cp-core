@@ -1,5 +1,7 @@
 package structure;
 
+import models.SongEntity;
+
 import java.io.Serializable;
 
 /**
@@ -10,21 +12,32 @@ import java.io.Serializable;
  * To change this template use File | Settings | File Templates.
  */
 public class Song implements Serializable {
-
     private String fileId;
     private String fileName;
     private String url;
-    private long cloudId;
+    private Long cloudId;
     private SongMetadata metadata;
-    private Long urlExipresTime;
+    private Long urlExpiresTime;
+    private Long fileSize;
+    private Boolean hasMetadata;
 
-    public Song(long cloudId, String fileId, String fileName, String url, Long urlExipresTime) {
+    public Song(){}
 
+    public Song(long cloudId, String fileId, String fileName, String url, Long urlExpiresTime) {
         this.fileName = fileName;
         this.cloudId = cloudId;
         this.fileId = fileId;
         this.url = url;
-        this.urlExipresTime = urlExipresTime;
+        this.urlExpiresTime = urlExpiresTime;
+    }
+
+    public Song(SongEntity entity){
+        this.fileName = entity.getFileName();
+        this.cloudId = entity.getCloudId();
+        this.fileId = entity.getFileId();
+
+        SongMetadata metadata = new SongMetadata(entity);
+        this.metadata = metadata;
     }
 
     public String getFileId() {
@@ -36,11 +49,11 @@ public class Song implements Serializable {
     }
 
 
-    public long getCloudId() {
+    public Long getCloudId() {
         return cloudId;
     }
 
-    public void setCloudId(long cloudId) {
+    public void setCloudId(Long cloudId) {
         this.cloudId = cloudId;
     }
 
@@ -70,14 +83,29 @@ public class Song implements Serializable {
         this.fileName = fileName;
     }
 
-    public Long getUrlExipresTime() {
-        return urlExipresTime;
+    public Long getUrlExpiresTime() {
+        return urlExpiresTime;
     }
 
-    public void setUrlExipresTime(Long urlExipresTime) {
-        this.urlExipresTime = urlExipresTime;
+    public void setUrlExpiresTime(Long urlExpiresTime) {
+        this.urlExpiresTime = urlExpiresTime;
     }
 
+    public Long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(Long fileSize) {
+        this.fileSize = fileSize;
+    }
+
+    public Boolean isHasMetadata() {
+        return hasMetadata;
+    }
+
+    public void setHasMetadata(Boolean hasMetadata) {
+        this.hasMetadata = hasMetadata;
+    }
 
     public String toString() {
         return "Song name:" + this.fileName + " metadata:" + this.metadata;

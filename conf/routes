@@ -2,12 +2,26 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
-GET         /                    controllers.Application.index()
+POST          /login                              controllers.AuthorizationApi.login()
+POST          /user                               controllers.AuthorizationApi.registerUser()
+DELETE        /user                               controllers.AuthorizationApi.removeAccount()
+GET           /logout                             controllers.AuthorizationApi.logout()
 
+GET           /dropboxAuthComplete                controllers.AuthorizationApi.dropboxAuthComplete(code: String)
+GET           /driveAuthComplete                  controllers.AuthorizationApi.driveAuthComplete(code: String)
 
-POST        /login               controllers.AuthorizationApi.login()
-POST        /user                  controllers.AuthorizationApi.registerUser()
+GET           /removeDropbox                      controllers.ContentApi.removeDropbox()
+GET           /removeDrive                        controllers.ContentApi.removeDrive()
+
+GET           /api/link                           controllers.ContentApi.getFileSrc(cloudId: Long, fileId: String)
+GET           /api/playList                       controllers.ContentApi.getPlayList()
+#TODO change signature
+GET           /api/playList/:playListId           controllers.ContentApi.getPlayListById(playListId: Long)
+GET           /api/playLists                      controllers.ContentApi.getPlayLists()
+DELETE        /api/playList/:playListId           controllers.ContentApi.deletePlayList(playListId: Long)
+
+POST          /api/saveSongMetadata               controllers.ContentApi.saveSongMetadata()
+POST          /api/playList                       controllers.ContentApi.addPlayList()
 
 # Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file        controllers.Assets.at(path="/public", file)
+GET           /assets/*file                       controllers.Assets.at(path="/public", file)

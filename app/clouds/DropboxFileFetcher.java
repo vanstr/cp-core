@@ -22,8 +22,8 @@ public class DropboxFileFetcher extends FileFetcher {
     public List<Song> getCloudFiles(String folderPath, Long userId) {
         List<Song> files = null;
         try {
-            UserEntity user = UserEntity.getUserById(userId);
-            String accessTokenKey = user.dropboxAccessKey;
+            UserEntity userEntity = UserEntity.getUserById(userId);
+            String accessTokenKey = userEntity.getDropboxAccessKey();
 
             if (accessTokenKey != null) {
                 Dropbox drop = new Dropbox(accessTokenKey);
