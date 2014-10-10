@@ -68,7 +68,7 @@ public class AuthorizationApi extends BaseController {
     }
 
     public static Result removeAccount(){
-        String userId = session("user");
+        String userId = session("userId");
         session().clear();
         UserEntity.deleteUserById(Long.parseLong(userId));
         return ok();
@@ -92,7 +92,7 @@ public class AuthorizationApi extends BaseController {
             userEntity.setDriveTokenExpires(oAuth2UserData.getExpiresIn() * 1000 + System.currentTimeMillis());
             userEntity.update();
         }
-        String userId = session("user");
+        String userId = session("userId");
         if (userId == null) {
             session().clear();
             session("userId", userEntity.getId().toString());
@@ -120,7 +120,7 @@ public class AuthorizationApi extends BaseController {
             userEntity.setDropboxAccessKey(oAuth2UserData.getAccessToken());
             userEntity.update();
         }
-        String userId = session("user");
+        String userId = session("userId");
         if (userId == null) {
             session().clear();
             session("userId", userEntity.getId().toString());
