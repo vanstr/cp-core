@@ -20,6 +20,9 @@ public class BaseController extends Controller {
     }
 
     public static Result returnInJsonOk(Object obj) {
+        if (obj == null) {
+          return ok();
+        }
         JsonNode json = Json.toJson(obj);
 
         return ok(json);
