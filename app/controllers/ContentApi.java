@@ -92,6 +92,7 @@ public class ContentApi extends BaseController {
         SongEntity songEntity = SongEntity.getSongByHash(userEntity, song.getCloudId(), song.getFileName());
 
         if (songEntity == null) {
+            Logger.debug("add new song entry with metadata");
             // songEntity is empty, create new with metadata
             songEntity = new SongEntity(song);
             songEntity.setUser(userEntity);
@@ -196,7 +197,7 @@ public class ContentApi extends BaseController {
         fields.put("id", playListId);
         fields.put("user_id", Long.parseLong(session("userId")));
         List<PlayListEntity> list = PlayListEntity.getPlayListsByFields(fields);
-        if(fields != null && !fields.isEmpty()) {
+        if(fields != null && !fields.isEmpty() && !list.isEmpty()) {
             PlayListEntity playListEntity = list.get(0);
             Ebean.delete(playListEntity);
         } else {

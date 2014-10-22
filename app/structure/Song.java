@@ -1,5 +1,6 @@
 package structure;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import models.SongEntity;
 
 import java.io.Serializable;
@@ -11,6 +12,7 @@ import java.io.Serializable;
  * Time: 19:04
  * To change this template use File | Settings | File Templates.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Song implements Serializable {
     private String fileId;
     private String fileName;
