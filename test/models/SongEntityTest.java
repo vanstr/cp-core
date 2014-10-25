@@ -117,6 +117,7 @@ public class SongEntityTest extends BaseModelTest {
         map2.put("fileId", "QWERTY123456");
         fields.add(map2);
         assertNotNull(SongEntity.getSongsByMultipleFields(fields));
+        assertThat(SongEntity.getSongsByMultipleFields(fields).size()).isEqualTo(2);
         Ebean.delete(song1);
         Ebean.delete(song2);
         Logger.info("test5GetSongsByMultipleFields done");

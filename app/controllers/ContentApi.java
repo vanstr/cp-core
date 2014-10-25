@@ -88,17 +88,16 @@ public class ContentApi extends BaseController {
         UserEntity userEntity = UserEntity.getUserById(userId);
 
         // get song by id
-        Logger.info("pass1" + song + " " + song.getCloudId() + " " + song.getFileName());
-        SongEntity songEntity = SongEntity.getSongByHash(userEntity, song.getCloudId(), song.getFileName());
+        Logger.debug("name: " + song.getFileName() + "id: " + song.getFileId() + " cId: " + song.getCloudId() + "userId" + userEntity.getId());
+        SongEntity songEntity = SongEntity.getSongByHash(userEntity, song.getCloudId(), song.getFileId());
 
         if (songEntity == null) {
-            Logger.debug("add new song entry with metadata");
-            // songEntity is empty, create new with metadata
+            Logger.debug("Create new SongEntry with metadata");
             songEntity = new SongEntity(song);
             songEntity.setUser(userEntity);
             songEntity.save();
         } else {
-            // update metadata
+            Logger.debug("Update metadata of existing new SongEntry");
             songEntity.setMetadata(song);
             songEntity.update();
         }
