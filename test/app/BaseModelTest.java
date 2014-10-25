@@ -54,7 +54,6 @@ public class BaseModelTest {
         songEntity.setFileName("Shots.mp3");
         songEntity.setFileSize(0L);
         songEntity.setMetadataTitle("Song title");
-        songEntity.setHasMetadata(true);
         songEntity.save();
         return songEntity;
     }

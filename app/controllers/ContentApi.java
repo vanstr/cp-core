@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import commons.FileFetcher;
 import commons.SongMetadataPopulation;
 import commons.SystemProperty;
+import controllers.commons.BaseController;
+import controllers.commons.Secured;
 import models.PlayListEntity;
 import models.SongEntity;
 import models.UserEntity;

@@ -27,7 +27,7 @@ public class SongMetadataPopulation {
         for (int i = 0; i < size; i++) {
             Song song = data.get(i);
 
-            SongEntity songEntity = SongEntity.getSongByHash(userEntity, song.getCloudId(), song.getFileName());
+            SongEntity songEntity = SongEntity.getSongByHash(userEntity, song.getCloudId(), song.getFileId());
             if (songEntity != null) {
                 SongMetadata metadata = new SongMetadata(songEntity);
                 song.setMetadata(metadata);

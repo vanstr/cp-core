@@ -50,7 +50,7 @@ public class ContentApiTest extends BaseModelTest {
 
     @Test
     public void testAddPlayList(){
-        SongEntity song1 = new SongEntity(originUserEntity, 1L, "/songs/song1.mp3", "song1.mp3", false);
+        SongEntity song1 = new SongEntity(originUserEntity, 1L, "/songs/song1.mp3", "song1.mp3");
         song1.save();
 
         ObjectNode node = JsonNodeFactory.instance.objectNode();
@@ -70,7 +70,6 @@ public class ContentApiTest extends BaseModelTest {
         child3.put("fileName", "QWERTY123");
         child3.put("cloudId", 2);
         child3.put("url", "QWERTY123");
-        child3.put("hasMetadata", false);
 
         array.add(child1);
         array.add(child2);

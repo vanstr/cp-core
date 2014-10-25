@@ -1,4 +1,4 @@
-package controllers;
+package controllers.commons;
 
 import play.mvc.Http;
 import play.mvc.Result;

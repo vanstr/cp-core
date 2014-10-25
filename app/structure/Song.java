@@ -21,7 +21,6 @@ public class Song implements Serializable {
     private SongMetadata metadata;
     private Long urlExpiresTime;
     private Long fileSize;
-    private Boolean hasMetadata;
 
     public Song(){}
 
@@ -101,13 +100,6 @@ public class Song implements Serializable {
         this.fileSize = fileSize;
     }
 
-    public Boolean isHasMetadata() {
-        return hasMetadata;
-    }
-
-    public void setHasMetadata(Boolean hasMetadata) {
-        this.hasMetadata = hasMetadata;
-    }
 
     public String toString() {
         return "Song name:" + this.fileName + " metadata:" + this.metadata;
