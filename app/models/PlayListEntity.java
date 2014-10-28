@@ -43,7 +43,8 @@ public class PlayListEntity extends Model implements Serializable {
     @Column(nullable = false, columnDefinition = "timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp updated;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    //TODO why not tested?
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
     @JoinTable(name="playlist_song",
             joinColumns={@JoinColumn(name="playlist_id")},
             inverseJoinColumns={@JoinColumn(name="song_id")})
@@ -98,6 +99,11 @@ public class PlayListEntity extends Model implements Serializable {
     public void addSongEntity(SongEntity songEntity) {
         this.songs.add(songEntity);
         songEntity.addPlayList(this);
+    }
+
+    public void removeSongEntity(SongEntity songEntity) {
+        this.songs.remove(songEntity);
+        songEntity.removePlayList(this);
     }
 
     public static PlayListEntity getPlayListById(Long playListId) {

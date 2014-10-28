@@ -206,6 +206,49 @@ public class ContentApi extends BaseController {
         return ok();
     }
 
+    public static Result addSongToPlayList(){
+        Long userId = Long.parseLong(session("userId"));
+        UserEntity userEntity = UserEntity.getUserById(userId);
+        JsonNode node = request().body().asJson();
+        Long playListId = node.findValue("playListId").asLong();
+        String fileId = node.findValue("fileId").asText();
+        String fileName = node.findValue("fileName").asText();
+        Long cloudId = node.findValue("cloudId").asLong();
+        PlayListEntity playListEntity = PlayListEntity.getPlayListById(playListId);
+        if(playListEntity != null){
+            SongEntity songEntity = SongEntity.getSongByHash(userEntity, cloudId, fileId);
+            if(songEntity == null){
+                songEntity = new SongEntity(userEntity, cloudId, fileId, fileName, false);
+                songEntity.save();
+            }
+            playListEntity.addSongEntity(songEntity);
+            Ebean.save(playListEntity);
+            return ok();
+        }
+
+        return badRequest();
+    }
+
+    public static Result removeSongFromPlayList(){
+        Long userId = Long.parseLong(session("userId"));
+        UserEntity userEntity = UserEntity.getUserById(userId);
+        JsonNode node = request().body().asJson();
+        Long playListId = node.findValue("playListId").asLong();
+        String fileId = node.findValue("fileId").asText();
+        Long cloudId = node.findValue("cloudId").asLong();
+        PlayListEntity playListEntity = PlayListEntity.getPlayListById(playListId);
+        if(playListEntity != null){
+            SongEntity songEntity = SongEntity.getSongByHash(userEntity, cloudId, fileId);
+            if(songEntity != null){
+                playListEntity.removeSongEntity(songEntity);
+                Ebean.save(playListEntity);
+                return ok();
+            }
+        }
+
+        return badRequest();
+    }
+
     private static Set<SongEntity> addExistingSongs(List<Song> songList, UserEntity user){
         Set<SongEntity> songs = new HashSet<SongEntity>();
         Iterator<Song> iterator = songList.iterator();

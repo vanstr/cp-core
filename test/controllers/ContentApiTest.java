@@ -146,7 +146,6 @@ public class ContentApiTest extends BaseModelTest {
         request.withJsonBody(node);
         Result result = route(request);
         assertThat(status(result)).isEqualTo(OK);
-        System.out.println(contentAsString(result));
         SongEntity songEntity = SongEntity.getSongByHash(UserEntity.getUserById(1L), 1L, "/songs/song1.mp3");
 
         assertThat(songEntity.getMetadataTitle()).isEqualTo("Song 1");
@@ -156,6 +155,41 @@ public class ContentApiTest extends BaseModelTest {
         assertThat(songEntity.getMetadataYear()).isEqualTo("1");
         assertThat(songEntity.getMetadataGenre()).isEqualTo("Genre 1");
         Logger.info("Save metadata test done");
+    }
+
+    @Test
+    public void testAddSongToPlayList(){
+        testPlayListEntity = new PlayListEntity();
+        testPlayListEntity.setName("Test PLaylist");
+        testPlayListEntity.setUserEntity(originUserEntity);
+        testPlayListEntity.save();
+        FakeRequest request = new FakeRequest("POST", "/api/playListSong")
+                .withSession("userId", "1");
+        ObjectNode node = JsonNodeFactory.instance.objectNode();
+        node.put("playListId", testPlayListEntity.getId());
+        node.put("fileId", "/songs/my_song1.mp3");
+        node.put("fileName", "my_song1.mp3");
+        node.put("cloudId", 1L);
+        request.withJsonBody(node);
+        Result result = route(request);
+        assertThat(status(result)).isEqualTo(OK);
+        assertThat(testPlayListEntity.getSongs().size() > 0);
+        Logger.info("Add song to playlist test done");
+    }
+
+    @Test
+    public void testRemoveSongFromPlayList(){
+        FakeRequest request = new FakeRequest("DELETE", "/api/playListSong")
+                .withSession("userId", "1");
+        ObjectNode node = JsonNodeFactory.instance.objectNode();
+        node.put("playListId", testPlayListEntity.getId());
+        node.put("fileId", "/songs/my_song1.mp3");
+        node.put("cloudId", 1L);
+        request.withJsonBody(node);
+        Result result = route(request);
+        assertThat(status(result)).isEqualTo(OK);
+        assertThat(testPlayListEntity.getSongs().size() == 0);
+        Logger.info("Remove song from playlist test done");
     }
 
     @Test
