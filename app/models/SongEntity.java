@@ -56,8 +56,6 @@ public class SongEntity extends Model implements Serializable {
     private String metadataTitle;
     private String metadataYear;
 
-    @Column(nullable = false, columnDefinition="tinyint(1) NOT NULL DEFAULT '0'")
-    private Boolean hasMetadata;
     private Set<PlayListEntity> playLists = new HashSet<PlayListEntity>(0);
 
     public static Model.Finder<Long, SongEntity> find = new Model.Finder<Long, SongEntity>(Long.class, SongEntity.class);
@@ -72,12 +70,11 @@ public class SongEntity extends Model implements Serializable {
         this.setMetadata(song);
     }
 
-    public SongEntity(UserEntity user, Long cloudId, String fileId, String fileName, boolean hasMetadata){
+    public SongEntity(UserEntity user, Long cloudId, String fileId, String fileName){
         this.setUser(user);
         this.setCloudId(cloudId);
         this.setFileId(fileId);
         this.setFileName(fileName);
-        this.setHasMetadata(hasMetadata);
     }
 
     public Long getId() {
@@ -184,13 +181,6 @@ public class SongEntity extends Model implements Serializable {
         this.metadataYear = metadataYear;
     }
 
-    public Boolean getHasMetadata() {
-        return hasMetadata;
-    }
-
-    public void setHasMetadata(Boolean hasMetadata) {
-        this.hasMetadata = hasMetadata;
-    }
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "songs", cascade = CascadeType.ALL)
     public Set<PlayListEntity> getPlayLists() {
@@ -256,9 +246,6 @@ public class SongEntity extends Model implements Serializable {
             this.setMetadataGenre(metadata.getGenre());
             this.setMetadataYear(metadata.getYear());
             this.setMetadataLengthSeconds(metadata.getLengthSeconds());
-            this.setHasMetadata(true);
-        } else {
-            this.setHasMetadata(false);
         }
     }
 

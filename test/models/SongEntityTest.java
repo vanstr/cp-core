@@ -61,7 +61,6 @@ public class SongEntityTest extends BaseModelTest {
         originLocalSongEntity.setFileId("Saga.mp3");
         originLocalSongEntity.setFileSize(66666L);
         originLocalSongEntity.setMetadataTitle("Basldlsa dasdas");
-        originLocalSongEntity.setHasMetadata(true);
         originLocalSongEntity.save();
 
         SongEntity testSongEntity = SongEntity.find.byId(originLocalSongEntity.getId());
@@ -103,9 +102,9 @@ public class SongEntityTest extends BaseModelTest {
 
     @Test
     public void test5GetSongsByMultipleFields(){
-        SongEntity song1 = new SongEntity(UserEntity.getUserById(1L), 1L, "/test/song1.mp3", "song1.mp3", false);
+        SongEntity song1 = new SongEntity(UserEntity.getUserById(1L), 1L, "/test/song1.mp3", "song1.mp3");
         song1.save();
-        SongEntity song2 = new SongEntity(UserEntity.getUserById(1L), 2L, "QWERTY123456", "song2.mp3", false);
+        SongEntity song2 = new SongEntity(UserEntity.getUserById(1L), 2L, "QWERTY123456", "song2.mp3");
         song2.save();
         List<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
         Map<String, Object> map1 = new HashMap<String, Object>();
@@ -117,6 +116,7 @@ public class SongEntityTest extends BaseModelTest {
         map2.put("fileId", "QWERTY123456");
         fields.add(map2);
         assertNotNull(SongEntity.getSongsByMultipleFields(fields));
+        assertThat(SongEntity.getSongsByMultipleFields(fields).size()).isEqualTo(2);
         Ebean.delete(song1);
         Ebean.delete(song2);
         Logger.info("test5GetSongsByMultipleFields done");

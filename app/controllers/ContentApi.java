@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import commons.FileFetcher;
 import commons.SongMetadataPopulation;
 import commons.SystemProperty;
+import controllers.commons.BaseController;
+import controllers.commons.Secured;
 import models.PlayListEntity;
 import models.SongEntity;
 import models.UserEntity;
@@ -88,16 +90,16 @@ public class ContentApi extends BaseController {
         UserEntity userEntity = UserEntity.getUserById(userId);
 
         // get song by id
-        Logger.info("pass1" + song + " " + song.getCloudId() + " " + song.getFileName());
-        SongEntity songEntity = SongEntity.getSongByHash(userEntity, song.getCloudId(), song.getFileName());
+        Logger.debug("name: " + song.getFileName() + "id: " + song.getFileId() + " cId: " + song.getCloudId() + "userId" + userEntity.getId());
+        SongEntity songEntity = SongEntity.getSongByHash(userEntity, song.getCloudId(), song.getFileId());
 
         if (songEntity == null) {
-            // songEntity is empty, create new with metadata
+            Logger.debug("Create new SongEntry with metadata");
             songEntity = new SongEntity(song);
             songEntity.setUser(userEntity);
             songEntity.save();
         } else {
-            // update metadata
+            Logger.debug("Update metadata of existing new SongEntry");
             songEntity.setMetadata(song);
             songEntity.update();
         }
@@ -196,7 +198,7 @@ public class ContentApi extends BaseController {
         fields.put("id", playListId);
         fields.put("user_id", Long.parseLong(session("userId")));
         List<PlayListEntity> list = PlayListEntity.getPlayListsByFields(fields);
-        if(fields != null && !fields.isEmpty()) {
+        if(fields != null && !fields.isEmpty() && !list.isEmpty()) {
             PlayListEntity playListEntity = list.get(0);
             Ebean.delete(playListEntity);
         } else {

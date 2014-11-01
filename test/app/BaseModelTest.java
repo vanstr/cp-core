@@ -18,11 +18,11 @@ import java.util.Map;
  * Created by imi on 22.08.2014..
  */
 public class BaseModelTest {
-    //public static FakeApplication app;
+
+    public static final int port = 3333;
+    public static final String testServerHost = "http://localhost:" + port;
 
     public static TestServer testServer;
-    public static int port = 3333;
-    public static String testServerHost = "http://localhost:" + port;
 
 
     public static UserEntity originUserEntity = null;
@@ -54,7 +54,6 @@ public class BaseModelTest {
         songEntity.setFileName("Shots.mp3");
         songEntity.setFileSize(0L);
         songEntity.setMetadataTitle("Song title");
-        songEntity.setHasMetadata(true);
         songEntity.save();
         return songEntity;
     }
