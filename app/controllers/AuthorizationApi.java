@@ -5,9 +5,11 @@ import clouds.GDrive;
 import clouds.OAuth2UserData;
 import com.fasterxml.jackson.databind.JsonNode;
 import controllers.commons.BaseController;
+import controllers.commons.Secured;
 import models.UserEntity;
 import play.Logger;
 import play.mvc.Result;
+import play.mvc.Security;
 
 import java.util.HashMap;
 import java.util.List;
@@ -75,6 +77,29 @@ public class AuthorizationApi extends BaseController {
         return ok();
     }
 
+
+    @Security.Authenticated(Secured.class)
+    public static Result retrieveDropboxCredentials(String code) {
+        Logger.info("retrieveDropboxCredentials");
+        try {
+            Long userId = Long.valueOf(session("userId"));
+
+            Dropbox drop = new Dropbox();
+            OAuth2UserData oAuth2UserData = drop.retrieveAccessToken(code);
+            // get requestTokens from db
+            UserEntity user = UserEntity.getUserById(userId);
+
+            // save accessTokens to DB
+            user.setDropboxAccessKey(oAuth2UserData.getAccessToken());
+            user.setDropboxUid(oAuth2UserData.getUniqueCloudId());
+            user.save();
+        } catch (Exception e) {
+            Logger.error("Error retrieve dropbox user credential, e:" + e);
+            return badRequest("Error retrieve dropbox user credential");
+        }
+        return ok();
+    }
+
     public static Result driveAuthComplete(String code) {
         GDrive gDrive = new GDrive(null, null, null);
         OAuth2UserData oAuth2UserData = gDrive.retrieveAccessToken(code);
@@ -108,6 +133,8 @@ public class AuthorizationApi extends BaseController {
 
 
     public static Result dropboxAuthComplete(String code) {
+        Logger.info("dropboxAuthComplete");
+
         Dropbox dropbox = new Dropbox();
         OAuth2UserData oAuth2UserData = dropbox.retrieveAccessToken(code);
 
@@ -121,17 +148,19 @@ public class AuthorizationApi extends BaseController {
             userEntity.setDropboxAccessKey(oAuth2UserData.getAccessToken());
             userEntity.update();
         }
+        Logger.debug("user set");
         String userId = session("userId");
         if (userId == null) {
             session().clear();
             session("userId", userEntity.getId().toString());
-            session("username", userEntity.getLogin());
+            session("username", ""+userEntity.getLogin());
         }else if(Long.parseLong(userId) != userEntity.getId()){
             //TODO redirect with error message
             return badRequest("This Dropbox account is already used");
         }
+        Logger.debug("user session set");
 
-        return redirect("/");
+        return redirect("http://localhost:9000");
     }
 
 }

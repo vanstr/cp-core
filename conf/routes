@@ -7,6 +7,9 @@ POST          /user                               controllers.AuthorizationApi.r
 DELETE        /user                               controllers.AuthorizationApi.removeAccount()
 GET           /logout                             controllers.AuthorizationApi.logout()
 
+
+GET           /retrieveDropboxCredentials        controllers.AuthorizationApi.retrieveDropboxCredentials(code: String)
+
 GET           /dropboxAuthComplete                controllers.AuthorizationApi.dropboxAuthComplete(code: String)
 GET           /driveAuthComplete                  controllers.AuthorizationApi.driveAuthComplete(code: String)
 
