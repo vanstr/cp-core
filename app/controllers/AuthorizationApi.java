@@ -148,18 +148,12 @@ public class AuthorizationApi extends BaseController {
             userEntity.setDropboxAccessKey(oAuth2UserData.getAccessToken());
             userEntity.update();
         }
-        Logger.debug("user set");
-        String userId = session("userId");
-        if (userId == null) {
-            session().clear();
-            session("userId", userEntity.getId().toString());
-            session("username", ""+userEntity.getLogin());
-        }else if(Long.parseLong(userId) != userEntity.getId()){
-            //TODO redirect with error message
-            return badRequest("This Dropbox account is already used");
-        }
-        Logger.debug("user session set");
 
+        session().clear();
+        session("userId", userEntity.getId().toString());
+        session("username", "" + userEntity.getLogin());
+
+        // TODO add to properties, how to support mobile apps
         return redirect("http://localhost:9000");
     }
 
