@@ -169,9 +169,7 @@ public class ContentApi extends BaseController {
         playListEntity.setUserEntity(user);
         playListEntity.setCreated(new Timestamp(System.currentTimeMillis()));
         playListEntity.setUpdated(new Timestamp(System.currentTimeMillis()));
-        for(SongEntity songEntity : songs) {
-            playListEntity.addSongEntity(songEntity);
-        }
+        playListEntity.addSongEntities(songs);
 
         playListEntity.save();
 
@@ -206,22 +204,27 @@ public class ContentApi extends BaseController {
         return ok();
     }
 
-    public static Result addSongToPlayList(){
+    public static Result addSongsToPlayList(){
+        //TODO move JSON parsing to separate class/methods
         Long userId = Long.parseLong(session("userId"));
         UserEntity userEntity = UserEntity.getUserById(userId);
         JsonNode node = request().body().asJson();
         Long playListId = node.findValue("playListId").asLong();
-        String fileId = node.findValue("fileId").asText();
-        String fileName = node.findValue("fileName").asText();
-        Long cloudId = node.findValue("cloudId").asLong();
+        JsonNode songsNode = node.findValue("songs");
         PlayListEntity playListEntity = PlayListEntity.getPlayListById(playListId);
-        if(playListEntity != null){
-            SongEntity songEntity = SongEntity.getSongByHash(userEntity, cloudId, fileId);
-            if(songEntity == null){
-                songEntity = new SongEntity(userEntity, cloudId, fileId, fileName, false);
-                songEntity.save();
+        if(playListEntity != null && songsNode.isArray()) {
+            List<SongEntity> songEntities = new ArrayList<SongEntity>();
+            for (JsonNode songNode : songsNode) {
+                String fileId = songNode.findValue("fileId").asText();
+                Long cloudId = songNode.findValue("cloudId").asLong();
+                SongEntity songEntity = SongEntity.getSongByHash(userEntity, cloudId, fileId);
+                if(songEntity == null){
+                    songEntity = new SongEntity(userEntity, cloudId, fileId, fileId, false);
+                    songEntity.save();
+                }
+                songEntities.add(songEntity);
             }
-            playListEntity.addSongEntity(songEntity);
+            playListEntity.addSongEntities(songEntities);
             Ebean.save(playListEntity);
             return ok();
         }

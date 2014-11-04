@@ -23,7 +23,7 @@ DELETE        /api/playList/:playListId        controllers.ContentApi.deletePlay
 POST          /api/saveSongMetadata            controllers.ContentApi.saveSongMetadata()
 POST          /api/playList                    controllers.ContentApi.addPlayList()
 
-POST          /api/playListSong                controllers.ContentApi.addSongToPlayList()
+POST          /api/playListSong                controllers.ContentApi.addSongsToPlayList()
 DELETE        /api/playListSong                controllers.ContentApi.removeSongFromPlayList()
 
 # Map static resources from the /public folder to the /assets URL path

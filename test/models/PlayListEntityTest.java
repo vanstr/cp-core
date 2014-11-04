@@ -4,6 +4,8 @@ import app.BaseModelTest;
 import org.junit.Test;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 import static junit.framework.Assert.assertFalse;
 
@@ -18,7 +20,9 @@ public class PlayListEntityTest extends BaseModelTest {
         playListEntity.setName("My test playlist");
 
         playListEntity.setUserEntity(user);
-        playListEntity.addSongEntity(originSongEntity);
+        List<SongEntity> songEntityList = new ArrayList<SongEntity>();
+        songEntityList.add(originSongEntity);
+        playListEntity.addSongEntities(songEntityList);
         playListEntity.setCreated(new Timestamp(System.currentTimeMillis()));
         playListEntity.setUpdated(new Timestamp(System.currentTimeMillis()));
         playListEntity.save();

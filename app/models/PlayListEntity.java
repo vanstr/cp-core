@@ -15,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -96,9 +97,11 @@ public class PlayListEntity extends Model implements Serializable {
         return songs;
     }
 
-    public void addSongEntity(SongEntity songEntity) {
-        this.songs.add(songEntity);
-        songEntity.addPlayList(this);
+    public void addSongEntities(Collection<SongEntity> songEntityList) {
+        this.songs.addAll(songEntityList);
+        for(SongEntity songEntity : songEntityList) {
+            songEntity.addPlayList(this);
+        }
     }
 
     public void removeSongEntity(SongEntity songEntity) {

@@ -110,9 +110,7 @@ public class ContentApiTest extends BaseModelTest {
         PlayListEntity playListEntity = new PlayListEntity();
         playListEntity.setUserEntity(originUserEntity);
         playListEntity.setName("playlist2");
-        for(SongEntity songEntity : SongEntity.find.all()){
-            playListEntity.addSongEntity(songEntity);
-        }
+        playListEntity.addSongEntities(SongEntity.find.all());
         playListEntity.save();
         FakeRequest request = new FakeRequest("GET", "/api/playLists")
                 .withSession("userId", originUserEntity.getId().toString());
@@ -167,9 +165,12 @@ public class ContentApiTest extends BaseModelTest {
                 .withSession("userId", "1");
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         node.put("playListId", testPlayListEntity.getId());
-        node.put("fileId", "/songs/my_song1.mp3");
-        node.put("fileName", "my_song1.mp3");
-        node.put("cloudId", 1L);
+        ArrayNode songArray = JsonNodeFactory.instance.arrayNode();
+        ObjectNode songNode = JsonNodeFactory.instance.objectNode();
+        songNode.put("fileId", "/songs/my_song1.mp3");
+        songNode.put("cloudId", 1L);
+        songArray.add(songNode);
+        node.put("songs", songArray);
         request.withJsonBody(node);
         Result result = route(request);
         assertThat(status(result)).isEqualTo(OK);
