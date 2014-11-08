@@ -1,28 +1,17 @@
 package controllers;
 
-import clouds.Dropbox;
 import clouds.GDrive;
 import clouds.OAuth2UserData;
 import com.fasterxml.jackson.databind.JsonNode;
-import commons.SystemProperty;
 import controllers.commons.BaseController;
-import controllers.commons.Secured;
 import models.UserEntity;
 import play.Logger;
 import play.mvc.Result;
-import play.mvc.Security;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created with IntelliJ IDEA.
- * User: vanstr
- * Date: 14.11.9
- * Time: 20:48
- * To change this template use File | Settings | File Templates.
- */
 public class AuthorizationApi extends BaseController {
 
     // { "login": "user", "password" : "changeme" }
@@ -79,35 +68,6 @@ public class AuthorizationApi extends BaseController {
     }
 
 
-    @Security.Authenticated(Secured.class)
-    public static Result retrieveDropboxCredentials(String code) {
-        Logger.info("retrieveDropboxCredentials");
-        try {
-            Long userId = Long.valueOf(session("userId"));
-
-            Dropbox drop = new Dropbox();
-            OAuth2UserData oAuth2UserData = drop.retrieveAccessToken(code);
-            // get requestTokens from db
-            UserEntity user = UserEntity.getUserById(userId);
-
-            // save accessTokens to DB
-            user.setDropboxAccessKey(oAuth2UserData.getAccessToken());
-            user.setDropboxUid(oAuth2UserData.getUniqueCloudId());
-            user.save();
-        } catch (Exception e) {
-            Logger.error("Error retrieve dropbox user credential, e:" + e);
-            return badRequest("Error retrieve dropbox user credential");
-        }
-        return ok();
-    }
-
-    public static Result dropboxAuthUrl(){
-        String clientId = SystemProperty.DROPBOX_APP_KEY;
-        String redirectUrl = SystemProperty.DROPBOX_REDIRECT_URI;
-        String url = SystemProperty.DROPBOX_AUTH_URL + "?client_id="+ clientId+"&response_type=code&redirect_uri="+redirectUrl;
-        return ok(url);
-    }
-
     public static Result driveAuthComplete(String code) {
         GDrive gDrive = new GDrive(null, null, null);
         OAuth2UserData oAuth2UserData = gDrive.retrieveAccessToken(code);
@@ -139,30 +99,5 @@ public class AuthorizationApi extends BaseController {
         return redirect("/");
     }
 
-
-    public static Result dropboxAuthComplete(String code) {
-        Logger.info("dropboxAuthComplete");
-
-        Dropbox dropbox = new Dropbox();
-        OAuth2UserData oAuth2UserData = dropbox.retrieveAccessToken(code);
-
-        UserEntity userEntity = UserEntity.getUserByField("dropbox_uid", oAuth2UserData.getUniqueCloudId());
-        if (userEntity == null) {
-            userEntity = new UserEntity();
-            userEntity.setDropboxAccessKey(oAuth2UserData.getAccessToken());
-            userEntity.setDropboxUid(oAuth2UserData.getUniqueCloudId());
-            userEntity.save();
-        } else {
-            userEntity.setDropboxAccessKey(oAuth2UserData.getAccessToken());
-            userEntity.update();
-        }
-
-        session().clear();
-        session("userId", userEntity.getId().toString());
-        session("username", "" + userEntity.getLogin());
-
-        // TODO add to properties, how to support mobile apps
-        return redirect("http://localhost:9000");
-    }
 
 }

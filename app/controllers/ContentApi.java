@@ -30,9 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created by imi on 13.09.2014..
- */
 @Security.Authenticated(Secured.class)
 public class ContentApi extends BaseController {
 
@@ -143,14 +140,6 @@ public class ContentApi extends BaseController {
         return ok();
     }
 
-    public static Result removeDropbox(){
-        Long userId = Long.parseLong(session("userId"));
-        UserEntity userEntity = UserEntity.getUserById(userId);
-        userEntity.setDropboxAccessKey(null);
-        userEntity.setDropboxUid(null);
-        userEntity.update();
-        return ok();
-    }
 
     public static Result addPlayList() {
         JsonNode songNode = request().body().asJson();

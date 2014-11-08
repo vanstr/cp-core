@@ -7,10 +7,12 @@ import play.mvc.Result;
 
 import static play.libs.Jsonp.jsonp;
 
-/**
- * Created by imi on 14.09.2014..
- */
 public class BaseController extends Controller {
+
+    protected static boolean isLoggedIn(){
+        return session().get("userId") != null && !session().get("userId").isEmpty();
+    }
+
 
     public static Result returnOk(String callback, JsonNode jsonOutput) {
         if (callback == null) {
