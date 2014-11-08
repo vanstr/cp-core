@@ -3,6 +3,7 @@
 # ~~~~
 
 POST          /login                              controllers.AuthorizationApi.login()
+GET           /user                               controllers.AuthorizationApi.getUser()
 POST          /user                               controllers.AuthorizationApi.registerUser()
 DELETE        /user                               controllers.AuthorizationApi.removeAccount()
 GET           /logout                             controllers.AuthorizationApi.logout()

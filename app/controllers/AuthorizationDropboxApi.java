@@ -26,12 +26,13 @@ public class AuthorizationDropboxApi extends BaseController {
 
         if (isLoggedIn()) {
             addDropboxCredential(code);
-            return ok();
+
         } else {
             loginWithDropbox(code);
-            // TODO add to properties, how to support mobile apps
-            return redirect("http://localhost:9000");
+
         }
+        // TODO add to properties, how to support mobile apps
+        return redirect("http://localhost:9000");
     }
 
 

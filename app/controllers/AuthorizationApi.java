@@ -100,4 +100,10 @@ public class AuthorizationApi extends BaseController {
     }
 
 
+    public static Result getUser() {
+        Long userId = Long.parseLong(session("userId"));
+        UserEntity userEntity = UserEntity.getUserById(userId);
+
+        return returnInJsonCreated(userEntity);
+    }
 }
