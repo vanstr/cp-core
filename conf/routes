@@ -11,7 +11,7 @@ GET           /logout                             controllers.AuthorizationApi.l
 
 #TODO change format /dropbox/action
 GET           /dropboxAuthUrl                     controllers.AuthorizationDropboxApi.getAuthUrl()
-GET           /dropboxAuthComplete                controllers.AuthorizationDropboxApi.authComplete(code: String)
+GET           /dropboxAuthComplete                controllers.AuthorizationDropboxApi.authComplete(code: String ?= "")
 DELETE        /dropbox                            controllers.AuthorizationDropboxApi.removeAccount()
 
 GET           /driveAuthComplete                  controllers.AuthorizationApi.driveAuthComplete(code: String)

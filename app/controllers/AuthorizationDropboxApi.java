@@ -23,13 +23,12 @@ public class AuthorizationDropboxApi extends BaseController {
 
     public static Result authComplete(String code) {
         Logger.info("authComplete");
-
-        if (isLoggedIn()) {
-            addDropboxCredential(code);
-
-        } else {
-            loginWithDropbox(code);
-
+        if (!code.isEmpty()) {
+            if (isLoggedIn()) {
+                addDropboxCredential(code);
+            } else {
+                loginWithDropbox(code);
+            }
         }
         // TODO add to properties, how to support mobile apps
         return redirect("http://localhost:9000");
@@ -37,7 +36,7 @@ public class AuthorizationDropboxApi extends BaseController {
 
 
     @Security.Authenticated(Secured.class)
-    public static Result removeAccount(){
+    public static Result removeAccount() {
         Long userId = Long.valueOf(session("userId"));
         UserEntity userEntity = UserEntity.getUserById(userId);
         userEntity.setDropboxAccessKey(null);
