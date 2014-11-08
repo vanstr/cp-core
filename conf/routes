@@ -8,14 +8,18 @@ DELETE        /user                               controllers.AuthorizationApi.r
 GET           /logout                             controllers.AuthorizationApi.logout()
 
 
+#TODO change format /dropbox/action
 GET           /retrieveDropboxCredentials        controllers.AuthorizationApi.retrieveDropboxCredentials(code: String)
 
+GET           /dropboxAuthUrl                     controllers.AuthorizationApi.dropboxAuthUrl()
 GET           /dropboxAuthComplete                controllers.AuthorizationApi.dropboxAuthComplete(code: String)
 GET           /driveAuthComplete                  controllers.AuthorizationApi.driveAuthComplete(code: String)
 
 GET           /removeDropbox                      controllers.ContentApi.removeDropbox()
 GET           /removeDrive                        controllers.ContentApi.removeDrive()
 
+
+# TODO, why not introduce unique ID for song
 GET           /api/link                           controllers.ContentApi.getFileSrc(cloudId: Long, fileId: String)
 GET           /api/playList                       controllers.ContentApi.getPlayList()
 #TODO change signature

@@ -13,6 +13,7 @@ public class SystemProperty {
     public static String DROPBOX_APP_KEY;
     public static String DROPBOX_APP_SECRET;
     public static String DROPBOX_REDIRECT_URI;
+    public static String DROPBOX_AUTH_URL;
     public static String DROPBOX_TOKEN_URL;
     public static String DRIVE_CLIENT_ID;
     public static String DRIVE_CLIENT_SECRET;
@@ -23,8 +24,8 @@ public class SystemProperty {
     public static String DRIVE_FILES_URL;
     public static String DRIVE_SCOPE;
 
-    public final static Long DROPBOX_CLOUD_ID = 1L;
-    public final static Long DRIVE_CLOUD_ID = 2L;
+    public static final Long DROPBOX_CLOUD_ID = 1L;
+    public static final Long DRIVE_CLOUD_ID = 2L;
 
     private static Properties localProperties;
 
@@ -42,6 +43,7 @@ public class SystemProperty {
             DROPBOX_APP_SECRET = localProperties.getProperty("dropbox.app.secret");
             DROPBOX_REDIRECT_URI = localProperties.getProperty("dropbox.redirect.uri");
             DROPBOX_TOKEN_URL = localProperties.getProperty("dropbox.token.url");
+            DROPBOX_AUTH_URL = localProperties.getProperty("dropbox.auth.url");
             DRIVE_CLIENT_ID = localProperties.getProperty("drive.client.id");
             DRIVE_CLIENT_SECRET = localProperties.getProperty("drive.client.secret");
             DRIVE_REDIRECT_URI = localProperties.getProperty("drive.redirect.uri");

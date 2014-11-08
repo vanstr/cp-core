@@ -4,6 +4,7 @@ import clouds.Dropbox;
 import clouds.GDrive;
 import clouds.OAuth2UserData;
 import com.fasterxml.jackson.databind.JsonNode;
+import commons.SystemProperty;
 import controllers.commons.BaseController;
 import controllers.commons.Secured;
 import models.UserEntity;
@@ -98,6 +99,13 @@ public class AuthorizationApi extends BaseController {
             return badRequest("Error retrieve dropbox user credential");
         }
         return ok();
+    }
+
+    public static Result dropboxAuthUrl(){
+        String clientId = SystemProperty.DROPBOX_APP_KEY;
+        String redirectUrl = SystemProperty.DROPBOX_REDIRECT_URI;
+        String url = SystemProperty.DROPBOX_AUTH_URL + "?client_id="+ clientId+"&response_type=code&redirect_uri="+redirectUrl;
+        return ok(url);
     }
 
     public static Result driveAuthComplete(String code) {
