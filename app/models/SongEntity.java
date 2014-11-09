@@ -191,6 +191,10 @@ public class SongEntity extends Model implements Serializable {
         this.playLists.add(playList);
     }
 
+    public void removePlayList(PlayListEntity playList) {
+        this.playLists.remove(playList);
+    }
+
     public static List<SongEntity> getSongsByFields(Map<String, Object> fields) {
         List<SongEntity> songEntities = null;
         if (fields != null && fields.size() > 0) {
