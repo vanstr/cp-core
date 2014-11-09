@@ -1,7 +1,6 @@
 package controllers;
 
 import app.BaseModelTest;
-import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -18,9 +17,7 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static play.mvc.Http.Status.OK;
-import static play.test.Helpers.contentAsString;
-import static play.test.Helpers.route;
-import static play.test.Helpers.status;
+import static play.test.Helpers.*;
 
 /**
  * Created by alex on 10/1/14.
@@ -173,32 +170,4 @@ public class ContentApiTest extends BaseModelTest {
         Logger.info("Delete playlist test done");
     }
 
-    @Test
-    public void testRemoveDropbox(){
-        UserEntity dropboxUser = UserEntity.getUserByField("login", "dropbox");
-        FakeRequest request = new FakeRequest("GET", "/removeDropbox")
-                .withSession("userId", dropboxUser.getId().toString());
-
-        Result result = route(request);
-        assertThat(status(result)).isEqualTo(OK);
-        Ebean.refresh(dropboxUser);
-        assertNull(dropboxUser.getDropboxAccessKey());
-        assertNull(dropboxUser.getDropboxUid());
-        Logger.info("Remove Dropbox test done");
-    }
-
-    @Test
-    public void testRemoveGDrive(){
-        UserEntity gDriveuser = UserEntity.getUserByField("login", "gdrive");
-        FakeRequest request = new FakeRequest("GET", "/removeDrive")
-                .withSession("userId", gDriveuser.getId().toString());
-
-        Result result = route(request);
-        assertThat(status(result)).isEqualTo(OK);
-        Ebean.refresh(gDriveuser);
-        assertNull(gDriveuser.getDriveAccessToken());
-        assertNull(gDriveuser.getDriveRefreshToken());
-        assertNull(gDriveuser.getGoogleEmail());
-        Logger.info("Remove GDrive test done");
-    }
 }

@@ -55,6 +55,7 @@ public class ContentApi extends BaseController {
     }
 
     public static Result getPlayList() {
+        Logger.debug("getPlayList");
         Long userId = Long.parseLong(session("userId"));
         List<structure.Song> data = getFiles("/", userId);
         PlayList playList = SongMetadataPopulation.populate(data, userId);
@@ -129,16 +130,7 @@ public class ContentApi extends BaseController {
         return files;
     }
 
-    public static Result removeDrive(){
-        Long userId = Long.parseLong(session("userId"));
-        UserEntity userEntity = UserEntity.getUserById(userId);
-        userEntity.setDriveAccessToken(null);
-        userEntity.setDriveRefreshToken(null);
-        userEntity.setGoogleEmail(null);
-        userEntity.setDriveTokenExpires(null);
-        userEntity.update();
-        return ok();
-    }
+
 
 
     public static Result addPlayList() {

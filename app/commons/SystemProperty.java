@@ -18,6 +18,7 @@ public class SystemProperty {
     public static String DRIVE_CLIENT_ID;
     public static String DRIVE_CLIENT_SECRET;
     public static String DRIVE_REDIRECT_URI;
+    public static String DRIVE_AUTH_URL;
     public static String DRIVE_EMAIL_URL;
     public static String DRIVE_EMAIL_SCOPE;
     public static String DRIVE_TOKEN_URL;
@@ -48,6 +49,7 @@ public class SystemProperty {
             DRIVE_CLIENT_SECRET = localProperties.getProperty("drive.client.secret");
             DRIVE_REDIRECT_URI = localProperties.getProperty("drive.redirect.uri");
             DRIVE_EMAIL_URL = localProperties.getProperty("drive.email.url");
+            DRIVE_AUTH_URL = localProperties.getProperty("drive.auth.url");
             DRIVE_EMAIL_SCOPE = localProperties.getProperty("drive.email.scope");
             DRIVE_TOKEN_URL = localProperties.getProperty("drive.token.url");
             DRIVE_FILES_URL = localProperties.getProperty("drive.files.url");

@@ -14,9 +14,9 @@ GET           /dropboxAuthUrl                     controllers.AuthorizationDropb
 GET           /dropboxAuthComplete                controllers.AuthorizationDropboxApi.authComplete(code: String ?= "")
 DELETE        /dropbox                            controllers.AuthorizationDropboxApi.removeAccount()
 
-GET           /driveAuthComplete                  controllers.AuthorizationApi.driveAuthComplete(code: String)
-
-GET           /removeDrive                        controllers.ContentApi.removeDrive()
+GET           /driveAuthUrl                      controllers.AuthorizationGDriveApi.getAuthUrl()
+GET           /driveAuthComplete                 controllers.AuthorizationGDriveApi.authComplete(code: String ?= "")
+DELETE        /drive                             controllers.AuthorizationGDriveApi.removeAccount()
 
 
 # TODO, why not introduce unique ID for song
