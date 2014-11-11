@@ -30,9 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created by imi on 13.09.2014..
- */
 @Security.Authenticated(Secured.class)
 public class ContentApi extends BaseController {
 
@@ -58,6 +55,7 @@ public class ContentApi extends BaseController {
     }
 
     public static Result getPlayList() {
+        Logger.debug("getPlayList");
         Long userId = Long.parseLong(session("userId"));
         List<structure.Song> data = getFiles("/", userId);
         PlayList playList = SongMetadataPopulation.populate(data, userId);
@@ -132,25 +130,8 @@ public class ContentApi extends BaseController {
         return files;
     }
 
-    public static Result removeDrive(){
-        Long userId = Long.parseLong(session("userId"));
-        UserEntity userEntity = UserEntity.getUserById(userId);
-        userEntity.setDriveAccessToken(null);
-        userEntity.setDriveRefreshToken(null);
-        userEntity.setGoogleEmail(null);
-        userEntity.setDriveTokenExpires(null);
-        userEntity.update();
-        return ok();
-    }
 
-    public static Result removeDropbox(){
-        Long userId = Long.parseLong(session("userId"));
-        UserEntity userEntity = UserEntity.getUserById(userId);
-        userEntity.setDropboxAccessKey(null);
-        userEntity.setDropboxUid(null);
-        userEntity.update();
-        return ok();
-    }
+
 
     public static Result addPlayList() {
         JsonNode songNode = request().body().asJson();

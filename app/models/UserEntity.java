@@ -34,11 +34,11 @@ public class UserEntity extends Model implements Serializable {
     @Id
     private Long id;
 
-    @Column(nullable = false, columnDefinition="varchar(255) NOT NULL")
+    @Column(columnDefinition="varchar(255)")
     private String login;
 
     @JsonIgnore
-    @Column(nullable = false, columnDefinition="varchar(255) NOT NULL")
+    @Column(columnDefinition="varchar(255)")
     private String password;
 
     @JsonIgnore

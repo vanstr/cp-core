@@ -1,6 +1,5 @@
 package controllers;
 
-import clouds.Dropbox;
 import clouds.GDrive;
 import clouds.OAuth2UserData;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -13,13 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created with IntelliJ IDEA.
- * User: vanstr
- * Date: 14.11.9
- * Time: 20:48
- * To change this template use File | Settings | File Templates.
- */
 public class AuthorizationApi extends BaseController {
 
     // { "login": "user", "password" : "changeme" }
@@ -75,6 +67,7 @@ public class AuthorizationApi extends BaseController {
         return ok();
     }
 
+
     public static Result driveAuthComplete(String code) {
         GDrive gDrive = new GDrive(null, null, null);
         OAuth2UserData oAuth2UserData = gDrive.retrieveAccessToken(code);
@@ -107,31 +100,10 @@ public class AuthorizationApi extends BaseController {
     }
 
 
-    public static Result dropboxAuthComplete(String code) {
-        Dropbox dropbox = new Dropbox();
-        OAuth2UserData oAuth2UserData = dropbox.retrieveAccessToken(code);
+    public static Result getUser() {
+        Long userId = Long.parseLong(session("userId"));
+        UserEntity userEntity = UserEntity.getUserById(userId);
 
-        UserEntity userEntity = UserEntity.getUserByField("dropbox_uid", oAuth2UserData.getUniqueCloudId());
-        if (userEntity == null) {
-            userEntity = new UserEntity();
-            userEntity.setDropboxAccessKey(oAuth2UserData.getAccessToken());
-            userEntity.setDropboxUid(oAuth2UserData.getUniqueCloudId());
-            userEntity.save();
-        } else {
-            userEntity.setDropboxAccessKey(oAuth2UserData.getAccessToken());
-            userEntity.update();
-        }
-        String userId = session("userId");
-        if (userId == null) {
-            session().clear();
-            session("userId", userEntity.getId().toString());
-            session("username", userEntity.getLogin());
-        }else if(Long.parseLong(userId) != userEntity.getId()){
-            //TODO redirect with error message
-            return badRequest("This Dropbox account is already used");
-        }
-
-        return redirect("/");
+        return returnInJsonCreated(userEntity);
     }
-
 }

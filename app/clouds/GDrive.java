@@ -7,6 +7,7 @@ import commons.SystemProperty;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import play.Logger;
 import structure.PlayList;
 import structure.Song;
 
@@ -66,13 +67,14 @@ public class GDrive extends OAuth2Communicator {
         try {
             files = retrieveAllFiles();
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.error("Exception in getFileList " + e.getMessage());
         }
 
 
         Iterator<Song> i = files.getSongs().iterator();
         while (i.hasNext()) {
             Song track = i.next();
+
             if ( !CloudFile.checkFileType(track.getFileName(), fileTypes) ) {
                 i.remove();
             }
@@ -89,14 +91,16 @@ public class GDrive extends OAuth2Communicator {
             return playList;
         }
         JSONArray fileArray = object.getJSONArray("items");
+        Logger.debug("retrieved files size: " + fileArray.length());
         for(int i = 0; i < fileArray.length(); i++){
+            Logger.debug("file:" + fileArray.getJSONObject(i).getString("title"));
             if(!fileArray.getJSONObject(i).getJSONObject("labels").getBoolean("trashed")
                     && !"application/vnd.google-apps.folder".equals(fileArray.getJSONObject(i).getString("mimeType"))
                     && fileArray.getJSONObject(i).has("title")
                     && fileArray.getJSONObject(i).has("downloadUrl")){
 
                 Song song = new Song(
-                        (long)(SystemProperty.DRIVE_CLOUD_ID),
+                        SystemProperty.DRIVE_CLOUD_ID,
                         fileArray.getJSONObject(i).getString("id"),
                         fileArray.getJSONObject(i).getString("title"),
                         fileArray.getJSONObject(i).getString("downloadUrl") + "&oauth_token=" + this.accessToken,
