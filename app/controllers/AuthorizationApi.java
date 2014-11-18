@@ -1,7 +1,5 @@
 package controllers;
 
-import clouds.GDrive;
-import clouds.OAuth2UserData;
 import com.fasterxml.jackson.databind.JsonNode;
 import controllers.commons.BaseController;
 import models.UserEntity;
@@ -16,6 +14,7 @@ public class AuthorizationApi extends BaseController {
 
     // { "login": "user", "password" : "changeme" }
     public static Result login() {
+        Logger.debug("login");
         JsonNode receivedJson = request().body().asJson();
         String login = receivedJson.findPath("login").asText();
         String password = receivedJson.findPath("password").asText();
@@ -37,12 +36,14 @@ public class AuthorizationApi extends BaseController {
     }
 
     public static Result logout() {
+        Logger.debug("logout");
         session().clear();
         return ok();
     }
 
     // { "login": "user", "password" : "changeme" }
     public static Result registerUser() {
+        Logger.debug("registerUser");
         JsonNode receivedJson = request().body().asJson();
         String login = receivedJson.findPath("login").asText();
         String password = receivedJson.findPath("password").asText();
@@ -61,6 +62,7 @@ public class AuthorizationApi extends BaseController {
     }
 
     public static Result removeAccount(){
+        Logger.debug("removeAccount");
         String userId = session("userId");
         session().clear();
         UserEntity.deleteUserById(Long.parseLong(userId));
@@ -68,39 +70,8 @@ public class AuthorizationApi extends BaseController {
     }
 
 
-    public static Result driveAuthComplete(String code) {
-        GDrive gDrive = new GDrive(null, null, null);
-        OAuth2UserData oAuth2UserData = gDrive.retrieveAccessToken(code);
-
-        UserEntity userEntity = UserEntity.getUserByField("google_email", oAuth2UserData.getUniqueCloudId());
-        if (userEntity == null) {
-            userEntity = new UserEntity();
-            userEntity.setDriveAccessToken(oAuth2UserData.getAccessToken());
-            userEntity.setDriveRefreshToken(oAuth2UserData.getRefreshToken());
-            userEntity.setGoogleEmail(oAuth2UserData.getUniqueCloudId());
-            userEntity.setDriveTokenExpires(oAuth2UserData.getExpiresIn() * 1000 + System.currentTimeMillis());
-            userEntity.save();
-        } else {
-            userEntity.setDriveAccessToken(oAuth2UserData.getAccessToken());
-            userEntity.setDriveRefreshToken(oAuth2UserData.getRefreshToken());
-            userEntity.setDriveTokenExpires(oAuth2UserData.getExpiresIn() * 1000 + System.currentTimeMillis());
-            userEntity.update();
-        }
-        String userId = session("userId");
-        if (userId == null) {
-            session().clear();
-            session("userId", userEntity.getId().toString());
-            session("username", userEntity.getLogin());
-        }else if(Long.parseLong(userId) != userEntity.getId()){
-            //TODO redirect with error message
-            return badRequest("This GDrive account is already used");
-        }
-
-        return redirect("/");
-    }
-
-
     public static Result getUser() {
+        Logger.debug("getUser");
         Long userId = Long.parseLong(session("userId"));
         UserEntity userEntity = UserEntity.getUserById(userId);
 
