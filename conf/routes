@@ -2,29 +2,29 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-POST          /login                              controllers.AuthorizationApi.login()
-GET           /user                               controllers.AuthorizationApi.getUser()
-POST          /user                               controllers.AuthorizationApi.registerUser()
-DELETE        /user                               controllers.AuthorizationApi.removeAccount()
-GET           /logout                             controllers.AuthorizationApi.logout()
+POST          /api/login                       controllers.AuthorizationApi.login()
+GET           /api/user                        controllers.AuthorizationApi.getUser()
+POST          /api/user                        controllers.AuthorizationApi.registerUser()
+DELETE        /api/user                        controllers.AuthorizationApi.removeAccount()
+GET           /api/logout                      controllers.AuthorizationApi.logout()
 
 #TODO change format /dropbox/action
-GET           /dropboxAuthUrl                     controllers.AuthorizationDropboxApi.getAuthUrl()
-GET           /dropboxAuthComplete                controllers.AuthorizationDropboxApi.authComplete(code: String ?= "")
-DELETE        /dropbox                            controllers.AuthorizationDropboxApi.removeAccount()
+GET           /api/dropboxAuthUrl              controllers.AuthorizationDropboxApi.getAuthUrl()
+GET           /api/dropboxAuthComplete         controllers.AuthorizationDropboxApi.authComplete(code: String ?= "")
+DELETE        /api/dropbox                     controllers.AuthorizationDropboxApi.removeAccount()
 
-GET           /driveAuthUrl                      controllers.AuthorizationGDriveApi.getAuthUrl()
-GET           /driveAuthComplete                 controllers.AuthorizationGDriveApi.authComplete(code: String ?= "")
-DELETE        /drive                             controllers.AuthorizationGDriveApi.removeAccount()
+GET           /api/driveAuthUrl                controllers.AuthorizationGDriveApi.getAuthUrl()
+GET           /api/driveAuthComplete           controllers.AuthorizationGDriveApi.authComplete(code: String ?= "")
+DELETE        /api/drive                       controllers.AuthorizationGDriveApi.removeAccount()
 
 
 # TODO, why not introduce unique ID for song
-GET           /api/link                           controllers.ContentApi.getFileSrc(cloudId: Long, fileId: String)
-GET           /api/playList                       controllers.ContentApi.getPlayList()
+GET           /api/link                        controllers.ContentApi.getFileSrc(cloudId: Long, fileId: String)
+GET           /api/playList                    controllers.ContentApi.getPlayList()
 
-GET           /api/playList/:playListId           controllers.ContentApi.getPlayListById(playListId: Long)
-GET           /api/playLists                      controllers.ContentApi.getPlayLists()
-DELETE        /api/playList/:playListId           controllers.ContentApi.deletePlayList(playListId: Long)
+GET           /api/playList/:playListId        controllers.ContentApi.getPlayListById(playListId: Long)
+GET           /api/playLists                   controllers.ContentApi.getPlayLists()
+DELETE        /api/playList/:playListId        controllers.ContentApi.deletePlayList(playListId: Long)
 
 POST          /api/saveSongMetadata            controllers.ContentApi.saveSongMetadata()
 POST          /api/playList                    controllers.ContentApi.addPlayList()
