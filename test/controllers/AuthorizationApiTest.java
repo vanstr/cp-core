@@ -24,7 +24,7 @@ public class AuthorizationApiTest extends BaseModelTest {
 
     @Test
     public void testLogin(){
-        FakeRequest request = new FakeRequest("POST", "/login");
+        FakeRequest request = new FakeRequest("POST", "/api/login");
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         node.put("login", "test");
         node.put("password", "123");
@@ -38,7 +38,7 @@ public class AuthorizationApiTest extends BaseModelTest {
 
     @Test
     public void testLogout(){
-        FakeRequest request = new FakeRequest("GET", "/logout");
+        FakeRequest request = new FakeRequest("GET", "/api/logout");
         Result result = route(request);
         assertThat(status(result)).isEqualTo(OK);
         Logger.info("Logout test done");
@@ -46,7 +46,7 @@ public class AuthorizationApiTest extends BaseModelTest {
 
     @Test
     public void testRegisterUser(){
-        FakeRequest request = new FakeRequest("POST", "/user");
+        FakeRequest request = new FakeRequest("POST", "/api/user");
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         node.put("login", "user_from_test");
         node.put("password", "Qwerty132");
@@ -62,7 +62,7 @@ public class AuthorizationApiTest extends BaseModelTest {
     public void testDeleteUser(){
         UserEntity user = UserEntity.getUserByField("login", "user_from_test");
         //TODO session data names -> constants
-        FakeRequest request = new FakeRequest("DELETE", "/user").withSession("userId", user.getId().toString());
+        FakeRequest request = new FakeRequest("DELETE", "/api/user").withSession("userId", user.getId().toString());
         Result result = route(request);
         assertThat(status(result)).isEqualTo(OK);
         assertNull(UserEntity.getUserByField("login", "user_from_test"));

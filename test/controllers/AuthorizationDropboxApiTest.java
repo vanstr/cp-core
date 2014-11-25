@@ -20,7 +20,7 @@ public class AuthorizationDropboxApiTest extends BaseModelTest {
     @Test
     public void testRemoveDropbox(){
         UserEntity dropboxUser = UserEntity.getUserByField("login", "dropbox");
-        FakeRequest request = new FakeRequest("DELETE", "/dropbox")
+        FakeRequest request = new FakeRequest("DELETE", "/api/dropbox")
                 .withSession("userId", dropboxUser.getId().toString());
 
         Result result = route(request);

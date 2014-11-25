@@ -21,7 +21,7 @@ public class AuthorizationGDriveApiTest extends BaseModelTest {
     @Test
     public void testRemoveGDrive(){
         UserEntity gDriveuser = UserEntity.getUserByField("login", "gdrive");
-        FakeRequest request = new FakeRequest("DELETE", "/drive")
+        FakeRequest request = new FakeRequest("DELETE", "/api/drive")
                 .withSession("userId", gDriveuser.getId().toString());
 
         Result result = route(request);
