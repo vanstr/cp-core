@@ -31,7 +31,7 @@ public class AuthorizationDropboxApi extends BaseController {
             }
         }
         // TODO add to properties, how to support mobile apps
-        return redirect("http://localhost:9000");
+        return redirect(SystemProperty.DROPBOX_FINISHED_URL);
     }
 
 
