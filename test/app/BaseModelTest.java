@@ -14,16 +14,12 @@ import play.test.TestServer;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by imi on 22.08.2014..
- */
+
 public class BaseModelTest {
 
     public static final int port = 3333;
-    public static final String testServerHost = "http://localhost:" + port;
 
     public static TestServer testServer;
-
 
     public static UserEntity originUserEntity = null;
     public static SongEntity originSongEntity = null;
@@ -31,10 +27,15 @@ public class BaseModelTest {
     @BeforeClass
     public static void startApp() {
 
+        String dbPass = ((System.getenv("MYSQL_PASSWORD") != null ) ? System.getenv("MYSQL_PASSWORD") : "123");
+        String dbUser = ((System.getenv("MYSQL_USER") != null ) ? System.getenv("MYSQL_USER") : "admin");
+        String dbName = ((System.getenv("CP_MYSQL_DB_NAME") != null ) ? System.getenv("CP_MYSQL_DB_NAME") : "cloud_player_test");
+
+
         Map<String, String> settings = new HashMap<String, String>();
-        settings.put("db.default.url", "jdbc:mysql://localhost:3306/cloud_player_test");
-        settings.put("db.default.user", "admin");
-        settings.put("db.default.password", "123");
+        settings.put("db.default.url", "jdbc:mysql://localhost:3306/" + dbName + "?characterEncoding=UTF-8");
+        settings.put("db.default.user", dbUser);
+        settings.put("db.default.password", dbPass);
         settings.put("db.default.jndiName", "DefaultDS");
         FakeApplication app = Helpers.fakeApplication(settings);
 
