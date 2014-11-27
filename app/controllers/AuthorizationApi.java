@@ -52,7 +52,10 @@ public class AuthorizationApi extends BaseController {
         if (checingkUserEntity != null){
             return badRequest("Login already exists");
         }
-
+        if( password.length() < 4 ){
+            return badRequest("Password too short");
+        }
+        
         UserEntity newUserEntity = new UserEntity();
         newUserEntity.setLogin(login);
         newUserEntity.setPassword(password);
