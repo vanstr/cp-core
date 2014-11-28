@@ -14,13 +14,7 @@ import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-/**
- * Created with IntelliJ IDEA.
- * User: vanstr
- * Date: 13.17.7
- * Time: 21:58
- * To change this template use File | Settings | File Templates.
- */
+
 public class DropboxTest extends BaseModelTest {
 
 
@@ -47,7 +41,7 @@ public class DropboxTest extends BaseModelTest {
     public void testDropboxFail() {
         try {
             new Dropbox(null);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             Logger.info("testDropboxFail done");
             return;
         }
@@ -73,7 +67,7 @@ public class DropboxTest extends BaseModelTest {
         String res2 = null;
         try {
             res2 = dropAuth.getFileLink(INCORRECT_FILE_DROPBOX);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             Logger.debug("OK, Exception catched");
         }
         assertNull("Bad file link", res2);
@@ -84,7 +78,7 @@ public class DropboxTest extends BaseModelTest {
     @Test
     public void testGetFileList() {
 
-        ArrayList<String> fileTypes = new ArrayList<String>();
+        List<String> fileTypes = new ArrayList<>();
         fileTypes.add("mp3");
 
         // 1. should be exception in method because dropbox session not established
@@ -93,7 +87,7 @@ public class DropboxTest extends BaseModelTest {
         try {
             res5 = dropUnAuth.getFileList("/", fileTypes);
         }
-        catch (Exception e) {
+        catch (Exception ignored) {
             Logger.debug("OK, Exception catched");
         }
         assertNull("Exception", res5);
@@ -109,10 +103,9 @@ public class DropboxTest extends BaseModelTest {
         // check does searched file presents in music list
         boolean filePresents = false;
 
-        int resSize = res.size();
-        for (int i = 0; i < resSize; i++) {
-            Logger.debug(res.get(i).getFileId());
-            if (CORRECT_FILE_DROPBOX.equals(res.get(i).getFileId())) {
+        for (Song re : res) {
+            Logger.debug(re.getFileId());
+            if (CORRECT_FILE_DROPBOX.equals(re.getFileId())) {
                 filePresents = true;
             }
         }

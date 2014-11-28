@@ -31,7 +31,7 @@ public class ContentApiTest extends BaseModelTest {
                 .withSession("userId", "1");
         Result result = route(request);
         assertNotNull(contentAsString(result));
-        System.out.println(contentAsString(result));
+        Logger.debug(contentAsString(result));
         Logger.info("Get file src test done");
     }
 
@@ -41,7 +41,7 @@ public class ContentApiTest extends BaseModelTest {
                 .withSession("userId", "1");
         Result result = route(request);
         assertNotNull(contentAsString(result));
-        System.out.println(contentAsString(result));
+        Logger.debug(contentAsString(result));
         Logger.info("Get playlist test done");
     }
 
@@ -80,7 +80,7 @@ public class ContentApiTest extends BaseModelTest {
 
         Result result = route(request);
         assertNotNull(contentAsString(result));
-        System.out.println(contentAsString(result));
+        Logger.debug(contentAsString(result));
         testPlayListEntity = PlayListEntity.getPlayListById(Long.parseLong(contentAsString(result)));
         assertThat(status(result)).isEqualTo(OK);
         assertNotNull(PlayListEntity.find.all());
@@ -97,7 +97,7 @@ public class ContentApiTest extends BaseModelTest {
 
         assertThat(status(result)).isEqualTo(OK);
         assertNotNull(contentAsString(result));
-        System.out.println(contentAsString(result));
+        Logger.debug(contentAsString(result));
         Logger.info("Get playlist by id test done");
     }
 
@@ -114,7 +114,7 @@ public class ContentApiTest extends BaseModelTest {
 
         assertThat(status(result)).isEqualTo(OK);
         assertNotNull(contentAsString(result));
-        System.out.println(contentAsString(result));
+        Logger.debug(contentAsString(result));
         Logger.info("Get playlists test done");
     }
 

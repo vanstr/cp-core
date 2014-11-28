@@ -1,9 +1,7 @@
 package models;
 
 import app.BaseModelTest;
-import clouds.Dropbox;
 import com.avaje.ebean.Ebean;
-import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -17,38 +15,12 @@ import java.util.Map;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.TestCase.assertNotNull;
 import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-/**
- * Created with IntelliJ IDEA.
- * User: vanstr
- * Date: 14.19.2
- * Time: 20:12
- * To change this template use File | Settings | File Templates.
- */
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SongEntityTest extends BaseModelTest {
 
-    private static Dropbox dropUnAuth = null; // un authorized dropboz session
-    private static Dropbox dropAuth = null; // authorized dropboz session
-
     private static SongEntity originLocalSongEntity = null;
 
-    @BeforeClass
-    public static void method() {
-        try {
-            dropUnAuth = new Dropbox();
-
-            dropAuth = new Dropbox(originUserEntity.getDropboxAccessKey());
-        }
-        catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            fail("error in preparing");
-        }
-
-    }
 
     @Test
     public void test1SaveSongs() {
@@ -70,10 +42,9 @@ public class SongEntityTest extends BaseModelTest {
     public void test2GetSongByFields() {
         Map<String, Object> whereClause = new HashMap<String, Object>();
         whereClause.put("id", originLocalSongEntity.getId());
-        //whereClause.put("originUser", originUser);
         List<SongEntity> list = SongEntity.getSongsByFields(whereClause);
-        assertNotNull(list);
-        assertTrue(originLocalSongEntity.getId().equals(list.get(0).getId()));
+        assertThat(list).isNotNull();
+        assertThat(originLocalSongEntity.getId()).isEqualTo(list.get(0).getId());
         Logger.info("test2GetSongs done");
     }
 
@@ -89,7 +60,7 @@ public class SongEntityTest extends BaseModelTest {
 
     @Test
     public void test4RemoveSongsById() {
-        List<Long> ids = new ArrayList<Long>();
+        List<Long> ids = new ArrayList<>();
         ids.add(originLocalSongEntity.getId());
         SongEntity.deleteSongsByID(ids);
         SongEntity deletedSongEntity = SongEntity.find.byId(originLocalSongEntity.getId());
@@ -104,16 +75,16 @@ public class SongEntityTest extends BaseModelTest {
         song1.save();
         SongEntity song2 = new SongEntity(UserEntity.getUserById(1L), 2L, "QWERTY123456", "song2.mp3");
         song2.save();
-        List<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
-        Map<String, Object> map1 = new HashMap<String, Object>();
+        List<Map<String, Object>> fields = new ArrayList<>();
+        Map<String, Object> map1 = new HashMap<>();
         map1.put("cloudId", "1");
         map1.put("fileId", "/test/song1.mp3");
         fields.add(map1);
-        Map<String, Object> map2 = new HashMap<String, Object>();
+        Map<String, Object> map2 = new HashMap<>();
         map2.put("cloudId", "2");
         map2.put("fileId", "QWERTY123456");
         fields.add(map2);
-        assertNotNull(SongEntity.getSongsByMultipleFields(fields));
+        assertThat(SongEntity.getSongsByMultipleFields(fields)).isNotNull();
         assertThat(SongEntity.getSongsByMultipleFields(fields).size()).isEqualTo(2);
         Ebean.delete(song1);
         Ebean.delete(song2);
