@@ -47,14 +47,14 @@ public class ContentApiTest extends BaseModelTest {
 
     @Test
     public void testAddPlayList(){
-        SongEntity song1 = new SongEntity(originUserEntity, 1L, "/songs/song1.mp3", "song1.mp3");
+        SongEntity song1 = new SongEntity(originUserEntity, 1L, "/songs/song2.mp3", "song2.mp3");
         song1.save();
 
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         node.put("id", (byte[]) null);
         node.put("name", "playlist1");
         ObjectNode child1 = JsonNodeFactory.instance.objectNode();
-        child1.put("fileId", "/songs/song1.mp3");
+        child1.put("fileId", "/songs/song2.mp3");
         child1.put("cloudId", 1);
         ArrayNode array = JsonNodeFactory.instance.arrayNode();
 

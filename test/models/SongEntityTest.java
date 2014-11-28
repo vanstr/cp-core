@@ -41,8 +41,6 @@ public class SongEntityTest extends BaseModelTest {
         try {
             dropUnAuth = new Dropbox();
 
-            originUserEntity = UserEntity.getUserByField("login", "test");
-
             dropAuth = new Dropbox(originUserEntity.getDropboxAccessKey());
         }
         catch (Exception e) {

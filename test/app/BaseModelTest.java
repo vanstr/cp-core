@@ -7,6 +7,7 @@ import models.SongEntity;
 import models.UserEntity;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import play.Logger;
 import play.test.FakeApplication;
 import play.test.Helpers;
 import play.test.TestServer;
@@ -27,24 +28,32 @@ public class BaseModelTest {
     @BeforeClass
     public static void startApp() {
 
-        String dbPass = ((System.getenv("MYSQL_PASSWORD") != null ) ? System.getenv("MYSQL_PASSWORD") : "123");
-        String dbUser = ((System.getenv("MYSQL_USER") != null ) ? System.getenv("MYSQL_USER") : "admin");
-        String dbName = ((System.getenv("CP_MYSQL_DB_NAME") != null ) ? System.getenv("CP_MYSQL_DB_NAME") : "cloud_player_test");
-
-
-        Map<String, String> settings = new HashMap<String, String>();
-        settings.put("db.default.url", "jdbc:mysql://localhost:3306/" + dbName + "?characterEncoding=UTF-8");
-        settings.put("db.default.user", dbUser);
-        settings.put("db.default.password", dbPass);
-        settings.put("db.default.jndiName", "DefaultDS");
+        Map<String, String> settings = getSettings();
         FakeApplication app = Helpers.fakeApplication(settings);
 
         testServer = Helpers.testServer(port, app);
 
         Helpers.start(testServer);
         prepareDB();
-        originUserEntity = createUsers();
+        createUsers();
+
+        originUserEntity = UserEntity.getUserById(1L);
         originSongEntity = createSong(originUserEntity.getId());
+    }
+
+    private static Map<String, String> getSettings() {
+        String dbPass = ((System.getenv("MYSQL_PASSWORD") != null ) ? System.getenv("MYSQL_PASSWORD") : "123");
+        String dbUser = ((System.getenv("MYSQL_USER") != null ) ? System.getenv("MYSQL_USER") : "admin");
+        String dbName = ((System.getenv("CP_MYSQL_DB_NAME") != null ) ? System.getenv("CP_MYSQL_DB_NAME") : "cloud_player_test");
+
+        Logger.debug("dbName :" + dbName + " dbUser: " + dbUser + " dbPass: " + dbPass);
+
+        Map<String, String> settings = new HashMap<String, String>();
+        settings.put("db.default.url", "jdbc:mysql://localhost:3306/" + dbName + "?characterEncoding=UTF-8");
+        settings.put("db.default.user", dbUser);
+        settings.put("db.default.password", dbPass);
+        settings.put("db.default.jndiName", "DefaultDS");
+        return settings;
     }
 
     private static SongEntity createSong(long id) {
@@ -59,15 +68,7 @@ public class BaseModelTest {
         return songEntity;
     }
 
-    private static UserEntity createUsers() {
-//        Ebean.delete(PlayListEntity.find.all());
-        UserEntity dropboxUser = new UserEntity();
-        dropboxUser.setId(1L);
-        dropboxUser.setLogin("dropbox");
-        dropboxUser.setPassword("123456");
-        dropboxUser.setDropboxAccessKey("uDdND44fHTAAAAAAAAAADG8zqeAjiSUyJz949D7c00gXz9rQPgh51yv-cnmLJlHW");
-        dropboxUser.setDropboxUid("192670402");
-        dropboxUser.save();
+    private static void createUsers() {
 
         UserEntity gDriveUser = new UserEntity();
         gDriveUser.setId(2L);
@@ -80,16 +81,15 @@ public class BaseModelTest {
         gDriveUser.save();
 
         UserEntity newUserEntity = new UserEntity();
-        newUserEntity.setId(3L);
+        newUserEntity.setId(1L);
         newUserEntity.setDropboxAccessKey("BAus-dLEjW8AAAAAAAAAAVDysztTsSGkiwlJV7Fm6lvHYxbp0-QdBsyE_Hb_7dYd");
         newUserEntity.setDropboxUid("192670402");
         newUserEntity.setDriveAccessToken("7hlztwsgm4v8l2f");
         newUserEntity.setDriveRefreshToken("C6jC5Vm8aiRDiNwy");
-        newUserEntity.setLogin("test");
+        newUserEntity.setLogin("dropbox");
         newUserEntity.setPassword("123");
         newUserEntity.save();
 
-        return newUserEntity;
     }
 
     private static void prepareDB(){

@@ -28,9 +28,8 @@ public class DropboxTest extends BaseModelTest {
     private static Dropbox dropAuth = null; // authorized dropboz session
 
     private static final String CORRECT_FILE_DROPBOX = SystemProperty.getLocalProperties().getProperty("test.dropbox.correct_file");
-    ;
     private static final String INCORRECT_FILE_DROPBOX = SystemProperty.getLocalProperties().getProperty("test.dropbox.incorrect_file");
-    ;
+
 
     @BeforeClass
     public static void method() {
@@ -54,47 +53,6 @@ public class DropboxTest extends BaseModelTest {
         }
 
         fail("testDropbox wrong result with NULL key pair value");
-    }
-
-
-    // We assume that user has requestTokens in DB
-    //@Test
-    public void testGetUserAccessTokens() {
-
-        // 1. User not provided access to his account, -> get exception in Dropbox class
-        /*
-        Tokens res = dropUnAuth.getRequestTokens();
-
-        Tokens accessTokens = null;
-        try {
-            accessTokens = dropUnAuth.getUserAccessTokens(res);
-        } catch (Exception e) {
-            //e.printStackTrace();
-        }
-
-        // accessTokens must be null because not provided access via link to account
-        assertNull("AccessTokens should be NULL!", accessTokens);
-        */
-        // 2.User has provided access to his account
-        // assume that user has requestTokens in DB
-        // TODO: get user requestTokens, provide access to acc via link, retrieve accessTokens, save them to DB and update dropAuth
-        // Problem: user should refer to URL and provide access
-        /*
-        UserManager manager = new UserManager();
-        User user = manager.getPlayListById(1);
-
-        Tokens res1 = new Tokens(user.getDropboxRequestKey(), user.getDropboxRequestSecret());
-        Tokens accessTokens1 = dropAuth.getUserAccessTokens(res1);
-
-        if( accessTokens1 == null ) fail("AccessTokens1 should not be NULL!");
-        if( accessTokens1.secret.isEmpty() || accessTokens1.key.isEmpty() ) fail("key or secret is empty");
-
-        user.setDropboxAccessKey(accessTokens1.key);
-        user.setDropboxAccessSecret(accessTokens1.secret);
-        manager.updateUser(user);
-        manager.finalize();
-        */
-        // Logger.info("testGetUserAccessTokens done");
     }
 
     @Test

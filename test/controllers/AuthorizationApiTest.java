@@ -26,7 +26,7 @@ public class AuthorizationApiTest extends BaseModelTest {
     public void testLogin(){
         FakeRequest request = new FakeRequest("POST", "/api/login");
         ObjectNode node = JsonNodeFactory.instance.objectNode();
-        node.put("login", "test");
+        node.put("login", "dropbox");
         node.put("password", "123");
         request.withJsonBody(node);
 
