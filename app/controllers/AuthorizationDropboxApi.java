@@ -23,15 +23,20 @@ public class AuthorizationDropboxApi extends BaseController {
 
     public static Result authComplete(String code) {
         Logger.info("authComplete");
+        String message = "";
         if (!code.isEmpty()) {
             if (isLoggedIn()) {
-                addDropboxCredential(code);
+                try{
+                    addDropboxCredential(code);
+                }catch (Exception ignored){
+                    message = "/#/?message=failed to add account&type=error";
+                }
             } else {
                 loginWithDropbox(code);
             }
         }
         // TODO add to properties, how to support mobile apps
-        return redirect(SystemProperty.DROPBOX_FINISHED_URL);
+        return redirect(SystemProperty.WEB_APP_HOST + message);
     }
 
 

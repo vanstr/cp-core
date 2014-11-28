@@ -25,15 +25,20 @@ public class AuthorizationGDriveApi extends BaseController {
 
     public static Result authComplete(String code) {
         Logger.info("authComplete");
+        String message = "";
         if (!code.isEmpty()) {
             if (isLoggedIn()) {
-                addGDriveCredential(code);
+                try{
+                    addGDriveCredential(code);
+                }catch (Exception ignored){
+                    message = "/#/?message=failed to add account&type=error";
+                }
             } else {
                 loginWithGDrive(code);
             }
         }
         // TODO add to properties, how to support mobile apps
-        return redirect(SystemProperty.DRIVE_FINISHED_URL);
+        return redirect(SystemProperty.WEB_APP_HOST + message);
     }
 
 

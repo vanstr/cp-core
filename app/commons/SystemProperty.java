@@ -8,7 +8,8 @@ import java.util.Properties;
 
 public class SystemProperty {
 
-    public static String SYSTEM_HOST;
+    public static String WEB_APP_HOST;
+    public static String CORE_APP_HOST;
     public static String APP_KEY;
     public static String APP_SECRET;
     public static String INCORRECT_FILE_DROPBOX;
@@ -40,7 +41,8 @@ public class SystemProperty {
         localProperties = new Properties();
 
         try {
-            SYSTEM_HOST = Play.application().configuration().getString("system.host");
+            CORE_APP_HOST = Play.application().configuration().getString("core.app.host");
+            WEB_APP_HOST = Play.application().configuration().getString("web.app.host");
             localProperties.load(SystemProperty.class.getClassLoader().getResourceAsStream("local.properties"));
             APP_KEY = localProperties.getProperty("app.key");
             APP_SECRET = localProperties.getProperty("app.secret");
@@ -48,20 +50,19 @@ public class SystemProperty {
             CORRECT_FILE_DROPBOX = localProperties.getProperty("test.drive.correct_file");
             DROPBOX_APP_KEY = localProperties.getProperty("dropbox.app.key");
             DROPBOX_APP_SECRET = localProperties.getProperty("dropbox.app.secret");
-            DROPBOX_REDIRECT_URI = SYSTEM_HOST + localProperties.getProperty("dropbox.redirect.path");
+            DROPBOX_REDIRECT_URI = CORE_APP_HOST + localProperties.getProperty("dropbox.redirect.path");
             DROPBOX_TOKEN_URL = localProperties.getProperty("dropbox.token.url");
             DROPBOX_AUTH_URL = localProperties.getProperty("dropbox.auth.url");
-            DROPBOX_FINISHED_URL = localProperties.getProperty("dropbox.finished.url");
+
             DRIVE_CLIENT_ID = localProperties.getProperty("drive.client.id");
             DRIVE_CLIENT_SECRET = localProperties.getProperty("drive.client.secret");
-            DRIVE_REDIRECT_URI = SYSTEM_HOST + localProperties.getProperty("drive.redirect.path");
+            DRIVE_REDIRECT_URI = CORE_APP_HOST + localProperties.getProperty("drive.redirect.path");
             DRIVE_EMAIL_URL = localProperties.getProperty("drive.email.url");
             DRIVE_AUTH_URL = localProperties.getProperty("drive.auth.url");
             DRIVE_EMAIL_SCOPE = localProperties.getProperty("drive.email.scope");
             DRIVE_TOKEN_URL = localProperties.getProperty("drive.token.url");
             DRIVE_FILES_URL = localProperties.getProperty("drive.files.url");
             DRIVE_SCOPE = localProperties.getProperty("drive.scope.url");
-            DRIVE_FINISHED_URL = localProperties.getProperty("drive.finished.url");
         }
         catch (IOException e) {
             e.printStackTrace();
