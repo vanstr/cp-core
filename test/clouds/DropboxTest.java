@@ -78,7 +78,7 @@ public class DropboxTest extends BaseModelTest {
     @Test
     public void testGetFileList() {
 
-        List<String> fileTypes = new ArrayList<>();
+        List<String> fileTypes = new ArrayList<String>();
         fileTypes.add("mp3");
 
         // 1. should be exception in method because dropbox session not established

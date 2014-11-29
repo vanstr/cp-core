@@ -60,7 +60,7 @@ public class SongEntityTest extends BaseModelTest {
 
     @Test
     public void test4RemoveSongsById() {
-        List<Long> ids = new ArrayList<>();
+        List<Long> ids = new ArrayList<Long>();
         ids.add(originLocalSongEntity.getId());
         SongEntity.deleteSongsByID(ids);
         SongEntity deletedSongEntity = SongEntity.find.byId(originLocalSongEntity.getId());
@@ -75,12 +75,12 @@ public class SongEntityTest extends BaseModelTest {
         song1.save();
         SongEntity song2 = new SongEntity(UserEntity.getUserById(1L), 2L, "QWERTY123456", "song2.mp3");
         song2.save();
-        List<Map<String, Object>> fields = new ArrayList<>();
-        Map<String, Object> map1 = new HashMap<>();
+        List<Map<String, Object>> fields = new ArrayList<Map<String, Object>>();
+        Map<String, Object> map1 = new HashMap<String, Object>();
         map1.put("cloudId", "1");
         map1.put("fileId", "/test/song1.mp3");
         fields.add(map1);
-        Map<String, Object> map2 = new HashMap<>();
+        Map<String, Object> map2 = new HashMap<String, Object>();
         map2.put("cloudId", "2");
         map2.put("fileId", "QWERTY123456");
         fields.add(map2);
