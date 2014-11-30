@@ -14,9 +14,16 @@ import play.mvc.Security;
 public class AuthorizationDropboxApi extends BaseController {
 
 
-    public static Result getAuthUrl() {
+    public static Result getAuthorizationUrl() {
         String clientId = SystemProperty.DROPBOX_APP_KEY;
-        String redirectUrl = SystemProperty.DROPBOX_REDIRECT_URI;
+        String redirectUrl = SystemProperty.DROPBOX_REDIRECT_AUTHORISED;
+        String url = SystemProperty.DROPBOX_AUTH_URL + "?client_id=" + clientId + "&response_type=code&redirect_uri=" + redirectUrl;
+        return ok(url);
+    }
+
+    public static Result getAddingUrl() {
+        String clientId = SystemProperty.DROPBOX_APP_KEY;
+        String redirectUrl = SystemProperty.DROPBOX_REDIRECT_ADDED;
         String url = SystemProperty.DROPBOX_AUTH_URL + "?client_id=" + clientId + "&response_type=code&redirect_uri=" + redirectUrl;
         return ok(url);
     }
@@ -24,14 +31,24 @@ public class AuthorizationDropboxApi extends BaseController {
     public static Result authComplete(String code) {
         Logger.info("authComplete");
         if (!code.isEmpty()) {
-            if (isLoggedIn()) {
+            loginWithDropbox(code);
+        }
+        return redirect(SystemProperty.WEB_APP_HOST);
+    }
+
+
+    @Security.Authenticated(Secured.class)
+    public static Result addingComplete(String code) {
+        Logger.info("addingComplete");
+        String message = "";
+        if (!code.isEmpty()) {
+            try{
                 addDropboxCredential(code);
-            } else {
-                loginWithDropbox(code);
+            }catch (Exception ignored){
+                message = "/#/?message=failed to add account&message_type=error";
             }
         }
-        // TODO add to properties, how to support mobile apps
-        return redirect(SystemProperty.DROPBOX_FINISHED_URL);
+        return redirect(SystemProperty.WEB_APP_HOST + message);
     }
 
 

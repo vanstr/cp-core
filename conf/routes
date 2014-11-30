@@ -9,12 +9,17 @@ DELETE        /api/user                        controllers.AuthorizationApi.remo
 GET           /api/logout                      controllers.AuthorizationApi.logout()
 
 #TODO change format /dropbox/action
-GET           /api/dropboxAuthUrl              controllers.AuthorizationDropboxApi.getAuthUrl()
-GET           /api/dropboxAuthComplete         controllers.AuthorizationDropboxApi.authComplete(code: String ?= "")
+GET           /api/dropbox/url/authorize       controllers.AuthorizationDropboxApi.getAuthorizationUrl()
+GET           /api/dropbox/url/add             controllers.AuthorizationDropboxApi.getAddingUrl()
+GET           /api/dropbox/authorised          controllers.AuthorizationDropboxApi.authComplete(code: String ?= "")
+GET           /api/dropbox/added               controllers.AuthorizationDropboxApi.addingComplete(code: String ?= "")
 DELETE        /api/dropbox                     controllers.AuthorizationDropboxApi.removeAccount()
 
-GET           /api/driveAuthUrl                controllers.AuthorizationGDriveApi.getAuthUrl()
-GET           /api/driveAuthComplete           controllers.AuthorizationGDriveApi.authComplete(code: String ?= "")
+
+GET           /api/drive/url/authorize         controllers.AuthorizationGDriveApi.getAuthorizationUrl()
+GET           /api/drive/url/add               controllers.AuthorizationGDriveApi.getAddingUrl()
+GET           /api/drive/authorised            controllers.AuthorizationGDriveApi.authComplete(code: String ?= "")
+GET           /api/drive/added                 controllers.AuthorizationGDriveApi.addingComplete(code: String ?= "")
 DELETE        /api/drive                       controllers.AuthorizationGDriveApi.removeAccount()
 
 

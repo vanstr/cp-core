@@ -7,11 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import play.db.ebean.Model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +30,7 @@ public class UserEntity extends Model implements Serializable {
     @Id
     private Long id;
 
-    @Column(columnDefinition="varchar(255)")
+    @Column(columnDefinition="varchar(255)", unique = true)
     private String login;
 
     @JsonIgnore
@@ -50,8 +46,10 @@ public class UserEntity extends Model implements Serializable {
     @JsonIgnore
     private String driveRefreshToken;
 
+    @Column(unique = true)
     private String googleEmail;
 
+    @Column(unique = true)
     private String dropboxUid;
 
     private Long driveTokenExpires;

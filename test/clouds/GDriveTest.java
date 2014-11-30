@@ -27,14 +27,14 @@ import static org.junit.Assert.fail;
 public class GDriveTest extends BaseModelTest {
 
 
-    private static String INCORRECT_FILE = SystemProperty.getLocalProperties().getProperty("test.drive.incorrect_file");
-    private static String FILE_ID = SystemProperty.getLocalProperties().getProperty("test.drive.correct_file_id");
+    private static String INCORRECT_FILE = "/balaslkdjasc.mp3";
+    private static String FILE_ID = "0B44SMymWtF8BdmlnUm5ZRFNvcE0";
     private static GDrive gDrive = null;
 
     @BeforeClass
     public static void method() {
         try {
-            UserEntity userEntity = UserEntity.getUserById(2l);
+            UserEntity userEntity = UserEntity.getUserById(SystemProperty.DRIVE_CLOUD_ID);
             gDrive = new GDrive(userEntity.getDriveAccessToken(), userEntity.getDriveRefreshToken());
             String newToken = gDrive.refreshToken(userEntity.getDriveRefreshToken());
             gDrive.setAccessToken(newToken);
@@ -81,7 +81,7 @@ public class GDriveTest extends BaseModelTest {
         String incorrectLink = null;
         try {
             incorrectLink = gDrive.getFileLink(INCORRECT_FILE);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             assertNull("Incorrect file link", incorrectLink);
         }
         Logger.info("testGetFileLink done");
