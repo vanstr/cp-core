@@ -45,7 +45,7 @@ public class AuthorizationDropboxApi extends BaseController {
             try{
                 addDropboxCredential(code);
             }catch (Exception ignored){
-                message = "/#/?message=failed to add account&type=error";
+                message = "/#/?message=failed to add account&message_type=error";
             }
         }
         return redirect(SystemProperty.WEB_APP_HOST + message);
