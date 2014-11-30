@@ -14,9 +14,17 @@ import play.mvc.Security;
 public class AuthorizationGDriveApi extends BaseController {
 
 
-    public static Result getAuthUrl() {
+    public static Result getAuthorizationUrl() {
         String clientId = SystemProperty.DRIVE_CLIENT_ID;
-        String redirectUrl = SystemProperty.DRIVE_REDIRECT_URI;
+        String redirectUrl = SystemProperty.DRIVE_REDIRECT_AUTHORISED;
+        String scope = SystemProperty.DRIVE_SCOPE+"+"+SystemProperty.DRIVE_EMAIL_SCOPE;
+
+        String url = SystemProperty.DRIVE_AUTH_URL + "?redirect_uri="+ redirectUrl +"&response_type=code&client_id="+clientId+"&scope="+scope+"&approval_prompt=force&access_type=offline";
+        return ok(url);
+    }
+    public static Result getAddingUrl() {
+        String clientId = SystemProperty.DRIVE_CLIENT_ID;
+        String redirectUrl = SystemProperty.DRIVE_REDIRECT_ADDED;
         String scope = SystemProperty.DRIVE_SCOPE+"+"+SystemProperty.DRIVE_EMAIL_SCOPE;
 
         String url = SystemProperty.DRIVE_AUTH_URL + "?redirect_uri="+ redirectUrl +"&response_type=code&client_id="+clientId+"&scope="+scope+"&approval_prompt=force&access_type=offline";
@@ -25,19 +33,24 @@ public class AuthorizationGDriveApi extends BaseController {
 
     public static Result authComplete(String code) {
         Logger.info("authComplete");
+        if (!code.isEmpty()) {
+            loginWithGDrive(code);
+        }
+        return redirect(SystemProperty.WEB_APP_HOST);
+    }
+
+
+    @Security.Authenticated(Secured.class)
+    public static Result addingComplete(String code) {
+        Logger.info("addingComplete");
         String message = "";
         if (!code.isEmpty()) {
-            if (isLoggedIn()) {
-                try{
-                    addGDriveCredential(code);
-                }catch (Exception ignored){
-                    message = "/#/?message=failed to add account&type=error";
-                }
-            } else {
-                loginWithGDrive(code);
+            try{
+                addGDriveCredential(code);
+            }catch (Exception ignored){
+                message = "/#/?message=failed to add account&message_type=error";
             }
         }
-        // TODO add to properties, how to support mobile apps
         return redirect(SystemProperty.WEB_APP_HOST + message);
     }
 

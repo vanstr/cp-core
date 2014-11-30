@@ -23,6 +23,8 @@ public class SystemProperty {
     public static String DRIVE_CLIENT_ID;
     public static String DRIVE_CLIENT_SECRET;
     public static String DRIVE_REDIRECT_URI;
+    public static String DRIVE_REDIRECT_AUTHORISED;
+    public static String DRIVE_REDIRECT_ADDED;
     public static String DRIVE_AUTH_URL;
     public static String DRIVE_EMAIL_URL;
     public static String DRIVE_EMAIL_SCOPE;
@@ -56,7 +58,8 @@ public class SystemProperty {
 
             DRIVE_CLIENT_ID = localProperties.getProperty("drive.client.id");
             DRIVE_CLIENT_SECRET = localProperties.getProperty("drive.client.secret");
-            DRIVE_REDIRECT_URI = CORE_APP_HOST + localProperties.getProperty("drive.redirect.path");
+            DRIVE_REDIRECT_AUTHORISED = CORE_APP_HOST + localProperties.getProperty("drive.redirect.authorised");
+            DRIVE_REDIRECT_ADDED = CORE_APP_HOST + localProperties.getProperty("drive.redirect.added");
             DRIVE_EMAIL_URL = localProperties.getProperty("drive.email.url");
             DRIVE_AUTH_URL = localProperties.getProperty("drive.auth.url");
             DRIVE_EMAIL_SCOPE = localProperties.getProperty("drive.email.scope");

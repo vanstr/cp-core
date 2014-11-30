@@ -15,8 +15,11 @@ GET           /api/dropbox/authorised          controllers.AuthorizationDropboxA
 GET           /api/dropbox/added               controllers.AuthorizationDropboxApi.addingComplete(code: String ?= "")
 DELETE        /api/dropbox                     controllers.AuthorizationDropboxApi.removeAccount()
 
-GET           /api/driveAuthUrl                controllers.AuthorizationGDriveApi.getAuthUrl()
-GET           /api/driveAuthComplete           controllers.AuthorizationGDriveApi.authComplete(code: String ?= "")
+
+GET           /api/drive/url/authorize         controllers.AuthorizationGDriveApi.getAuthorizationUrl()
+GET           /api/drive/url/add               controllers.AuthorizationGDriveApi.getAddingUrl()
+GET           /api/drive/authorised            controllers.AuthorizationGDriveApi.authComplete(code: String ?= "")
+GET           /api/drive/added                 controllers.AuthorizationGDriveApi.addingComplete(code: String ?= "")
 DELETE        /api/drive                       controllers.AuthorizationGDriveApi.removeAccount()
 
 
