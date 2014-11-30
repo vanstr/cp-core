@@ -16,10 +16,10 @@ public class SystemProperty {
     public static String CORRECT_FILE_DROPBOX;
     public static String DROPBOX_APP_KEY;
     public static String DROPBOX_APP_SECRET;
-    public static String DROPBOX_REDIRECT_URI;
     public static String DROPBOX_AUTH_URL;
     public static String DROPBOX_TOKEN_URL;
-    public static String DROPBOX_FINISHED_URL;
+    public static String DROPBOX_REDIRECT_ADDED;
+    public static String DROPBOX_REDIRECT_AUTHORISED;
     public static String DRIVE_CLIENT_ID;
     public static String DRIVE_CLIENT_SECRET;
     public static String DRIVE_REDIRECT_URI;
@@ -29,7 +29,6 @@ public class SystemProperty {
     public static String DRIVE_TOKEN_URL;
     public static String DRIVE_FILES_URL;
     public static String DRIVE_SCOPE;
-    public static String DRIVE_FINISHED_URL;
 
     public static final Long DROPBOX_CLOUD_ID = 1L;
     public static final Long DRIVE_CLOUD_ID = 2L;
@@ -50,7 +49,8 @@ public class SystemProperty {
             CORRECT_FILE_DROPBOX = localProperties.getProperty("test.drive.correct_file");
             DROPBOX_APP_KEY = localProperties.getProperty("dropbox.app.key");
             DROPBOX_APP_SECRET = localProperties.getProperty("dropbox.app.secret");
-            DROPBOX_REDIRECT_URI = CORE_APP_HOST + localProperties.getProperty("dropbox.redirect.path");
+            DROPBOX_REDIRECT_AUTHORISED = CORE_APP_HOST + localProperties.getProperty("dropbox.redirect.authorised");
+            DROPBOX_REDIRECT_ADDED = CORE_APP_HOST + localProperties.getProperty("dropbox.redirect.added");
             DROPBOX_TOKEN_URL = localProperties.getProperty("dropbox.token.url");
             DROPBOX_AUTH_URL = localProperties.getProperty("dropbox.auth.url");
 
