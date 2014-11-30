@@ -1,7 +1,6 @@
 package commons;
 
 import app.BaseModelTest;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import play.Logger;
 import structure.PlayList;
@@ -13,20 +12,9 @@ import java.util.List;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created with IntelliJ IDEA.
- * User: vanstr
- * Date: 14.1.3
- * Time: 22:41
- * To change this template use File | Settings | File Templates.
- */
+
 public class SongMetadataPopulationTest extends BaseModelTest {
 
-
-    @BeforeClass
-    public static void method() {
-        Logger.info("BeforeClass done");
-    }
 
     @Test
     public void test1PopulatePlaylist() {
@@ -35,7 +23,7 @@ public class SongMetadataPopulationTest extends BaseModelTest {
 
         Song trackHasMetadata = new Song(originSongEntity.getCloudId(), originSongEntity.getFileId(),
                 originSongEntity.getFileName(), null, null);
-        Song trackDoesNotHasMetadata = new Song(1, "NoThatSong", "", null, null);
+        Song trackDoesNotHasMetadata = new Song(SystemProperty.DROPBOX_CLOUD_ID, "NoThatSong", "", null, null);
         data.add(trackHasMetadata);
         data.add(trackDoesNotHasMetadata);
 

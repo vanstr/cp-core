@@ -1,7 +1,6 @@
 package clouds;
 
 import app.BaseModelTest;
-import commons.SystemProperty;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import play.Logger;
@@ -21,8 +20,8 @@ public class DropboxTest extends BaseModelTest {
     private static Dropbox dropUnAuth = null; // un authorized dropboz session
     private static Dropbox dropAuth = null; // authorized dropboz session
 
-    private static final String CORRECT_FILE_DROPBOX = SystemProperty.getLocalProperties().getProperty("test.dropbox.correct_file");
-    private static final String INCORRECT_FILE_DROPBOX = SystemProperty.getLocalProperties().getProperty("test.dropbox.incorrect_file");
+    private static final String CORRECT_FILE_DROPBOX = "/JUnit/music.mp3";
+    private static final String INCORRECT_FILE_DROPBOX = "/balaslkdjasc.mp3";
 
 
     @BeforeClass
