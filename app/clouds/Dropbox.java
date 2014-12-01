@@ -75,10 +75,10 @@ public class Dropbox extends OAuth2Communicator {
     }
 
     @Override
-    public OAuth2UserData retrieveAccessToken(String code){
+    public OAuth2UserData retrieveAccessToken(String code, String redirectUrl ){
         JSONObject object = super.retrieveAccessToken(code, SystemProperty.DROPBOX_APP_KEY,
                 SystemProperty.DROPBOX_APP_SECRET, GRANT_TYPE_AUTHORIZATION,
-                SystemProperty.DROPBOX_REDIRECT_AUTHORISED, null, SystemProperty.DROPBOX_TOKEN_URL);
+                redirectUrl, null, SystemProperty.DROPBOX_TOKEN_URL);
         OAuth2UserData oAuth2UserData = null;
         try {
             oAuth2UserData = parseDropboxData(object);

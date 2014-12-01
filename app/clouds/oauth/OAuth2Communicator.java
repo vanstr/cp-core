@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public abstract class OAuth2Communicator {
 
-    public abstract OAuth2UserData retrieveAccessToken(String code);
+    public abstract OAuth2UserData retrieveAccessToken(String code, String redirectUrl);
     public abstract String refreshToken(String refreshToken);
 
     public JSONObject retrieveAccessToken(String code, String clientId,

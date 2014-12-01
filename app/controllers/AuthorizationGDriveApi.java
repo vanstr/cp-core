@@ -75,7 +75,7 @@ public class AuthorizationGDriveApi extends BaseController {
         Logger.info("loginWithGDrive");
 
         GDrive gDrive = new GDrive(null, null, null);
-        OAuth2UserData oAuth2UserData = gDrive.retrieveAccessToken(code);
+        OAuth2UserData oAuth2UserData = gDrive.retrieveAccessToken(code, SystemProperty.DRIVE_REDIRECT_AUTHORISED);
 
         UserEntity userEntity = UserEntity.getUserByField("google_email", oAuth2UserData.getUniqueCloudId());
         if(userEntity == null ){
@@ -107,7 +107,7 @@ public class AuthorizationGDriveApi extends BaseController {
 
         // retrive AccessToken
         GDrive gDrive = new GDrive(null, null, null);
-        OAuth2UserData credentials = gDrive.retrieveAccessToken(code);
+        OAuth2UserData credentials = gDrive.retrieveAccessToken(code, SystemProperty.DRIVE_REDIRECT_ADDED);
         String accessToken = credentials.getAccessToken();
         String refreshToken = credentials.getRefreshToken();
 

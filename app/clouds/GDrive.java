@@ -127,9 +127,9 @@ public class GDrive extends OAuth2Communicator {
     }
 
     @Override
-    public OAuth2UserData retrieveAccessToken(String code){
+    public OAuth2UserData retrieveAccessToken(String code, String redirectUrl){
         JSONObject object = super.retrieveAccessToken(code, SystemProperty.DRIVE_CLIENT_ID,
-                SystemProperty.DRIVE_CLIENT_SECRET, GRANT_TYPE_AUTHORIZATION, SystemProperty.DRIVE_REDIRECT_AUTHORISED,
+                SystemProperty.DRIVE_CLIENT_SECRET, GRANT_TYPE_AUTHORIZATION, redirectUrl,
                 SystemProperty.DRIVE_EMAIL_SCOPE + "+" + SystemProperty.DRIVE_SCOPE, SystemProperty.DRIVE_TOKEN_URL);
         OAuth2UserData oAuth2UserData = null;
         try {

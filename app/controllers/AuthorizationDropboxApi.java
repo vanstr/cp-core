@@ -44,7 +44,8 @@ public class AuthorizationDropboxApi extends BaseController {
         if (!code.isEmpty()) {
             try{
                 addDropboxCredential(code);
-            }catch (Exception ignored){
+            }catch (Exception e){
+                Logger.error("addDropboxCredential exception: " + e);
                 message = "/#/?message=failed to add account&message_type=error";
             }
         }
@@ -54,6 +55,7 @@ public class AuthorizationDropboxApi extends BaseController {
 
     @Security.Authenticated(Secured.class)
     public static Result removeAccount() {
+        Logger.info("removeAccount");
         Long userId = Long.valueOf(session("userId"));
         UserEntity userEntity = UserEntity.getUserById(userId);
         userEntity.setDropboxAccessKey(null);
@@ -69,7 +71,7 @@ public class AuthorizationDropboxApi extends BaseController {
     private static void loginWithDropbox(String code) {
         Logger.info("loginWithDropbox");
         Dropbox dropbox = new Dropbox();
-        OAuth2UserData oAuth2UserData = dropbox.retrieveAccessToken(code);
+        OAuth2UserData oAuth2UserData = dropbox.retrieveAccessToken(code, SystemProperty.DROPBOX_REDIRECT_AUTHORISED);
 
         UserEntity userEntity = UserEntity.getUserByField("dropbox_uid", oAuth2UserData.getUniqueCloudId());
         if (userEntity == null) {
@@ -92,7 +94,7 @@ public class AuthorizationDropboxApi extends BaseController {
         Logger.info("addDropboxCredential");
 
         Dropbox drop = new Dropbox();
-        OAuth2UserData oAuth2UserData = drop.retrieveAccessToken(code);
+        OAuth2UserData oAuth2UserData = drop.retrieveAccessToken(code, SystemProperty.DROPBOX_REDIRECT_ADDED);
 
         Long userId = Long.valueOf(session("userId"));
         UserEntity user = UserEntity.getUserById(userId);
