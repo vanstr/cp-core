@@ -1,6 +1,7 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import commons.PasswordService;
 import controllers.commons.BaseController;
 import models.PlayListEntity;
 import models.SongEntity;
@@ -21,9 +22,12 @@ public class AuthorizationApi extends BaseController {
         String login = receivedJson.findPath("login").asText();
         String password = receivedJson.findPath("password").asText();
         Logger.debug("json:" + receivedJson);
+
+        String encryptedPassword = PasswordService.getInstance().encrypt(password);
+
         Map<String, Object> fieldMap = new HashMap<String, Object>();
         fieldMap.put("login", login);
-        fieldMap.put("password", password);
+        fieldMap.put("password", encryptedPassword);
         List<UserEntity> list = UserEntity.getUsersByFields(fieldMap);
         if (list != null && list.size() > 0) {
             UserEntity userEntity = list.get(0);
@@ -57,10 +61,11 @@ public class AuthorizationApi extends BaseController {
         if( password.length() < 4 ){
             return badRequest("Password too short");
         }
-        
+
         UserEntity newUserEntity = new UserEntity();
         newUserEntity.setLogin(login);
-        newUserEntity.setPassword(password);
+        String encryptedPassword = PasswordService.getInstance().encrypt(password);
+        newUserEntity.setPassword(encryptedPassword);
         newUserEntity.save();
 
         return returnInJsonCreated(newUserEntity);
