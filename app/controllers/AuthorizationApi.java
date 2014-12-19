@@ -2,6 +2,7 @@ package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import controllers.commons.BaseController;
+import models.PlayListEntity;
 import models.UserEntity;
 import play.Logger;
 import play.mvc.Result;
@@ -66,9 +67,14 @@ public class AuthorizationApi extends BaseController {
 
     public static Result removeAccount(){
         Logger.debug("removeAccount");
-        String userId = session("userId");
+        long userId = Long.parseLong(session("userId"));
+
+        // TODO delete songs, playlists, user
+        PlayListEntity.deletePlayListByUser(userId);
+        UserEntity.deleteUserById(userId);
+
         session().clear();
-        UserEntity.deleteUserById(Long.parseLong(userId));
+
         return ok();
     }
 
@@ -79,5 +85,9 @@ public class AuthorizationApi extends BaseController {
         UserEntity userEntity = UserEntity.getUserById(userId);
 
         return returnInJsonCreated(userEntity);
+    }
+
+    public static Result updateUser() {
+        return play.mvc.Results.TODO;
     }
 }

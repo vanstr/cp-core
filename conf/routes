@@ -2,11 +2,12 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-POST          /api/login                       controllers.AuthorizationApi.login()
 GET           /api/user                        controllers.AuthorizationApi.getUser()
-POST          /api/user                        controllers.AuthorizationApi.registerUser()
 DELETE        /api/user                        controllers.AuthorizationApi.removeAccount()
+POST          /api/user                        controllers.AuthorizationApi.updateUser()
+POST          /api/login                       controllers.AuthorizationApi.login()
 GET           /api/logout                      controllers.AuthorizationApi.logout()
+POST          /api/register                    controllers.AuthorizationApi.registerUser()
 
 #TODO change format /dropbox/action
 GET           /api/dropbox/url/authorize       controllers.AuthorizationDropboxApi.getAuthorizationUrl()
