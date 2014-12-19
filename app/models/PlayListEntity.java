@@ -113,7 +113,8 @@ public class PlayListEntity extends Model implements Serializable {
     public static void deletePlayListById(Long playListId){
         Ebean.delete(find.byId(playListId));
     }
-    public static void deletePlayListByUser(Long userId){
+
+    public static void deletePlayListsByUserId(Long userId){
         ExpressionList<PlayListEntity> userPlayListsExpression = find.where().eq("user_id", userId);
         List<PlayListEntity> userEntity1 = userPlayListsExpression.findList();
         Logger.debug("before delete: " + userEntity1.size());
