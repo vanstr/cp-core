@@ -5,6 +5,5 @@ package commons.exceptions;
  */
 public class UnauthorizedAccessException extends RuntimeException {
 
-  public UnauthorizedAccessException(String s) {
-  }
+  public UnauthorizedAccessException() {}
 }

@@ -2,9 +2,8 @@ package clouds;
 
 import commons.FileFetcher;
 import models.UserEntity;
-import structure.Song;
-
-import java.util.List;
+import play.Logger;
+import structure.PlayList;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,19 +18,19 @@ public class DropboxFileFetcher extends FileFetcher {
         super(folderPath, userId);
     }
 
-    public List<Song> getCloudFiles(String folderPath, Long userId) {
-        List<Song> files = null;
+    public PlayList getCloudPlayList(String folderPath, Long userId) {
+        playList = new PlayList();
         try {
             UserEntity userEntity = UserEntity.getUserById(userId);
             String accessTokenKey = userEntity.getDropboxAccessKey();
 
             if (accessTokenKey != null) {
                 Dropbox drop = new Dropbox(accessTokenKey);
-                files = drop.getFileList(folderPath, REQUIRED_FILE_TYPES);
+                playList.setSongs(drop.getFileList(folderPath, REQUIRED_FILE_TYPES));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.error("Exception in getCloudPlayList", e);
         }
-        return files;
+        return playList;
     }
 }

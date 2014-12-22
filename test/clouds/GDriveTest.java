@@ -52,7 +52,7 @@ public class GDriveTest extends BaseModelTest {
         List<String> fileTypes = new ArrayList<String>();
         fileTypes.add("mp3");
         try {
-            List<Song> songList = gDrive.getFileList("/", fileTypes).getSongs();
+            List<Song> songList = gDrive.getFileList(null, "/", fileTypes).getSongs();
             assertNotNull(songList);
             boolean isFilePresent = false;
             for (Song song : songList) {

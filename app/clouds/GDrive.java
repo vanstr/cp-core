@@ -12,6 +12,7 @@ import structure.PlayList;
 import structure.Song;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -62,16 +63,15 @@ public class GDrive extends OAuth2Communicator {
         this.tokenExpires = tokenExpires;
     }
 
-    public PlayList getFileList(String folderPath, List<String> fileTypes){
-        PlayList files = null;
+    public PlayList getFileList(String nextPageToken, String folderPath, List<String> fileTypes){
+        PlayList playList = null;
         try {
-            files = retrieveAllFiles();
-        } catch (Exception e) {
+            playList = retrieveAllFiles(nextPageToken);
+        } catch (IOException e) {
             Logger.error("Exception in getFileList " + e.getMessage());
         }
 
-
-        Iterator<Song> i = files.getSongs().iterator();
+        Iterator<Song> i = playList.getSongs().iterator();
         while (i.hasNext()) {
             Song track = i.next();
 
@@ -79,16 +79,22 @@ public class GDrive extends OAuth2Communicator {
                 i.remove();
             }
         }
-        return files;
+        return playList;
     }
 
 
-    public PlayList retrieveAllFiles() throws IOException, JSONException {
+    public PlayList retrieveAllFiles(String pageToken) throws IOException, JSONException {
         PlayList playList = new PlayList();
         String url = "https://www.googleapis.com/drive/v2/files?oauth_token=" + accessToken;
+        if(pageToken != null && !"".equals(pageToken)){
+            url += "&pageToken=" + URLEncoder.encode(pageToken, "UTF-8");
+        }
         JSONObject object = HttpWorker.sendGetRequest(url);
         if(object == null){
             return playList;
+        }
+        if(object.has("nextPageToken")){
+            playList.setNextPageToken(object.getString("nextPageToken"));
         }
         JSONArray fileArray = object.getJSONArray("items");
         Logger.debug("retrieved files size: " + fileArray.length());
@@ -121,7 +127,7 @@ public class GDrive extends OAuth2Communicator {
                     + "&oauth_token="
                     + this.accessToken;
         } catch (JSONException e) {
-            e.printStackTrace();
+            Logger.error("Exception in getFileLink", e);
         }
         return fileSrc;
     }
@@ -135,7 +141,7 @@ public class GDrive extends OAuth2Communicator {
         try {
             oAuth2UserData = parseDriveData(object);
         } catch (JSONException e) {
-            e.printStackTrace();
+            Logger.error("Exception in retrieveAccessToken", e);
         }
         return oAuth2UserData;
     }
@@ -153,7 +159,7 @@ public class GDrive extends OAuth2Communicator {
             accessToken = object.getString("access_token");
             this.tokenExpires = object.getLong("expires_in")*1000 + System.currentTimeMillis();
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.error("Exception in refreshToken", e);
         }
         return accessToken;
     }

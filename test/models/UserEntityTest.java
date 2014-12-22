@@ -39,7 +39,7 @@ public class UserEntityTest extends BaseModelTest{
 
             dropAuth = new Dropbox(originUserEntity.getDropboxAccessKey());
         } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            Logger.error("Exception while initializing Dropbox", e);
             fail("error in preparing");
         }
     }

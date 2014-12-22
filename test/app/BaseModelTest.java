@@ -84,8 +84,6 @@ public class BaseModelTest {
         newUserEntity.setId(1L);
         newUserEntity.setDropboxAccessKey("BAus-dLEjW8AAAAAAAAAAVDysztTsSGkiwlJV7Fm6lvHYxbp0-QdBsyE_Hb_7dYd");
         newUserEntity.setDropboxUid("192670402");
-        newUserEntity.setDriveAccessToken("7hlztwsgm4v8l2f");
-        newUserEntity.setDriveRefreshToken("C6jC5Vm8aiRDiNwy");
         newUserEntity.setLogin("dropbox");
         newUserEntity.setPassword("123");
         newUserEntity.save();
@@ -100,12 +98,6 @@ public class BaseModelTest {
 
     @AfterClass
     public static void stopApp() {
-        // delete originXXX
-//    originSong.delete();
-
-
-        //   originUser.delete();
-
         Helpers.stop(testServer);
     }
 }

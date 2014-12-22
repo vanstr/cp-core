@@ -6,8 +6,6 @@ import structure.PlayList;
 import structure.Song;
 import structure.SongMetadata;
 
-import java.util.List;
-
 /**
  * Created with IntelliJ IDEA.
  * User: vanstr
@@ -17,26 +15,21 @@ import java.util.List;
  */
 public class SongMetadataPopulation {
 
-    public static PlayList populate(List<Song> data, long userId) {
+    public static void populate(PlayList playList, long userId) {
 
         UserEntity userEntity = UserEntity.getUserById(userId);
 
-        PlayList playList = new PlayList();
+        if(playList != null) {
+            int size = playList.getSongs().size();
+            for (int i = 0; i < size; i++) {
+                Song song = playList.getSongs().get(i);
 
-        int size = data.size();
-        for (int i = 0; i < size; i++) {
-            Song song = data.get(i);
-
-            SongEntity songEntity = SongEntity.getSongByHash(userEntity, song.getCloudId(), song.getFileId());
-            if (songEntity != null) {
-                SongMetadata metadata = new SongMetadata(songEntity);
-                song.setMetadata(metadata);
+                SongEntity songEntity = SongEntity.getSongByHash(userEntity, song.getCloudId(), song.getFileId());
+                if (songEntity != null) {
+                    SongMetadata metadata = new SongMetadata(songEntity);
+                    song.setMetadata(metadata);
+                }
             }
-
-            playList.add(song);
         }
-
-        return playList;
-
     }
 }

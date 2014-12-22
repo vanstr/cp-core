@@ -19,15 +19,17 @@ public class SongMetadataPopulationTest extends BaseModelTest {
     @Test
     public void test1PopulatePlaylist() {
 
+        PlayList playList = new PlayList();
         List<Song> data = new ArrayList<Song>();
 
         Song trackHasMetadata = new Song(originSongEntity.getCloudId(), originSongEntity.getFileId(),
                 originSongEntity.getFileName(), null, null);
-        Song trackDoesNotHasMetadata = new Song(SystemProperty.DROPBOX_CLOUD_ID, "NoThatSong", "", null, null);
+        Song trackDoesNotHaveMetadata = new Song(SystemProperty.DROPBOX_CLOUD_ID, "NoThatSong", "", null, null);
         data.add(trackHasMetadata);
-        data.add(trackDoesNotHasMetadata);
+        data.add(trackDoesNotHaveMetadata);
+        playList.addSongs(data);
 
-        PlayList playList = SongMetadataPopulation.populate(data, originUserEntity.getId());
+        SongMetadataPopulation.populate(playList, originUserEntity.getId());
 
         Logger.debug("Songs in playlist:" + playList.getSongs().size());
         try {
