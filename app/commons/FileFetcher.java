@@ -15,7 +15,7 @@ import java.util.List;
 //TODO: refactor
 public abstract class FileFetcher implements Runnable{
 
-    public final static List<String> REQUIRED_FILE_TYPES = Arrays.asList("mp3", "wav", "ogg");
+    public static final List<String> REQUIRED_FILE_TYPES = Arrays.asList("mp3", "wav", "ogg");
 
     protected String folderPath;
     protected Long userId;

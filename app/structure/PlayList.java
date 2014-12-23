@@ -20,7 +20,6 @@ public class PlayList implements Serializable{
     private long id;
     private String name;
     private List<Song> songs;
-    private String nextPageToken;
 
     public PlayList(){
         this.songs = new ArrayList<Song>();
@@ -73,11 +72,4 @@ public class PlayList implements Serializable{
         this.songs.addAll(newSongs);
     }
 
-    public String getNextPageToken() {
-        return nextPageToken;
-    }
-
-    public void setNextPageToken(String nextPageToken) {
-        this.nextPageToken = nextPageToken;
-    }
 }

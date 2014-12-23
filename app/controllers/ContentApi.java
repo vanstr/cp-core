@@ -55,10 +55,10 @@ public class ContentApi extends BaseController {
         return returnInJsonOk(file);
     }
 
-    public static Result getPlayList(String nextPageToken) {
+    public static Result getPlayList() {
         Logger.debug("getPlayList");
         Long userId = Long.parseLong(session("userId"));
-        PlayList result = getPlayList(nextPageToken, "/", userId);
+        PlayList result = getPlayList("/", userId);
         SongMetadataPopulation.populate(result, userId);
 
         return returnInJsonOk(result);
@@ -106,9 +106,9 @@ public class ContentApi extends BaseController {
         return returnInJsonOk(songEntity.getId());
     }
 
-    private static PlayList getPlayList(String nextPageToken, String folderPath, Long userId) {
+    private static PlayList getPlayList(String folderPath, Long userId) {
         FileFetcher dropboxFetcher = new DropboxFileFetcher(folderPath, userId);
-        FileFetcher driveFetcher = new DriveFileFetcher(nextPageToken, folderPath, userId);
+        FileFetcher driveFetcher = new DriveFileFetcher(folderPath, userId);
         Thread dropboxThread = new Thread(dropboxFetcher);
         Thread driveThread = new Thread(driveFetcher);
         dropboxThread.start();

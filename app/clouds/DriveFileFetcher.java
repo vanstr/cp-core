@@ -15,11 +15,9 @@ import structure.PlayList;
  */
 public class DriveFileFetcher extends FileFetcher{
 
-    private String nextPageToken;
 
-    public DriveFileFetcher(String nextPageToken, String folderPath, Long userId) {
+    public DriveFileFetcher(String folderPath, Long userId) {
         super(folderPath, userId);
-        this.nextPageToken = nextPageToken;
     }
 
     public PlayList getCloudPlayList(String folderPath, Long userId){
@@ -31,12 +29,12 @@ public class DriveFileFetcher extends FileFetcher{
             String driveRefreshToken = userEntity.getDriveRefreshToken();
             if(driveAccessToken != null && driveRefreshToken != null){
                 gDrive = new GDrive(driveAccessToken, driveRefreshToken);
-                this.playList = gDrive.getFileList(this.nextPageToken, folderPath, REQUIRED_FILE_TYPES);
+                this.playList = gDrive.getFileList(folderPath, REQUIRED_FILE_TYPES);
             }
         } catch (UnauthorizedAccessException e) {
             gDrive.setAccessToken(gDrive.refreshToken(gDrive.getRefreshToken()));
             try {
-                this.playList = gDrive.getFileList(nextPageToken, folderPath, REQUIRED_FILE_TYPES);
+                this.playList = gDrive.getFileList(folderPath, REQUIRED_FILE_TYPES);
                 userEntity.setDriveAccessToken(gDrive.getAccessToken());
                 userEntity.update();
             } catch (Exception e1) {
@@ -48,11 +46,4 @@ public class DriveFileFetcher extends FileFetcher{
         return this.playList;
     }
 
-    public String getNextPageToken() {
-        return nextPageToken;
-    }
-
-    public void setNextPageToken(String nextPageToken) {
-        this.nextPageToken = nextPageToken;
-    }
 }

@@ -25,7 +25,7 @@ DELETE        /api/drive                       controllers.AuthorizationGDriveAp
 
 # TODO, why not introduce unique ID for song
 GET           /api/link                        controllers.ContentApi.getFileSrc(cloudId: Long, fileId: String)
-GET           /api/playList                    controllers.ContentApi.getPlayList(nextPageToken: String ?= null)
+GET           /api/playList                    controllers.ContentApi.getPlayList()
 
 GET           /api/playList/:playListId        controllers.ContentApi.getPlayListById(playListId: Long)
 GET           /api/playLists                   controllers.ContentApi.getPlayLists()
