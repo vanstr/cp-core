@@ -12,6 +12,8 @@ import play.Logger;
 import play.mvc.Result;
 import play.test.FakeRequest;
 
+import java.util.Arrays;
+
 import static junit.framework.TestCase.assertNotNull;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertNull;
@@ -25,6 +27,7 @@ import static play.test.Helpers.*;
 public class ContentApiTest extends BaseModelTest {
 
     private static PlayListEntity testPlayListEntity = null;
+    private static PlayListEntity playListWithOneSong = null;
     @Test
     public void testGetFileSrc(){
         FakeRequest request = new FakeRequest("GET", "/api/link?cloudId=1&fileId=/JUnit/music.mp3")
@@ -153,14 +156,14 @@ public class ContentApiTest extends BaseModelTest {
 
     @Test
     public void testAddSongToPlayList(){
-        testPlayListEntity = new PlayListEntity();
-        testPlayListEntity.setName("Test PLaylist");
-        testPlayListEntity.setUserEntity(originUserEntity);
-        testPlayListEntity.save();
+        playListWithOneSong = new PlayListEntity();
+        playListWithOneSong.setName("Test PLaylist");
+        playListWithOneSong.setUserEntity(originUserEntity);
+        playListWithOneSong.save();
         FakeRequest request = new FakeRequest("POST", "/api/playListSong")
                 .withSession("userId", "1");
         ObjectNode node = JsonNodeFactory.instance.objectNode();
-        node.put("playListId", testPlayListEntity.getId());
+        node.put("playListId", playListWithOneSong.getId());
         ArrayNode songArray = JsonNodeFactory.instance.arrayNode();
         ObjectNode songNode = JsonNodeFactory.instance.objectNode();
         songNode.put("fileId", "/songs/my_song1.mp3");
@@ -169,33 +172,47 @@ public class ContentApiTest extends BaseModelTest {
         node.put("songs", songArray);
         request.withJsonBody(node);
         Result result = route(request);
+        playListWithOneSong.refresh();
         assertThat(status(result)).isEqualTo(OK);
-        assertThat(testPlayListEntity.getSongs().size() > 0);
+        assertThat(playListWithOneSong.getSongs().size() > 0).isTrue();
         Logger.info("Add song to playlist test done");
     }
 
     @Test
     public void testRemoveSongFromPlayList(){
+        PlayListEntity playListEntity = new PlayListEntity();
+        SongEntity song1 = new SongEntity();
+        song1.setUser(originUserEntity);
+        song1.setCloudId(1L);
+        song1.setFileId("songToRemoveFromPlayList.mp3");
+        song1.setFileName("songToRemoveFromPlayList.mp3");
+        song1.save();
+        playListEntity.setName("Test PLaylist");
+        playListEntity.setUserEntity(originUserEntity);
+        playListEntity.addSongEntities(Arrays.asList(song1));
+        playListEntity.save();
+
         FakeRequest request = new FakeRequest("DELETE", "/api/playListSong")
                 .withSession("userId", "1");
         ObjectNode node = JsonNodeFactory.instance.objectNode();
-        node.put("playListId", testPlayListEntity.getId());
-        node.put("fileId", "/songs/my_song1.mp3");
+        node.put("playListId", playListEntity.getId());
+        node.put("fileId", "songToRemoveFromPlayList.mp3");
         node.put("cloudId", 1L);
         request.withJsonBody(node);
         Result result = route(request);
+        playListEntity.refresh();
         assertThat(status(result)).isEqualTo(OK);
-        assertThat(testPlayListEntity.getSongs().size() == 0);
+        assertThat(playListEntity.getSongs().size() == 0).isTrue();
         Logger.info("Remove song from playlist test done");
     }
 
     @Test
     public void testDeletePlayList(){
-        testPlayListEntity = new PlayListEntity();
-        testPlayListEntity.setName("name");
-        testPlayListEntity.setUserEntity(originUserEntity);
-        testPlayListEntity.save();
-        Long playListId = testPlayListEntity.getId();
+        PlayListEntity playListEntity = new PlayListEntity();
+        playListEntity.setName("name");
+        playListEntity.setUserEntity(originUserEntity);
+        playListEntity.save();
+        Long playListId = playListEntity.getId();
         FakeRequest request = new FakeRequest("DELETE", "/api/playList/" + playListId)
                 .withSession("userId", originUserEntity.getId().toString());
 
