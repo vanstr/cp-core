@@ -37,7 +37,7 @@ public class ContentApi extends BaseController {
     public static Result getFileSrc(Long cloudId, String fileId) {
         String file = null;
         try {
-            UserEntity userEntity = UserEntity.getUserById(Long.parseLong(session("userId")));
+            UserEntity userEntity = getUserFromSession();
             if (SystemProperty.DROPBOX_CLOUD_ID.equals(cloudId)) {
                 String accessTokenKey = userEntity.getDropboxAccessKey();
                 Dropbox drop = new Dropbox(accessTokenKey);
@@ -85,8 +85,7 @@ public class ContentApi extends BaseController {
     public static Result saveSongMetadata() {
         JsonNode songNode = request().body().asJson();
         Song song = Json.fromJson(songNode, Song.class);
-        Long userId = Long.parseLong(session("userId"));
-        UserEntity userEntity = UserEntity.getUserById(userId);
+        UserEntity userEntity = getUserFromSession();
 
         // get song by id
         Logger.debug("name: " + song.getFileName() + "id: " + song.getFileId() + " cId: " + song.getCloudId() + "userId" + userEntity.getId());
@@ -131,8 +130,7 @@ public class ContentApi extends BaseController {
     public static Result addPlayList() {
         JsonNode songNode = request().body().asJson();
         PlayList playList = Json.fromJson(songNode, PlayList.class);
-        Long userId = Long.parseLong(session("userId"));
-        UserEntity user = UserEntity.getUserById(userId);
+        UserEntity user = getUserFromSession();
 
         Set<SongEntity> songs = new HashSet<SongEntity>();
         if(playList.getSongs() != null){
@@ -184,8 +182,7 @@ public class ContentApi extends BaseController {
 
     public static Result addSongsToPlayList(){
         //TODO move JSON parsing to separate class/methods
-        Long userId = Long.parseLong(session("userId"));
-        UserEntity userEntity = UserEntity.getUserById(userId);
+        UserEntity userEntity = getUserFromSession();
         JsonNode node = request().body().asJson();
         Long playListId = node.findValue("playListId").asLong();
         JsonNode songsNode = node.findValue("songs");
@@ -211,8 +208,7 @@ public class ContentApi extends BaseController {
     }
 
     public static Result removeSongFromPlayList(){
-        Long userId = Long.parseLong(session("userId"));
-        UserEntity userEntity = UserEntity.getUserById(userId);
+        UserEntity userEntity = getUserFromSession();
         JsonNode node = request().body().asJson();
         Long playListId = node.findValue("playListId").asLong();
         String fileId = node.findValue("fileId").asText();

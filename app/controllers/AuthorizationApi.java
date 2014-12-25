@@ -3,11 +3,13 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import commons.PasswordService;
 import controllers.commons.BaseController;
+import controllers.commons.Secured;
 import models.PlayListEntity;
 import models.SongEntity;
 import models.UserEntity;
 import play.Logger;
 import play.mvc.Result;
+import play.mvc.Security;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,11 +25,11 @@ public class AuthorizationApi extends BaseController {
         String password = receivedJson.findPath("password").asText();
         Logger.debug("json:" + receivedJson);
 
-        String encryptedPassword = PasswordService.getInstance().encrypt(password);
+        String hashedPassword = PasswordService.encrypt(password);
 
         Map<String, Object> fieldMap = new HashMap<String, Object>();
         fieldMap.put("login", login);
-        fieldMap.put("password", encryptedPassword);
+        fieldMap.put("password", hashedPassword);
         List<UserEntity> list = UserEntity.getUsersByFields(fieldMap);
         if (list != null && list.size() > 0) {
             UserEntity userEntity = list.get(0);
@@ -41,6 +43,7 @@ public class AuthorizationApi extends BaseController {
         return badRequest("user not found");
     }
 
+    @Security.Authenticated(Secured.class)
     public static Result logout() {
         Logger.debug("logout");
         session().clear();
@@ -64,13 +67,14 @@ public class AuthorizationApi extends BaseController {
 
         UserEntity newUserEntity = new UserEntity();
         newUserEntity.setLogin(login);
-        String encryptedPassword = PasswordService.getInstance().encrypt(password);
-        newUserEntity.setPassword(encryptedPassword);
+        String hashedPassword = PasswordService.encrypt(password);
+        newUserEntity.setPassword(hashedPassword);
         newUserEntity.save();
 
         return returnInJsonCreated(newUserEntity);
     }
 
+    @Security.Authenticated(Secured.class)
     public static Result removeAccount(){
         Logger.debug("removeAccount");
         long userId = Long.parseLong(session("userId"));
@@ -85,15 +89,40 @@ public class AuthorizationApi extends BaseController {
     }
 
 
+    @Security.Authenticated(Secured.class)
     public static Result getUser() {
         Logger.debug("getUser");
-        Long userId = Long.parseLong(session("userId"));
-        UserEntity userEntity = UserEntity.getUserById(userId);
+        UserEntity userEntity = getUserFromSession();
 
         return returnInJsonCreated(userEntity);
     }
 
+    @Security.Authenticated(Secured.class)
     public static Result updateUser() {
         return play.mvc.Results.TODO;
     }
+
+
+    // { "password": "changeme", "new_password" : "new_password" }
+    @Security.Authenticated(Secured.class)
+    public static Result updatePassword() {
+        Logger.debug("updatePassword");
+        JsonNode receivedJson = request().body().asJson();
+        String currentPassword = receivedJson.findPath("password").asText();
+        String newPassword = receivedJson.findPath("new_password").asText();
+
+        UserEntity user = getUserFromSession();
+        String hashedCurrentPassword = PasswordService.encrypt(currentPassword);
+        if( user.getPassword().equals(hashedCurrentPassword)) {
+            String hashedNewPassword = PasswordService.encrypt(newPassword);
+            user.setPassword(hashedNewPassword);
+            user.save();
+            return ok();
+        }else{
+            return badRequest("wrong current password");
+        }
+
+    }
+
+
 }

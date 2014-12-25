@@ -4,13 +4,12 @@ import org.apache.commons.codec.binary.Base64;
 import play.Logger;
 
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 public final class PasswordService {
     private static PasswordService instance = null;
     private static final String SALT = "Bizwe62DefO0er";
 
-    public String encrypt(String plaintext){
+    private String encryptPassword(String plaintext){
         MessageDigest md = null;
         try {
             md = MessageDigest.getInstance("SHA");
@@ -29,5 +28,9 @@ public final class PasswordService {
             instance = new PasswordService();
         }
         return instance;
+    }
+
+    public static String encrypt(String plaintext){
+        return getInstance().encryptPassword(plaintext);
     }
 }

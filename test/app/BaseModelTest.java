@@ -23,6 +23,7 @@ public class BaseModelTest {
 
     public static TestServer testServer;
 
+    public static final String USER_ID = "1";
     public static UserEntity originUserEntity = null;
     public static SongEntity originSongEntity = null;
 
@@ -74,8 +75,7 @@ public class BaseModelTest {
         UserEntity gDriveUser = new UserEntity();
         gDriveUser.setId(2L);
         gDriveUser.setLogin("gdrive");
-        String pwd = PasswordService.getInstance().encrypt("123456");
-        gDriveUser.setPassword(pwd);
+        gDriveUser.setPassword(PasswordService.encrypt("123456"));
         gDriveUser.setDriveAccessToken("ya29.hADeLWkw9ImDLr7p7hivANfWYhI8fJcfNBESB9pBJ9y3S5VyhyuJdQLY");
         gDriveUser.setDriveRefreshToken("1/sTej2wr_j-D3XYL0yVkrWoyBNuRyZn9N7qlMWZRnuPk");
         gDriveUser.setGoogleEmail("cp.cloudplayer@gmail.com");
@@ -83,14 +83,13 @@ public class BaseModelTest {
         gDriveUser.save();
 
         UserEntity dropboxUserEntry = new UserEntity();
-        dropboxUserEntry.setId(1L);
+        dropboxUserEntry.setId(Long.parseLong(USER_ID));
         dropboxUserEntry.setDropboxAccessKey("BAus-dLEjW8AAAAAAAAAAVDysztTsSGkiwlJV7Fm6lvHYxbp0-QdBsyE_Hb_7dYd");
         dropboxUserEntry.setDropboxUid("192670402");
         dropboxUserEntry.setDriveAccessToken("7hlztwsgm4v8l2f");
         dropboxUserEntry.setDriveRefreshToken("C6jC5Vm8aiRDiNwy");
         dropboxUserEntry.setLogin("dropbox");
-        String pwd2 = PasswordService.getInstance().encrypt("123");
-        dropboxUserEntry.setPassword(pwd2);
+        dropboxUserEntry.setPassword(PasswordService.encrypt("123"));
         dropboxUserEntry.save();
 
     }

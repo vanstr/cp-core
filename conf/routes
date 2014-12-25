@@ -5,6 +5,7 @@
 GET           /api/user                        controllers.AuthorizationApi.getUser()
 DELETE        /api/user                        controllers.AuthorizationApi.removeAccount()
 POST          /api/user                        controllers.AuthorizationApi.updateUser()
+POST          /api/user/password               controllers.AuthorizationApi.updatePassword()
 POST          /api/login                       controllers.AuthorizationApi.login()
 GET           /api/logout                      controllers.AuthorizationApi.logout()
 POST          /api/register                    controllers.AuthorizationApi.registerUser()
