@@ -148,7 +148,6 @@ public class AuthorizationApi extends BaseController {
         if(currentUser.getLogin() != null ){ // allowed only for users, who doesn't have login
             return badRequest("This user can't execute this operation");
         }
-
         if (login.length() < MIN_LOGIN_LENGTH) {
             return badRequest("Login too short");
         }
@@ -167,8 +166,24 @@ public class AuthorizationApi extends BaseController {
         return returnInJsonCreated(currentUser);
     }
 
-    public static Boolean isLoginFree(String login) {
+    public static Result updateUserPersonalInfo() {
+        Logger.debug("updateUserPersonalInfo");
+        JsonNode receivedJson = request().body().asJson();
+        String name = receivedJson.findPath("name").asText();
+        String email = receivedJson.findPath("email").asText();
+
+        UserEntity currentUser = getUserFromSession();
+        currentUser.setName(name);
+        currentUser.setEmail(email);
+        currentUser.save();
+
+        return ok();
+    }
+
+
+    private static Boolean isLoginFree(String login) {
         UserEntity user = UserEntity.getUserByField("login", login);
         return user == null;
     }
+
 }
