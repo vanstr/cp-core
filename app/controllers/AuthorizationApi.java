@@ -17,6 +17,9 @@ import java.util.Map;
 
 public class AuthorizationApi extends BaseController {
 
+    public static final int MIN_LOGIN_LENGTH = 4;
+    public static final int MIN_PASSWORD_LENGTH = 4;
+
     // { "login": "user", "password" : "changeme" }
     public static Result login() {
         Logger.debug("login");
@@ -57,11 +60,14 @@ public class AuthorizationApi extends BaseController {
         String login = receivedJson.findPath("login").asText();
         String password = receivedJson.findPath("password").asText();
 
-        UserEntity checingkUserEntity = UserEntity.getUserByField("login", login);
-        if (checingkUserEntity != null){
+
+        if (login.length() < MIN_LOGIN_LENGTH) {
+            return badRequest("Login too short");
+        }
+        if (!isLoginFree(login)) {
             return badRequest("Login already exists");
         }
-        if( password.length() < 4 ){
+        if (password.length() < MIN_PASSWORD_LENGTH) {
             return badRequest("Password too short");
         }
 
@@ -75,7 +81,7 @@ public class AuthorizationApi extends BaseController {
     }
 
     @Security.Authenticated(Secured.class)
-    public static Result removeAccount(){
+    public static Result removeAccount() {
         Logger.debug("removeAccount");
         long userId = Long.parseLong(session("userId"));
 
@@ -111,18 +117,58 @@ public class AuthorizationApi extends BaseController {
         String currentPassword = receivedJson.findPath("password").asText();
         String newPassword = receivedJson.findPath("new_password").asText();
 
+        if (newPassword.length() < MIN_PASSWORD_LENGTH) {
+            return badRequest("New password too short");
+        }
+
         UserEntity user = getUserFromSession();
         String hashedCurrentPassword = PasswordService.encrypt(currentPassword);
-        if( user.getPassword().equals(hashedCurrentPassword)) {
+        String pwd = user.getPassword();
+        if (pwd != null && pwd.equals(hashedCurrentPassword)) {
             String hashedNewPassword = PasswordService.encrypt(newPassword);
             user.setPassword(hashedNewPassword);
             user.save();
             return ok();
-        }else{
-            return badRequest("wrong current password");
+        } else {
+            return badRequest("Wrong current password");
         }
 
     }
 
 
+    // { "password": "changeme", "login" : "myLogin" }
+    @Security.Authenticated(Secured.class)
+    public static Result addLoginAndPasswordForExistingUser() {
+        Logger.debug("addLoginAndPasswordForExistingUser");
+        JsonNode receivedJson = request().body().asJson();
+        String password = receivedJson.findPath("password").asText();
+        String login = receivedJson.findPath("login").asText();
+
+        UserEntity currentUser = getUserFromSession();
+        if(currentUser.getLogin() != null ){ // allowed only for users, who doesn't have login
+            return badRequest("This user can't execute this operation");
+        }
+
+        if (login.length() < MIN_LOGIN_LENGTH) {
+            return badRequest("Login too short");
+        }
+        if (!isLoginFree(login)) {
+            return badRequest("Login already exists");
+        }
+        if (password.length() < MIN_PASSWORD_LENGTH) {
+            return badRequest("Password too short");
+        }
+
+        currentUser.setLogin(login);
+        String hashedPassword = PasswordService.encrypt(password);
+        currentUser.setPassword(hashedPassword);
+        currentUser.save();
+
+        return returnInJsonCreated(currentUser);
+    }
+
+    public static Boolean isLoginFree(String login) {
+        UserEntity user = UserEntity.getUserByField("login", login);
+        return user == null;
+    }
 }
