@@ -3,9 +3,8 @@ package clouds;
 import commons.FileFetcher;
 import commons.exceptions.UnauthorizedAccessException;
 import models.UserEntity;
-import structure.Song;
-
-import java.util.List;
+import play.Logger;
+import structure.PlayList;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,12 +15,12 @@ import java.util.List;
  */
 public class DriveFileFetcher extends FileFetcher{
 
+
     public DriveFileFetcher(String folderPath, Long userId) {
         super(folderPath, userId);
     }
 
-    public List<Song> getCloudFiles(String folderPath, Long userId){
-        List<Song> files = null;
+    public PlayList getCloudPlayList(String folderPath, Long userId){
         GDrive gDrive = null;
 
         UserEntity userEntity = UserEntity.getUserById(userId);
@@ -30,23 +29,21 @@ public class DriveFileFetcher extends FileFetcher{
             String driveRefreshToken = userEntity.getDriveRefreshToken();
             if(driveAccessToken != null && driveRefreshToken != null){
                 gDrive = new GDrive(driveAccessToken, driveRefreshToken);
-                files = gDrive.getFileList(folderPath, REQUIRED_FILE_TYPES).getSongs();
+                this.playList = gDrive.getFileList(folderPath, REQUIRED_FILE_TYPES);
             }
         } catch (UnauthorizedAccessException e) {
-            if("401".equals(e.getMessage())){
-                gDrive.setAccessToken(gDrive.refreshToken(gDrive.getRefreshToken()));
-                try {
-                    files = gDrive.getFileList(folderPath, REQUIRED_FILE_TYPES).getSongs();
-                    userEntity.setDriveAccessToken(gDrive.getAccessToken());
-                    userEntity.update();
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
+            gDrive.setAccessToken(gDrive.refreshToken(gDrive.getRefreshToken()));
+            try {
+                this.playList = gDrive.getFileList(folderPath, REQUIRED_FILE_TYPES);
+                userEntity.setDriveAccessToken(gDrive.getAccessToken());
+                userEntity.update();
+            } catch (Exception e1) {
+                Logger.error("Exception in getCloudPlayList", e1);
             }
         } catch (Exception e){
-            e.printStackTrace();
+            Logger.error("Exception in getCloudPlayList", e);
         }
-        return files;
+        return this.playList;
     }
 
 }

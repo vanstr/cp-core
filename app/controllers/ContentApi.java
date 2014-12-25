@@ -7,6 +7,7 @@ import clouds.GDrive;
 import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.JsonNode;
 import commons.FileFetcher;
+import commons.PlayListHelper;
 import commons.SongMetadataPopulation;
 import commons.SystemProperty;
 import controllers.commons.BaseController;
@@ -48,7 +49,7 @@ public class ContentApi extends BaseController {
                 file = gDrive.getFileLink(fileId);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.error("Exception in getFileSrc", e);
         }
 
         return returnInJsonOk(file);
@@ -57,10 +58,10 @@ public class ContentApi extends BaseController {
     public static Result getPlayList() {
         Logger.debug("getPlayList");
         Long userId = Long.parseLong(session("userId"));
-        List<structure.Song> data = getFiles("/", userId);
-        PlayList playList = SongMetadataPopulation.populate(data, userId);
+        PlayList result = getPlayList("/", userId);
+        SongMetadataPopulation.populate(result, userId);
 
-        return returnInJsonOk(playList);
+        return returnInJsonOk(result);
     }
 
     public static Result getPlayListById(Long playListId) {
@@ -105,7 +106,7 @@ public class ContentApi extends BaseController {
         return returnInJsonOk(songEntity.getId());
     }
 
-    private static List<Song> getFiles(String folderPath, Long userId) {
+    private static PlayList getPlayList(String folderPath, Long userId) {
         FileFetcher dropboxFetcher = new DropboxFileFetcher(folderPath, userId);
         FileFetcher driveFetcher = new DriveFileFetcher(folderPath, userId);
         Thread dropboxThread = new Thread(dropboxFetcher);
@@ -116,18 +117,12 @@ public class ContentApi extends BaseController {
             dropboxThread.join();
             driveThread.join();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Logger.error("Exception in getPlayList", e);
         }
 
-        List<structure.Song> files = new ArrayList<structure.Song>();
-        if (dropboxFetcher.getFiles() != null) {
-            files.addAll(dropboxFetcher.getFiles());
-        }
-        if (driveFetcher.getFiles() != null) {
-            files.addAll(driveFetcher.getFiles());
-        }
+        PlayList playList = PlayListHelper.mergePlayLists(dropboxFetcher.getPlayList(), driveFetcher.getPlayList());
 
-        return files;
+        return playList;
     }
 
 

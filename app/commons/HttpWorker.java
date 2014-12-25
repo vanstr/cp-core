@@ -11,6 +11,7 @@ import play.Logger;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Map;
@@ -45,9 +46,8 @@ public class HttpWorker {
             wr.close();
 
             if (con.getResponseCode() == 401) {
-                throw new UnauthorizedAccessException("401");
-            }
-            else if (con.getResponseCode() < 200 || con.getResponseCode() >= 300) {
+                throw new UnauthorizedAccessException();
+            } else if (con.getResponseCode() < 200 || con.getResponseCode() >= 300) {
                 return null;
             }
 
@@ -61,9 +61,8 @@ public class HttpWorker {
             }
             in.close();
             object = new JSONObject(response.toString());
-        }
-        catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            Logger.error("Exception in sendPostRequest", e);
         }
         return object;
     }
@@ -76,7 +75,7 @@ public class HttpWorker {
         try {
             HttpResponse response = client.execute(request);
             if (response.getStatusLine().getStatusCode() == 401) {
-                throw new UnauthorizedAccessException("401");
+                throw new UnauthorizedAccessException();
             }
             else if (response.getStatusLine().getStatusCode() < 200 || response.getStatusLine().getStatusCode() >= 300) {
                 return null;
@@ -91,8 +90,7 @@ public class HttpWorker {
             }
             rd.close();
             object = new JSONObject(result.toString());
-        }
-        catch (Exception e) {
+        } catch (IOException e) {
             Logger.error("Exception:" + e);
         }
         return object;

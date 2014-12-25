@@ -13,7 +13,6 @@ public class BaseController extends Controller {
         return session().get("userId") != null && !session().get("userId").isEmpty();
     }
 
-
     public static Result returnOk(String callback, JsonNode jsonOutput) {
         if (callback == null) {
             return ok(jsonOutput);

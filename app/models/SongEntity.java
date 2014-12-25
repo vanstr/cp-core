@@ -279,34 +279,13 @@ public class SongEntity extends Model implements Serializable {
 
         SongEntity that = (SongEntity) o;
 
-        if (cloudId != that.cloudId) {
+        if (!fileId.equals(that.fileId)) {
             return false;
         }
-        if (fileSize != that.fileSize) {
+        if (!cloudId.equals(that.cloudId)) {
             return false;
         }
-        if (id != that.id) {
-            return false;
-        }
-        if (metadataLengthSeconds != that.metadataLengthSeconds) {
-            return false;
-        }
-        if (fileName != null ? !fileName.equals(that.fileName) : that.fileName != null) {
-            return false;
-        }
-        if (metadataAlbum != null ? !metadataAlbum.equals(that.metadataAlbum) : that.metadataAlbum != null) {
-            return false;
-        }
-        if (metadataArtist != null ? !metadataArtist.equals(that.metadataArtist) : that.metadataArtist != null) {
-            return false;
-        }
-        if (metadataGenre != null ? !metadataGenre.equals(that.metadataGenre) : that.metadataGenre != null) {
-            return false;
-        }
-        if (metadataTitle != null ? !metadataTitle.equals(that.metadataTitle) : that.metadataTitle != null) {
-            return false;
-        }
-        if (metadataYear != null ? !metadataYear.equals(that.metadataYear) : that.metadataYear != null) {
+        if (!id.equals(that.id)) {
             return false;
         }
 

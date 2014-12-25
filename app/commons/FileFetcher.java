@@ -1,6 +1,6 @@
 package commons;
 
-import structure.Song;
+import structure.PlayList;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,25 +15,25 @@ import java.util.List;
 //TODO: refactor
 public abstract class FileFetcher implements Runnable{
 
-    public final static List<String> REQUIRED_FILE_TYPES = Arrays.asList("mp3", "wav", "ogg");
+    public static final List<String> REQUIRED_FILE_TYPES = Arrays.asList("mp3", "wav", "ogg");
 
     protected String folderPath;
     protected Long userId;
-    protected List<Song> files;
+    protected PlayList playList;
 
     public FileFetcher(String folderPath, Long userId){
         this.folderPath = folderPath;
         this.userId = userId;
     }
 
-    public List<Song> getFiles() {
-        return files;
+    public PlayList getPlayList() {
+        return playList;
     }
 
     @Override
     public void run(){
-        files = getCloudFiles(folderPath, userId);
+        playList = getCloudPlayList(folderPath, userId);
     }
 
-    public abstract List<Song> getCloudFiles(String folderPath, Long userId);
+    public abstract PlayList getCloudPlayList(String folderPath, Long userId);
 }

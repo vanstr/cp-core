@@ -9,6 +9,7 @@ import commons.CloudFile;
 import commons.SystemProperty;
 import org.json.JSONException;
 import org.json.JSONObject;
+import play.Logger;
 import structure.Song;
 
 import java.util.ArrayList;
@@ -82,9 +83,8 @@ public class Dropbox extends OAuth2Communicator {
         OAuth2UserData oAuth2UserData = null;
         try {
             oAuth2UserData = parseDropboxData(object);
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
+        } catch (JSONException e) {
+            Logger.error("Exception in retrieveAccessToken", e);
         }
         return oAuth2UserData;
     }

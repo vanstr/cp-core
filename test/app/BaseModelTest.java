@@ -103,12 +103,6 @@ public class BaseModelTest {
 
     @AfterClass
     public static void stopApp() {
-        // delete originXXX
-//    originSong.delete();
-
-
-        //   originUser.delete();
-
         Helpers.stop(testServer);
     }
 }

@@ -1,5 +1,6 @@
 package commons;
 
+import play.Logger;
 import play.Play;
 
 import java.io.IOException;
@@ -62,9 +63,8 @@ public class SystemProperty {
             DRIVE_TOKEN_URL = localProperties.getProperty("drive.token.url");
             DRIVE_FILES_URL = localProperties.getProperty("drive.files.url");
             DRIVE_SCOPE = localProperties.getProperty("drive.scope.url");
-        }
-        catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            Logger.error("Exception in fetchProperties", e);
         }
     }
 

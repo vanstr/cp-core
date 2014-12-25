@@ -6,12 +6,15 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.PlayListEntity;
 import models.SongEntity;
-import models.UserEntity;
 import org.junit.Test;
 import play.Logger;
 import play.mvc.Result;
 import play.test.FakeRequest;
 
+import java.util.Arrays;
+
+import static commons.SystemProperty.DRIVE_CLOUD_ID;
+import static commons.SystemProperty.DROPBOX_CLOUD_ID;
 import static junit.framework.TestCase.assertNotNull;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertNull;
@@ -19,16 +22,19 @@ import static org.junit.Assert.assertTrue;
 import static play.mvc.Http.Status.OK;
 import static play.test.Helpers.*;
 
+
 /**
  * Created by alex on 10/1/14.
  */
 public class ContentApiTest extends BaseModelTest {
 
+    private static final String USER_ID = originUserEntity.getId().toString();
     private static PlayListEntity testPlayListEntity = null;
+    private static PlayListEntity playListWithOneSong = null;
     @Test
     public void testGetFileSrc(){
-        FakeRequest request = new FakeRequest("GET", "/api/link?cloudId=1&fileId=/JUnit/music.mp3")
-                .withSession("userId", "1");
+        FakeRequest request = new FakeRequest("GET", "/api/link?cloudId="+DROPBOX_CLOUD_ID+"&fileId=/JUnit/music.mp3")
+                .withSession("userId", USER_ID);
         Result result = route(request);
         assertNotNull(contentAsString(result));
         Logger.debug(contentAsString(result));
@@ -38,7 +44,7 @@ public class ContentApiTest extends BaseModelTest {
     @Test
     public void testGetPlayList(){
         FakeRequest request = new FakeRequest("GET", "/api/playList")
-                .withSession("userId", "1");
+                .withSession("userId", USER_ID);
         Result result = route(request);
         assertNotNull(contentAsString(result));
         Logger.debug(contentAsString(result));
@@ -47,7 +53,7 @@ public class ContentApiTest extends BaseModelTest {
 
     @Test
     public void testAddPlayList(){
-        SongEntity song1 = new SongEntity(originUserEntity, 1L, "/songs/song2.mp3", "song2.mp3");
+        SongEntity song1 = new SongEntity(originUserEntity, DROPBOX_CLOUD_ID, "/songs/song2.mp3", "song2.mp3");
         song1.save();
 
         ObjectNode node = JsonNodeFactory.instance.objectNode();
@@ -55,17 +61,17 @@ public class ContentApiTest extends BaseModelTest {
         node.put("name", "playlist1");
         ObjectNode child1 = JsonNodeFactory.instance.objectNode();
         child1.put("fileId", "/songs/song2.mp3");
-        child1.put("cloudId", 1);
+        child1.put("cloudId", DROPBOX_CLOUD_ID);
         ArrayNode array = JsonNodeFactory.instance.arrayNode();
 
         ObjectNode child2 = JsonNodeFactory.instance.objectNode();
         child2.put("fileId", "Shots.mp3");
-        child2.put("cloudId", 1);
+        child2.put("cloudId", DROPBOX_CLOUD_ID);
 
         ObjectNode child3 = JsonNodeFactory.instance.objectNode();
         child3.put("fileId", "QWERTY123");
         child3.put("fileName", "QWERTY123");
-        child3.put("cloudId", 2);
+        child3.put("cloudId", DRIVE_CLOUD_ID);
         child3.put("url", "QWERTY123");
 
         array.add(child1);
@@ -92,7 +98,7 @@ public class ContentApiTest extends BaseModelTest {
     @Test
     public void testGetPlayListById(){
         FakeRequest request = new FakeRequest("GET", "/api/playList/" + testPlayListEntity.getId())
-                .withSession("userId", originUserEntity.getId().toString());
+                .withSession("userId", USER_ID);
         Result result = route(request);
 
         assertThat(status(result)).isEqualTo(OK);
@@ -109,7 +115,7 @@ public class ContentApiTest extends BaseModelTest {
         playListEntity.addSongEntities(SongEntity.find.all());
         playListEntity.save();
         FakeRequest request = new FakeRequest("GET", "/api/playLists")
-                .withSession("userId", originUserEntity.getId().toString());
+                .withSession("userId", USER_ID);
         Result result = route(request);
 
         assertThat(status(result)).isEqualTo(OK);
@@ -121,11 +127,11 @@ public class ContentApiTest extends BaseModelTest {
     @Test
     public void testSaveSongMetadata(){
         FakeRequest request = new FakeRequest("POST", "/api/saveSongMetadata")
-                .withSession("userId", "1");
+                .withSession("userId", USER_ID);
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         node.put("fileId", "/songs/song1.mp3");
         node.put("fileName", "song1.mp3");
-        node.put("cloudId", 1L);
+        node.put("cloudId", DROPBOX_CLOUD_ID);
         ObjectNode metadataNode = JsonNodeFactory.instance.objectNode();
         metadataNode.put("title", "Song 1");
         metadataNode.put("artist", "Artist 1");
@@ -140,7 +146,7 @@ public class ContentApiTest extends BaseModelTest {
         request.withJsonBody(node);
         Result result = route(request);
         assertThat(status(result)).isEqualTo(OK);
-        SongEntity songEntity = SongEntity.getSongByHash(UserEntity.getUserById(1L), 1L, "/songs/song1.mp3");
+        SongEntity songEntity = SongEntity.getSongByHash(originUserEntity, DROPBOX_CLOUD_ID, "/songs/song1.mp3");
 
         assertThat(songEntity.getMetadataTitle()).isEqualTo("Song 1");
         assertThat(songEntity.getMetadataArtist()).isEqualTo("Artist 1");
@@ -153,49 +159,63 @@ public class ContentApiTest extends BaseModelTest {
 
     @Test
     public void testAddSongToPlayList(){
-        testPlayListEntity = new PlayListEntity();
-        testPlayListEntity.setName("Test PLaylist");
-        testPlayListEntity.setUserEntity(originUserEntity);
-        testPlayListEntity.save();
+        playListWithOneSong = new PlayListEntity();
+        playListWithOneSong.setName("Test PLaylist");
+        playListWithOneSong.setUserEntity(originUserEntity);
+        playListWithOneSong.save();
         FakeRequest request = new FakeRequest("POST", "/api/playListSong")
-                .withSession("userId", "1");
+                .withSession("userId", USER_ID);
         ObjectNode node = JsonNodeFactory.instance.objectNode();
-        node.put("playListId", testPlayListEntity.getId());
+        node.put("playListId", playListWithOneSong.getId());
         ArrayNode songArray = JsonNodeFactory.instance.arrayNode();
         ObjectNode songNode = JsonNodeFactory.instance.objectNode();
         songNode.put("fileId", "/songs/my_song1.mp3");
-        songNode.put("cloudId", 1L);
+        songNode.put("cloudId", DROPBOX_CLOUD_ID);
         songArray.add(songNode);
         node.put("songs", songArray);
         request.withJsonBody(node);
         Result result = route(request);
+        playListWithOneSong.refresh();
         assertThat(status(result)).isEqualTo(OK);
-        assertThat(testPlayListEntity.getSongs().size() > 0);
+        assertThat(playListWithOneSong.getSongs().size() > 0).isTrue();
         Logger.info("Add song to playlist test done");
     }
 
     @Test
     public void testRemoveSongFromPlayList(){
+        PlayListEntity playListEntity = new PlayListEntity();
+        SongEntity song1 = new SongEntity();
+        song1.setUser(originUserEntity);
+        song1.setCloudId(DROPBOX_CLOUD_ID);
+        song1.setFileId("songToRemoveFromPlayList.mp3");
+        song1.setFileName("songToRemoveFromPlayList.mp3");
+        song1.save();
+        playListEntity.setName("Test PLaylist");
+        playListEntity.setUserEntity(originUserEntity);
+        playListEntity.addSongEntities(Arrays.asList(song1));
+        playListEntity.save();
+
         FakeRequest request = new FakeRequest("DELETE", "/api/playListSong")
-                .withSession("userId", "1");
+                .withSession("userId", USER_ID);
         ObjectNode node = JsonNodeFactory.instance.objectNode();
-        node.put("playListId", testPlayListEntity.getId());
-        node.put("fileId", "/songs/my_song1.mp3");
-        node.put("cloudId", 1L);
+        node.put("playListId", playListEntity.getId());
+        node.put("fileId", "songToRemoveFromPlayList.mp3");
+        node.put("cloudId", DROPBOX_CLOUD_ID);
         request.withJsonBody(node);
         Result result = route(request);
+        playListEntity.refresh();
         assertThat(status(result)).isEqualTo(OK);
-        assertThat(testPlayListEntity.getSongs().size() == 0);
+        assertThat(playListEntity.getSongs().size() == 0).isTrue();
         Logger.info("Remove song from playlist test done");
     }
 
     @Test
     public void testDeletePlayList(){
-        testPlayListEntity = new PlayListEntity();
-        testPlayListEntity.setName("name");
-        testPlayListEntity.setUserEntity(originUserEntity);
-        testPlayListEntity.save();
-        Long playListId = testPlayListEntity.getId();
+        PlayListEntity playListEntity = new PlayListEntity();
+        playListEntity.setName("name");
+        playListEntity.setUserEntity(originUserEntity);
+        playListEntity.save();
+        Long playListId = playListEntity.getId();
         FakeRequest request = new FakeRequest("DELETE", "/api/playList/" + playListId)
                 .withSession("userId", originUserEntity.getId().toString());
 

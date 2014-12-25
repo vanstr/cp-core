@@ -6,6 +6,7 @@ import models.SongEntity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 public class PlayList implements Serializable{
     private long id;
     private String name;
-    private ArrayList<Song> songs;
+    private List<Song> songs;
 
     public PlayList(){
         this.songs = new ArrayList<Song>();
@@ -55,15 +56,20 @@ public class PlayList implements Serializable{
         this.name = name;
     }
 
-    public ArrayList<Song> getSongs() {
+    public List<Song> getSongs() {
         return songs;
     }
 
-    public void setSongs(ArrayList<Song> songs) {
+    public void setSongs(List<Song> songs) {
         this.songs = songs;
     }
 
     public void add(Song song){
         this.songs.add(song);
     }
+
+    public void addSongs(List<Song> newSongs){
+        this.songs.addAll(newSongs);
+    }
+
 }
