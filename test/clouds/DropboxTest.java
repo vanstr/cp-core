@@ -1,6 +1,7 @@
 package clouds;
 
 import app.BaseModelTest;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import play.Logger;
@@ -11,6 +12,7 @@ import java.util.List;
 
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 
@@ -52,14 +54,13 @@ public class DropboxTest extends BaseModelTest {
     public void testGetFileLink() {
 
         // 1. file exists
-        String res = null; // http://dl.dropboxusercontent.com/1/view/n8cbbuw08p669ku/JUnit/music.mp3
-        try {
-            res = dropAuth.getFileLink(CORRECT_FILE_DROPBOX);
-        } catch (Exception e) {
-            fail("File not found" + e);
-        }
-        if (!res.endsWith(CORRECT_FILE_DROPBOX)) {
-            fail("Bad file link:" + res);
+        // http://dl.dropboxusercontent.com/1/view/n8cbbuw08p669ku/JUnit/music.mp3
+        String fileLink = dropAuth.getFileLink(CORRECT_FILE_DROPBOX);
+        assertNotNull("File not found", fileLink);
+        assertTrue("File is not correct", fileLink.contains(CORRECT_FILE_DROPBOX));
+
+        if (!fileLink.endsWith(CORRECT_FILE_DROPBOX)) {
+            fail("Bad file link:" + fileLink);
         }
 
         // 2. file doesnt exist
@@ -85,8 +86,7 @@ public class DropboxTest extends BaseModelTest {
         List<Song> res5 = null;
         try {
             res5 = dropUnAuth.getFileList("/", fileTypes);
-        }
-        catch (Exception ignored) {
+        } catch (Exception ignored) {
             Logger.debug("OK, Exception catched");
         }
         assertNull("Exception", res5);
@@ -95,6 +95,7 @@ public class DropboxTest extends BaseModelTest {
         List<Song> res = null;
         try {
             res = dropAuth.getFileList("/", fileTypes);
+            Assert.assertTrue(!res.isEmpty());
         } catch (Exception e) {
             fail("Exception" + e);
         }

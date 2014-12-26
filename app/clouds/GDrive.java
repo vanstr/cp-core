@@ -9,19 +9,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import play.Logger;
-import structure.PlayList;
 import structure.Song;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
-public class GDrive extends OAuth2Communicator {
+public class GDrive extends OAuth2Communicator implements Cloud {
 
     private static final String GRANT_TYPE_REFRESH = "refresh_token";
     private static final String GRANT_TYPE_AUTHORIZATION = "authorization_code";
@@ -66,35 +62,36 @@ public class GDrive extends OAuth2Communicator {
         this.tokenExpires = tokenExpires;
     }
 
-    public PlayList getFileList(String folderPath, List<String> fileTypes) {
-        PlayList playList = null;
+    @Override
+    public List<Song> getFileList(String folderPath, List<String> requestedFileTypes) {
+        List<Song> files = new ArrayList<Song>();
         try {
-            playList = retrieveAllFiles();
+            files = retrieveAllFiles();
         } catch (IOException e) {
             Logger.error("Exception in getFileList " + e.getMessage());
         }
 
-        Iterator<Song> i = playList.getSongs().iterator();
+        Iterator<Song> i = files.iterator();
         while (i.hasNext()) {
             Song track = i.next();
 
-            if (!CloudFile.checkFileType(track.getFileName(), fileTypes)) {
+            if (!CloudFile.checkFileType(track.getFileName(), requestedFileTypes)) {
                 i.remove();
             }
         }
-        return playList;
+        return files;
     }
 
 
-    public PlayList retrieveAllFiles() throws IOException, JSONException {
+    private List<Song> retrieveAllFiles() throws IOException, JSONException {
 
-        PlayList playList = new PlayList();
         String pageToken = "";
+        List<Song> files = new ArrayList<Song>();
         do {
             JSONObject object = getJsonObjectResponse(pageToken);
-            PlayList pagePlayList = getSongsFromJsonObject(object);
+            List<Song> chunkOfFiles = getSongsFromJsonObject(object);
 
-            playList.addSongs(pagePlayList.getSongs());
+            files.addAll(chunkOfFiles);
 
             if (object.has("nextPageToken")) {
                 pageToken = object.getString("nextPageToken");
@@ -103,7 +100,7 @@ public class GDrive extends OAuth2Communicator {
             }
         } while (hasNextPage(pageToken));
 
-        return playList;
+        return files;
     }
 
 
@@ -119,11 +116,11 @@ public class GDrive extends OAuth2Communicator {
         return pageToken != null && !"".equals(pageToken);
     }
 
-    private PlayList getSongsFromJsonObject(JSONObject object) {
+    private List<Song> getSongsFromJsonObject(JSONObject object) {
 
-        PlayList playList = new PlayList();
+        List<Song> files = new ArrayList<Song>();
         if (object == null) {
-            return playList;
+            return null;
         }
         JSONArray fileArray = object.getJSONArray("items");
         Logger.debug("retrieved files size: " + fileArray.length());
@@ -138,10 +135,10 @@ public class GDrive extends OAuth2Communicator {
                         obj.getString("downloadUrl") + "&oauth_token=" + this.accessToken,
                         this.tokenExpires
                 );
-                playList.add(song);
+                files.add(song);
             }
         }
-        return playList;
+        return files;
     }
 
     private boolean isCorrectJson(JSONObject obj) {
@@ -151,14 +148,13 @@ public class GDrive extends OAuth2Communicator {
                 && obj.has("downloadUrl");
     }
 
+    @Override
     public String getFileLink(String fileId) {
         JSONObject object = HttpWorker.sendGetRequest(SystemProperty.DRIVE_FILES_URL
                 + fileId + "?oauth_token=" + this.accessToken);
         String fileSrc = null;
         try {
-            fileSrc = object.getString("downloadUrl")
-                    + "&oauth_token="
-                    + this.accessToken;
+            fileSrc = object.getString("downloadUrl") + "&oauth_token=" + this.accessToken;
         } catch (JSONException e) {
             Logger.error("Exception in getFileLink", e);
         }

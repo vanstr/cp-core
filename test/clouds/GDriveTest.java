@@ -1,7 +1,6 @@
 package clouds;
 
 import app.BaseModelTest;
-import commons.SystemProperty;
 import models.UserEntity;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -34,7 +33,7 @@ public class GDriveTest extends BaseModelTest {
     @BeforeClass
     public static void method() {
         try {
-            UserEntity userEntity = UserEntity.getUserById(SystemProperty.DRIVE_CLOUD_ID);
+            UserEntity userEntity = UserEntity.getUserById(GDRIVE_USER_ID);
             gDrive = new GDrive(userEntity.getDriveAccessToken(), userEntity.getDriveRefreshToken());
             String newToken = gDrive.refreshToken(userEntity.getDriveRefreshToken());
             gDrive.setAccessToken(newToken);
@@ -52,7 +51,7 @@ public class GDriveTest extends BaseModelTest {
         List<String> fileTypes = new ArrayList<String>();
         fileTypes.add("mp3");
         try {
-            List<Song> songList = gDrive.getFileList("/", fileTypes).getSongs();
+            List<Song> songList = gDrive.getFileList("/", fileTypes);
             assertNotNull(songList);
             boolean isFilePresent = false;
             for (Song song : songList) {
@@ -69,14 +68,10 @@ public class GDriveTest extends BaseModelTest {
 
     @Test
     public void testGetFileLink() {
-        try {
-            String correctLink = gDrive.getFileLink(FILE_ID);
-            assertNotNull("File not found", correctLink);
-            assertTrue("File is not correct", correctLink.contains(FILE_ID));
-        } catch (Exception e) {
-            Logger.warn("getFileLink error", e);
-            fail("Error getting file link");
-        }
+
+        String correctLink = gDrive.getFileLink(FILE_ID);
+        assertNotNull("File not found", correctLink);
+        assertTrue("File is not correct", correctLink.contains(FILE_ID));
 
         String incorrectLink = null;
         try {

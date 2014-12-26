@@ -20,21 +20,22 @@ public class DriveFileFetcher extends FileFetcher{
         super(folderPath, userId);
     }
 
+    @Override
     public PlayList getCloudPlayList(String folderPath, Long userId){
         GDrive gDrive = null;
-
+        playList = new PlayList();
         UserEntity userEntity = UserEntity.getUserById(userId);
         try{
             String driveAccessToken = userEntity.getDriveAccessToken();
             String driveRefreshToken = userEntity.getDriveRefreshToken();
             if(driveAccessToken != null && driveRefreshToken != null){
                 gDrive = new GDrive(driveAccessToken, driveRefreshToken);
-                this.playList = gDrive.getFileList(folderPath, REQUIRED_FILE_TYPES);
+                playList.setSongs(gDrive.getFileList(folderPath, REQUIRED_FILE_TYPES));
             }
         } catch (UnauthorizedAccessException e) {
             gDrive.setAccessToken(gDrive.refreshToken(gDrive.getRefreshToken()));
             try {
-                this.playList = gDrive.getFileList(folderPath, REQUIRED_FILE_TYPES);
+                playList.setSongs(gDrive.getFileList(folderPath, REQUIRED_FILE_TYPES));
                 userEntity.setDriveAccessToken(gDrive.getAccessToken());
                 userEntity.update();
             } catch (Exception e1) {
@@ -43,7 +44,7 @@ public class DriveFileFetcher extends FileFetcher{
         } catch (Exception e){
             Logger.error("Exception in getCloudPlayList", e);
         }
-        return this.playList;
+        return playList;
     }
 
 }

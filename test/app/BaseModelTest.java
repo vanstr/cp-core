@@ -23,7 +23,10 @@ public class BaseModelTest {
     public static TestServer testServer;
 
     public static UserEntity originUserEntity = null;
+    public static UserEntity gdriveUserEntity = null;
     public static SongEntity originSongEntity = null;
+
+    public static final Long GDRIVE_USER_ID = 2l;
 
     @BeforeClass
     public static void startApp() {
@@ -71,7 +74,7 @@ public class BaseModelTest {
     private static void createUsers() {
 
         UserEntity gDriveUser = new UserEntity();
-        gDriveUser.setId(2L);
+        gDriveUser.setId(GDRIVE_USER_ID);
         gDriveUser.setLogin("gdrive");
         gDriveUser.setPassword("123456");
         gDriveUser.setDriveAccessToken("ya29.hADeLWkw9ImDLr7p7hivANfWYhI8fJcfNBESB9pBJ9y3S5VyhyuJdQLY");

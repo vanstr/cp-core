@@ -2,10 +2,7 @@ package clouds;
 
 import clouds.oauth.OAuth2Communicator;
 import clouds.oauth.OAuth2UserData;
-import com.dropbox.core.DbxClient;
-import com.dropbox.core.DbxEntry;
-import com.dropbox.core.DbxRequestConfig;
-import com.dropbox.core.DbxUrlWithExpiration;
+import com.dropbox.core.*;
 import commons.CloudFile;
 import commons.SystemProperty;
 import org.json.JSONException;
@@ -17,59 +14,65 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class Dropbox extends OAuth2Communicator {
+public class Dropbox extends OAuth2Communicator implements Cloud {
 
     private static final String GRANT_TYPE_AUTHORIZATION = "authorization_code";
 
     private DbxClient client;
 
-    public Dropbox(){}
+    public Dropbox() {
+    }
 
     public Dropbox(String accessToken) throws Exception {
         DbxRequestConfig config = new DbxRequestConfig("Cloud_Player", Locale.getDefault().toString());
         this.client = new DbxClient(config, accessToken);
     }
 
-    /**
-     * Get file link for downloading
-     * @return  file download link
-     */
-    public String getFileLink(String filePath) throws Exception {
-        return client.createTemporaryDirectUrl(filePath).url;
+    @Override
+    public String getFileLink(String filePath) {
+        String res = null;
+        try {
+            res = client.createTemporaryDirectUrl(filePath).url;
+        } catch (DbxException e) {
+            Logger.error("Exception in getFileLink", e);
+        }
+        return res;
     }
 
-    /**
-     * @param folderPath - in which folder look up
-     * @param requestedFileTypes  - if file type == NULL return all list, ex: folder, files, mp3, txt
-     *
-     * @return    array of file
-     */
-    public List<Song> getFileList(String folderPath, List<String> requestedFileTypes) throws Exception {
 
-        ArrayList<Song> files = new ArrayList<Song>();
+    @Override
+    public List<Song> getFileList(String folderPath, List<String> requestedFileTypes) {
 
-        for(String requestedType : requestedFileTypes){
-            List<DbxEntry> entryList = client.searchFileAndFolderNames(folderPath, "." + requestedType);
-            for(DbxEntry entry : entryList){
+        List<Song> files = new ArrayList<Song>();
 
-                if(entry.isFile() && CloudFile.checkFileType(entry.asFile().name, requestedFileTypes)){
-                    DbxUrlWithExpiration urlWithExpiration = client.createTemporaryDirectUrl(entry.path);
+        try {
+            for (String requestedType : requestedFileTypes) {
 
-                    files.add(new Song( SystemProperty.DROPBOX_CLOUD_ID,
-                                    entry.path,
-                                    getFileNameFromFilePath(entry.path),
-                                    urlWithExpiration.url,
-                                    urlWithExpiration.expires.getTime())
-                    );
+                List<DbxEntry> dbxEntries = client.searchFileAndFolderNames(folderPath, "." + requestedType);
+
+                for (DbxEntry entry : dbxEntries) {
+
+                    if (entry.isFile() && CloudFile.checkFileType(entry.asFile().name, requestedFileTypes)) {
+                        DbxUrlWithExpiration urlWithExpiration = client.createTemporaryDirectUrl(entry.path);
+
+                        files.add(new Song(SystemProperty.DROPBOX_CLOUD_ID,
+                                        entry.path,
+                                        getFileNameFromFilePath(entry.path),
+                                        urlWithExpiration.url,
+                                        urlWithExpiration.expires.getTime())
+                        );
+                    }
                 }
             }
+        } catch (DbxException e) {
+            Logger.error("Exception in getFileList", e);
         }
 
         return files;
     }
 
     @Override
-    public OAuth2UserData retrieveAccessToken(String code, String redirectUrl ){
+    public OAuth2UserData retrieveAccessToken(String code, String redirectUrl) {
         JSONObject object = super.retrieveAccessToken(code, SystemProperty.DROPBOX_APP_KEY,
                 SystemProperty.DROPBOX_APP_SECRET, GRANT_TYPE_AUTHORIZATION,
                 redirectUrl, null, SystemProperty.DROPBOX_TOKEN_URL);
@@ -94,7 +97,7 @@ public class Dropbox extends OAuth2Communicator {
         return oAuth2UserData;
     }
 
-    private String getFileNameFromFilePath(String filePath){
+    private String getFileNameFromFilePath(String filePath) {
         return filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length());
     }
 }
