@@ -1,6 +1,7 @@
 package clouds;
 
 import clouds.oauth.OAuth2Communicator;
+import clouds.oauth.OAuth2UserData;
 import commons.CloudFile;
 import commons.HttpWorker;
 import commons.SystemProperty;

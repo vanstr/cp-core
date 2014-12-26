@@ -1,6 +1,7 @@
 package clouds;
 
 import clouds.oauth.OAuth2Communicator;
+import clouds.oauth.OAuth2UserData;
 import com.dropbox.core.DbxClient;
 import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxRequestConfig;
@@ -16,24 +17,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * User: vanstr
- * Date: 13.29.6
- * Time: 20:55
- * Class represent basic cloud.Dropbox API functionality
- * Like: getFileList, getFileLink
- */
 public class Dropbox extends OAuth2Communicator {
 
     private static final String GRANT_TYPE_AUTHORIZATION = "authorization_code";
 
-    private DbxRequestConfig config = new DbxRequestConfig(
-            "Cloud_Player", Locale.getDefault().toString());
     private DbxClient client;
 
     public Dropbox(){}
 
     public Dropbox(String accessToken) throws Exception {
+        DbxRequestConfig config = new DbxRequestConfig("Cloud_Player", Locale.getDefault().toString());
         this.client = new DbxClient(config, accessToken);
     }
 

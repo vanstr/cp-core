@@ -1,6 +1,5 @@
 package clouds.oauth;
 
-import clouds.OAuth2UserData;
 import commons.HttpWorker;
 import org.json.JSONObject;
 

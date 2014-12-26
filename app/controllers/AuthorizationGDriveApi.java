@@ -1,7 +1,7 @@
 package controllers;
 
 import clouds.GDrive;
-import clouds.OAuth2UserData;
+import clouds.oauth.OAuth2UserData;
 import commons.SystemProperty;
 import controllers.commons.BaseController;
 import controllers.commons.Secured;

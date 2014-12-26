@@ -1,4 +1,4 @@
-package clouds;
+package clouds.oauth;
 
 /**
  * Created with IntelliJ IDEA.
