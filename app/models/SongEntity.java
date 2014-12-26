@@ -62,10 +62,9 @@ public class SongEntity extends Model implements Serializable {
 
     public SongEntity(){}
 
-    public SongEntity(Song song){
-        this.setCloudId(song.getCloudId());
-        this.setFileId(song.getFileId());
-        this.setFileName(song.getFileName());
+    public SongEntity(Song song, UserEntity user){
+        this(user, song.getCloudId(), song.getFileId(), song.getFileName());
+
         this.setFileSize(song.getFileSize());
         this.setMetadata(song);
     }
@@ -230,6 +229,10 @@ public class SongEntity extends Model implements Serializable {
         SongEntity songEntity = getSongByFields(fieldMap);
 
         return songEntity;
+    }
+
+    public static SongEntity getSongByHash(UserEntity userEntity, Song song) {
+        return getSongByHash(userEntity, song.getCloudId(), song.getFileId());
     }
 
     public static List<SongEntity> getSongsByMultipleFields(List<Map<String, Object>> fields){

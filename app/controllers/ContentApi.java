@@ -22,14 +22,7 @@ import play.mvc.Security;
 import structure.PlayList;
 import structure.Song;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Security.Authenticated(Secured.class)
 public class ContentApi extends BaseController {
@@ -90,12 +83,11 @@ public class ContentApi extends BaseController {
 
         // get song by id
         Logger.debug("name: " + song.getFileName() + "id: " + song.getFileId() + " cId: " + song.getCloudId() + "userId" + userEntity.getId());
-        SongEntity songEntity = SongEntity.getSongByHash(userEntity, song.getCloudId(), song.getFileId());
+        SongEntity songEntity = SongEntity.getSongByHash(userEntity, song);
 
         if (songEntity == null) {
             Logger.debug("Create new SongEntry with metadata");
-            songEntity = new SongEntity(song);
-            songEntity.setUser(userEntity);
+            songEntity = new SongEntity(song, userEntity);
             songEntity.save();
         } else {
             Logger.debug("Update metadata of existing new SongEntry");
@@ -136,17 +128,13 @@ public class ContentApi extends BaseController {
 
         Set<SongEntity> songs = new HashSet<SongEntity>();
         if(playList.getSongs() != null){
-            List<Song> songsToAdd = new ArrayList<Song>(playList.getSongs());
-
-            songs.addAll(addExistingSongs(songsToAdd, user));
-            songs.addAll(addNewSongs(songsToAdd, user));
+            Set<SongEntity> songEntities = getSongEntitiesFromSongs(playList.getSongs(), user);
+            songs.addAll(songEntities);
         }
 
         PlayListEntity playListEntity = new PlayListEntity();
         playListEntity.setName(playList.getName());
         playListEntity.setUserEntity(user);
-        playListEntity.setCreated(new Timestamp(System.currentTimeMillis()));
-        playListEntity.setUpdated(new Timestamp(System.currentTimeMillis()));
         playListEntity.addSongEntities(songs);
 
         playListEntity.save();
@@ -172,7 +160,7 @@ public class ContentApi extends BaseController {
         fields.put("id", playListId);
         fields.put("user_id", Long.parseLong(session("userId")));
         List<PlayListEntity> list = PlayListEntity.getPlayListsByFields(fields);
-        if(fields != null && !fields.isEmpty() && !list.isEmpty()) {
+        if(!fields.isEmpty() && !list.isEmpty()) {
             PlayListEntity playListEntity = list.get(0);
             Ebean.delete(playListEntity);
         } else {
@@ -230,29 +218,14 @@ public class ContentApi extends BaseController {
         return badRequest();
     }
 
-    private static Set<SongEntity> addExistingSongs(List<Song> songList, UserEntity user){
+    private static Set<SongEntity> getSongEntitiesFromSongs(List<Song> songList, UserEntity user){
         Set<SongEntity> songs = new HashSet<SongEntity>();
-        Iterator<Song> iterator = songList.iterator();
-        while(iterator.hasNext()){
-            Song currentSong = iterator.next();
-            SongEntity songEntity = SongEntity.getSongByHash(user, currentSong.getCloudId(),
-                    currentSong.getFileId());
-            if(songEntity != null){
-                songs.add(songEntity);
-                iterator.remove();
+        for (Song currentSong : songList) {
+            SongEntity songEntity = SongEntity.getSongByHash(user, currentSong);
+            if (songEntity == null) {
+                songEntity = new SongEntity(currentSong, user);
+                songEntity.save();
             }
-        }
-
-        return songs;
-    }
-
-    private static Set<SongEntity> addNewSongs(List<Song> songList, UserEntity user){
-        Set<SongEntity> songs = new HashSet<SongEntity>();
-
-        for(int i = 0; i < songList.size(); i++){
-            SongEntity songEntity = new SongEntity(songList.get(i));
-            songEntity.setUser(user);
-            songEntity.save();
             songs.add(songEntity);
         }
 

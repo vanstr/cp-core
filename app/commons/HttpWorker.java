@@ -68,16 +68,15 @@ public class HttpWorker {
     }
 
     public static JSONObject sendGetRequest(String url) {
-        HttpClient client = new DefaultHttpClient();
         HttpGet request = new HttpGet(url);
 
         JSONObject object = null;
         try {
+            HttpClient client = new DefaultHttpClient();
             HttpResponse response = client.execute(request);
             if (response.getStatusLine().getStatusCode() == 401) {
                 throw new UnauthorizedAccessException();
-            }
-            else if (response.getStatusLine().getStatusCode() < 200 || response.getStatusLine().getStatusCode() >= 300) {
+            } else if (response.getStatusLine().getStatusCode() < 200 || response.getStatusLine().getStatusCode() >= 300) {
                 return null;
             }
             BufferedReader rd = new BufferedReader(

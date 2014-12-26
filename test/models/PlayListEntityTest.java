@@ -3,7 +3,6 @@ package models;
 import app.BaseModelTest;
 import org.junit.Test;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +22,6 @@ public class PlayListEntityTest extends BaseModelTest {
         List<SongEntity> songEntityList = new ArrayList<SongEntity>();
         songEntityList.add(originSongEntity);
         playListEntity.addSongEntities(songEntityList);
-        playListEntity.setCreated(new Timestamp(System.currentTimeMillis()));
-        playListEntity.setUpdated(new Timestamp(System.currentTimeMillis()));
         playListEntity.save();
 
         assertFalse(PlayListEntity.find.all().isEmpty());

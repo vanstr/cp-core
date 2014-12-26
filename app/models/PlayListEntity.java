@@ -115,7 +115,7 @@ public class PlayListEntity extends Model implements Serializable {
 
     public static List<PlayListEntity> getPlayListsByFields(Map<String, Object> fields) {
         List<PlayListEntity> songEntities = null;
-        if (fields != null && fields.size() > 0) {
+        if (fields != null && !fields.isEmpty()) {
             songEntities = find.where().allEq(fields).findList();
         }
         return songEntities;
@@ -123,5 +123,10 @@ public class PlayListEntity extends Model implements Serializable {
 
     public static void deletePlayListById(Long playListId){
         Ebean.delete(PlayListEntity.find.byId(playListId));
+    }
+
+    public PlayListEntity(){
+        setCreated(new Timestamp(System.currentTimeMillis()));
+        setUpdated(new Timestamp(System.currentTimeMillis()));
     }
 }

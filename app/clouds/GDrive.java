@@ -197,7 +197,7 @@ public class GDrive extends OAuth2Communicator {
         return accessToken;
     }
 
-    public static OAuth2UserData parseDriveData(JSONObject jsonObject) throws JSONException {
+    private static OAuth2UserData parseDriveData(JSONObject jsonObject) throws JSONException {
         OAuth2UserData oAuth2UserData = new OAuth2UserData();
         oAuth2UserData.setAccessToken(jsonObject.getString("access_token"));
         oAuth2UserData.setRefreshToken(jsonObject.getString("refresh_token"));
