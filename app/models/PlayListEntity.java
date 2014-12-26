@@ -1,25 +1,14 @@
 package models;
 
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.ExpressionList;
+import play.Logger;
 import play.db.ebean.Model;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by alex on 9/23/14.
@@ -122,7 +111,17 @@ public class PlayListEntity extends Model implements Serializable {
     }
 
     public static void deletePlayListById(Long playListId){
-        Ebean.delete(PlayListEntity.find.byId(playListId));
+        Ebean.delete(find.byId(playListId));
+    }
+
+    public static void deletePlayListsByUserId(Long userId){
+        ExpressionList<PlayListEntity> userPlayListsExpression = find.where().eq("user_id", userId);
+        List<PlayListEntity> userEntity1 = userPlayListsExpression.findList();
+        Logger.debug("before delete: " + userEntity1.size());
+        Ebean.delete(userEntity1);
+
+        List<PlayListEntity> userEntity2 = userPlayListsExpression.findList();
+        Logger.debug("after delete: " + userEntity2.size());
     }
 
     public PlayListEntity(){

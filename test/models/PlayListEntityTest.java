@@ -26,4 +26,13 @@ public class PlayListEntityTest extends BaseModelTest {
 
         assertFalse(PlayListEntity.find.all().isEmpty());
     }
+
+    //TODO
+    @Test
+    public void testDeleteUserPlaylists(){
+        // Create two playlists for user
+        // call method
+        // check that user playlist count is 0
+    }
+
 }

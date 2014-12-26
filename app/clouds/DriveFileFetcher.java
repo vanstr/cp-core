@@ -6,15 +6,7 @@ import models.UserEntity;
 import play.Logger;
 import structure.PlayList;
 
-/**
- * Created with IntelliJ IDEA.
- * User: vanstr
- * Date: 14.25.2
- * Time: 19:23
- * To change this template use File | Settings | File Templates.
- */
 public class DriveFileFetcher extends FileFetcher{
-
 
     public DriveFileFetcher(String folderPath, Long userId) {
         super(folderPath, userId);

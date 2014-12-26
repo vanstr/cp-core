@@ -14,15 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-/**
- * Created with IntelliJ IDEA.
- * User: vanstr
- * Date: 13.7.7
- * Time: 16:24
- * To change this template use File | Settings | File Templates.
- */
-
 @Entity
 @Table(name = "user")
 public class UserEntity extends Model implements Serializable {
@@ -36,6 +27,13 @@ public class UserEntity extends Model implements Serializable {
     @JsonIgnore
     @Column(columnDefinition="varchar(255)")
     private String password;
+
+
+    @Column(columnDefinition="varchar(255)")
+    private String name = "Anonymous";
+
+    @Column(columnDefinition="varchar(255)")
+    private String email;
 
     @JsonIgnore
     private String dropboxAccessKey;
@@ -85,6 +83,23 @@ public class UserEntity extends Model implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getDropboxAccessKey() {
@@ -222,4 +237,5 @@ public class UserEntity extends Model implements Serializable {
         result = 31 * result + (login != null ? login.hashCode() : 0);
         return result;
     }
+
 }

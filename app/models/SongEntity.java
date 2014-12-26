@@ -1,9 +1,11 @@
 package models;
 
+import com.avaje.ebean.Ebean;
 import com.avaje.ebean.ExpressionList;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import play.Logger;
 import play.db.ebean.Model;
 import structure.Song;
 import structure.SongMetadata;
@@ -254,6 +256,16 @@ public class SongEntity extends Model implements Serializable {
             this.setMetadataYear(metadata.getYear());
             this.setMetadataLengthSeconds(metadata.getLengthSeconds());
         }
+    }
+
+    public static void deleteSongsByUserId(Long userId){
+        ExpressionList<SongEntity> userSongs = find.where().eq("user_id", userId);
+        List<SongEntity> userEntity1 = userSongs.findList();
+        Logger.debug("before delete: " + userEntity1.size());
+        Ebean.delete(userEntity1);
+
+        List<SongEntity> userEntity2 = userSongs.findList();
+        Logger.debug("after delete: " + userEntity2.size());
     }
 
     @Override

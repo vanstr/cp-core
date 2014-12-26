@@ -28,7 +28,6 @@ import static play.test.Helpers.*;
  */
 public class ContentApiTest extends BaseModelTest {
 
-    private static final String USER_ID = originUserEntity.getId().toString();
     private static PlayListEntity testPlayListEntity = null;
     private static PlayListEntity playListWithOneSong = null;
     @Test
