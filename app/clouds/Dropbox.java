@@ -7,8 +7,10 @@ import play.Logger;
 import structures.OAuth2UserData;
 import structures.Song;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.BufferedInputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -67,26 +69,39 @@ public class Dropbox implements Cloud {
         return files;
     }
 
+    private int getRemoteFileSize(URL link){
+        int size = 0;
+        try {
+            URLConnection conn = link.openConnection();
+            size = conn.getContentLength();
+            if(size < 0) {
+                Logger.debug("Could not determine file size.");
+            } else {
+                Logger.debug(link.getFile() + " size: " + size);
+            }
+            conn.getInputStream().close();
+        }
+        catch(Exception e) {
+            Logger.error("Error " + e);
+        }
+        return size;
+
+    }
+
     @Override
-    public Boolean uploadFile(String fullDestPath, File inputFile) {
-        inputFile = new File("working-draft.txt");
-        fullDestPath = "/magnum-opus.txt";
+    public Boolean uploadFileByUrl(String fullDestPath, URL link) {
 
         Boolean res = false;
-        FileInputStream inputStream = null;
+
         try {
-            inputStream = new FileInputStream(inputFile);
-            DbxEntry.File uploadedFile = client.uploadFile(fullDestPath, DbxWriteMode.add(), inputFile.length(), inputStream);
+            InputStream inputStream = new BufferedInputStream(link.openStream());
+            int fileSize = getRemoteFileSize(link);
+
+            DbxEntry.File uploadedFile = client.uploadFile(fullDestPath, DbxWriteMode.add(), fileSize, inputStream);
             Logger.debug("Uploaded: " + uploadedFile.toString());
             res = true;
         } catch (Exception e) {
-            Logger.error("Error in uploadFile: " + e);
-        } finally {
-            try {
-                inputStream.close();
-            } catch (Exception e) {
-                Logger.error("Error close inputStream in uploadFile: " + e);
-            }
+            Logger.error("Error in uploadFileByUrl: " + e);
         }
         return res;
     }

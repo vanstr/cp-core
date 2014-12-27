@@ -1,6 +1,5 @@
 package clouds;
 
-import structures.OAuth2UserData;
 import commons.CloudFile;
 import commons.HttpWorker;
 import commons.SystemProperty;
@@ -8,11 +7,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import play.Logger;
+import structures.OAuth2UserData;
 import structures.Song;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.*;
 
@@ -72,7 +72,7 @@ public class GDrive implements Cloud {
     }
 
     @Override
-    public Boolean uploadFile(String fullDestPath, File inputFile) {
+    public Boolean uploadFileByUrl(String fullDestPath, URL link) {
         return null;
     }
 

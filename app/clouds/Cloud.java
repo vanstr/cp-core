@@ -3,7 +3,7 @@ package clouds;
 import structures.OAuth2UserData;
 import structures.Song;
 
-import java.io.File;
+import java.net.URL;
 import java.util.List;
 
 public interface Cloud {
@@ -21,12 +21,12 @@ public interface Cloud {
     public List<Song> getFileList(String folderPath, List<String> requestedFileTypes);
 
     /**
-     * Upload file to cloud
-     * @param fullDestPath         - path with file name where file should be saved
-     * @param inputFile            - file
+     * Upload remote file to cloud
+     * @param fullDestPath         - destination path and file name where file should be saved on cloud
+     * @param link                 - URL link which should be uploaded
      * @return boolean, true on success
      */
-    public Boolean uploadFile(String fullDestPath, File inputFile);
+    public Boolean uploadFileByUrl(String fullDestPath, URL link);
 
     public String refreshToken(String refreshToken);
 

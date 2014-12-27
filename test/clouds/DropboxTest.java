@@ -7,6 +7,8 @@ import org.junit.Test;
 import play.Logger;
 import structures.Song;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,4 +115,18 @@ public class DropboxTest extends BaseModelTest {
 
         Logger.info("testGetFileList done");
     }
+
+    @Test
+    public void testUploadFileByUrl() throws MalformedURLException {
+
+        String fileDest = "/junit/tests/copiedMytestFile.txt";
+        URL url = new URL("https://www.dropbox.com/s/ibdqp9r9ldgvoz7/mytestFile.txt?dl=0");
+        //URL url = new URL("https://wordpress.org/plugins/about/readme.txt");
+        Boolean res = dropAuth.uploadFileByUrl(fileDest, url);
+        assertTrue("Failed to upload", res);
+
+        Logger.info("testUploadFileSuccess done");
+    }
+
+
 }
