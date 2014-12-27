@@ -24,31 +24,13 @@ public class GDrive implements Cloud {
     public static final String DRIVE_OAUTH_URL = "https://www.googleapis.com/drive/v2/files?oauth_token=";
 
     private String accessToken;
-    private String refreshToken;
     private Long tokenExpires;
-
-    public GDrive(String accessToken, String refreshToken) {
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
-    }
 
     public GDrive() {
     }
 
-    public String getAccessToken() {
-        return accessToken;
-    }
-
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
+    public GDrive(String driveRefreshToken) {
+        refreshAccessToken(driveRefreshToken);
     }
 
     @Override
@@ -104,22 +86,19 @@ public class GDrive implements Cloud {
         return oAuth2UserData;
     }
 
-    @Override
-    public String refreshToken(String refreshToken) {
-        String accessToken = null;
+    private void refreshAccessToken(String driveRefreshToken) {
         try {
             Map<String, String> params = new HashMap<String, String>();
             params.put("client_id", SystemProperty.DRIVE_CLIENT_ID);
             params.put("client_secret", SystemProperty.DRIVE_CLIENT_SECRET);
             params.put("grant_type", GRANT_TYPE_REFRESH);
-            params.put("refresh_token", refreshToken);
+            params.put("refresh_token", driveRefreshToken);
             JSONObject object = HttpWorker.sendPostRequest(SystemProperty.DRIVE_TOKEN_URL, params);
-            accessToken = object.getString("access_token");
+            this.accessToken = object.getString("access_token");
             this.tokenExpires = object.getLong("expires_in") * 1000 + System.currentTimeMillis();
         } catch (Exception e) {
-            Logger.error("Exception in refreshToken", e);
+            Logger.error("Exception in refreshAccessToken", e);
         }
-        return accessToken;
     }
 
     private static OAuth2UserData parseDriveData(JSONObject jsonObject) throws JSONException {

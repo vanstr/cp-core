@@ -1,7 +1,7 @@
 package controllers;
 
+import clouds.Cloud;
 import clouds.Dropbox;
-import structures.OAuth2UserData;
 import commons.SystemProperty;
 import controllers.commons.BaseController;
 import controllers.commons.Secured;
@@ -9,6 +9,7 @@ import models.UserEntity;
 import play.Logger;
 import play.mvc.Result;
 import play.mvc.Security;
+import structures.OAuth2UserData;
 
 
 public class AuthorizationDropboxApi extends BaseController {
@@ -70,7 +71,7 @@ public class AuthorizationDropboxApi extends BaseController {
 
     private static void loginWithDropbox(String code) {
         Logger.info("loginWithDropbox");
-        Dropbox dropbox = new Dropbox();
+        Cloud dropbox = new Dropbox();
         OAuth2UserData oAuth2UserData = dropbox.retrieveAccessToken(code, SystemProperty.DROPBOX_REDIRECT_AUTHORISED);
 
         UserEntity userEntity = UserEntity.getUserByField("dropbox_uid", oAuth2UserData.getUniqueCloudId());
@@ -93,7 +94,7 @@ public class AuthorizationDropboxApi extends BaseController {
     private static void addDropboxCredential(String code) {
         Logger.info("addDropboxCredential");
 
-        Dropbox drop = new Dropbox();
+        Cloud drop = new Dropbox();
         OAuth2UserData oAuth2UserData = drop.retrieveAccessToken(code, SystemProperty.DROPBOX_REDIRECT_ADDED);
 
         Long userId = Long.valueOf(session("userId"));

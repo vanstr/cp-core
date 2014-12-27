@@ -29,11 +29,10 @@ public class ContentApi extends BaseController {
             if (SystemProperty.DROPBOX_CLOUD_ID.equals(cloudId)) {
                 String accessTokenKey = userEntity.getDropboxAccessKey();
                 Cloud drop = new Dropbox(accessTokenKey);
-
-                Logger.info(fileId);
                 file = drop.getFileLink(fileId);
             } else if (SystemProperty.DRIVE_CLOUD_ID.equals(cloudId)) {
-                GDrive gDrive = new GDrive(userEntity.getDriveAccessToken(), userEntity.getDriveRefreshToken());
+                String driveRefreshToken = userEntity.getDriveRefreshToken();
+                Cloud gDrive = new GDrive(driveRefreshToken);
                 file = gDrive.getFileLink(fileId);
             }
         } catch (Exception e) {

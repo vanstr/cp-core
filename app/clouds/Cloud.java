@@ -28,8 +28,6 @@ public interface Cloud {
      */
     public Boolean uploadFileByUrl(String fullDestPath, URL link);
 
-    public String refreshToken(String refreshToken);
-
     public OAuth2UserData retrieveAccessToken(String code, String redirectUrl);
 
 }

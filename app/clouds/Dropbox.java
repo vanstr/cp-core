@@ -121,11 +121,6 @@ public class Dropbox implements Cloud {
         return oAuth2UserData;
     }
 
-    @Override
-    public String refreshToken(String refreshToken) {
-        return null;
-    }
-
 
     private String getFileNameFromFilePath(String filePath) {
         return filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length());

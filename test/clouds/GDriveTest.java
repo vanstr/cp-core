@@ -28,17 +28,13 @@ public class GDriveTest extends BaseModelTest {
 
     private static String INCORRECT_FILE = "/balaslkdjasc.mp3";
     private static String FILE_ID = "0B44SMymWtF8BdmlnUm5ZRFNvcE0";
-    private static GDrive gDrive = null;
+    private static Cloud gDrive = null;
 
     @BeforeClass
     public static void method() {
         try {
             UserEntity userEntity = UserEntity.getUserById(GDRIVE_USER_ID);
-            gDrive = new GDrive(userEntity.getDriveAccessToken(), userEntity.getDriveRefreshToken());
-            String newToken = gDrive.refreshToken(userEntity.getDriveRefreshToken());
-            gDrive.setAccessToken(newToken);
-            userEntity.setDriveAccessToken(newToken);
-            userEntity.update();
+            gDrive = new GDrive(userEntity.getDriveRefreshToken());
         } catch (Exception e) {
             Logger.warn("Initialization failed", e);
             fail("Initialization failed");

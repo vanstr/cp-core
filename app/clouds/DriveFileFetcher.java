@@ -1,7 +1,6 @@
 package clouds;
 
 import commons.FileFetcher;
-import commons.exceptions.UnauthorizedAccessException;
 import models.UserEntity;
 import play.Logger;
 import structures.PlayList;
@@ -14,24 +13,13 @@ public class DriveFileFetcher extends FileFetcher{
 
     @Override
     public PlayList getCloudPlayList(String folderPath, Long userId){
-        GDrive gDrive = null;
         playList = new PlayList();
         UserEntity userEntity = UserEntity.getUserById(userId);
         try{
-            String driveAccessToken = userEntity.getDriveAccessToken();
             String driveRefreshToken = userEntity.getDriveRefreshToken();
-            if(driveAccessToken != null && driveRefreshToken != null){
-                gDrive = new GDrive(driveAccessToken, driveRefreshToken);
+            if(driveRefreshToken != null){
+                Cloud gDrive = new GDrive(driveRefreshToken);
                 playList.setSongs(gDrive.getFileList(folderPath, REQUIRED_FILE_TYPES));
-            }
-        } catch (UnauthorizedAccessException e) {
-            gDrive.setAccessToken(gDrive.refreshToken(gDrive.getRefreshToken()));
-            try {
-                playList.setSongs(gDrive.getFileList(folderPath, REQUIRED_FILE_TYPES));
-                userEntity.setDriveAccessToken(gDrive.getAccessToken());
-                userEntity.update();
-            } catch (Exception e1) {
-                Logger.error("Exception in getCloudPlayList", e1);
             }
         } catch (Exception e){
             Logger.error("Exception in getCloudPlayList", e);
