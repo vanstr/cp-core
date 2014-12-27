@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import play.Logger;
 import structures.Song;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -68,6 +69,11 @@ public class GDrive implements Cloud {
             }
         }
         return files;
+    }
+
+    @Override
+    public Boolean uploadFile(String fullDestPath, File inputFile) {
+        return null;
     }
 
 

@@ -1,8 +1,6 @@
 package models;
 
 import app.BaseModelTest;
-import clouds.Dropbox;
-import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -11,11 +9,7 @@ import play.Logger;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -27,22 +21,6 @@ import static org.junit.Assert.fail;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UserEntityTest extends BaseModelTest{
 
-    private static Dropbox dropUnAuth = null; // un authorized dropboz session
-    private static Dropbox dropAuth = null; // authorized dropboz session
-
-
-
-    @BeforeClass
-    public static void method() {
-        try {
-            dropUnAuth = new Dropbox();
-
-            dropAuth = new Dropbox(originUserEntity.getDropboxAccessKey());
-        } catch (Exception e) {
-            Logger.error("Exception while initializing Dropbox", e);
-            fail("error in preparing");
-        }
-    }
 
     @Test
     public void test1CreateUser(){

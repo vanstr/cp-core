@@ -1,9 +1,6 @@
 package controllers;
 
-import clouds.DriveFileFetcher;
-import clouds.Dropbox;
-import clouds.DropboxFileFetcher;
-import clouds.GDrive;
+import clouds.*;
 import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.JsonNode;
 import commons.FileFetcher;
@@ -31,7 +28,7 @@ public class ContentApi extends BaseController {
             UserEntity userEntity = getUserFromSession();
             if (SystemProperty.DROPBOX_CLOUD_ID.equals(cloudId)) {
                 String accessTokenKey = userEntity.getDropboxAccessKey();
-                Dropbox drop = new Dropbox(accessTokenKey);
+                Cloud drop = new Dropbox(accessTokenKey);
 
                 Logger.info(fileId);
                 file = drop.getFileLink(fileId);

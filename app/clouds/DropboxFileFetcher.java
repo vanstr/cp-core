@@ -26,7 +26,7 @@ public class DropboxFileFetcher extends FileFetcher {
             String accessTokenKey = userEntity.getDropboxAccessKey();
 
             if (accessTokenKey != null) {
-                Dropbox drop = new Dropbox(accessTokenKey);
+                Cloud drop = new Dropbox(accessTokenKey);
                 playList.setSongs(drop.getFileList(folderPath, REQUIRED_FILE_TYPES));
             }
         } catch (Exception e) {

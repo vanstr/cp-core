@@ -19,8 +19,8 @@ import static org.junit.Assert.fail;
 public class DropboxTest extends BaseModelTest {
 
 
-    private static Dropbox dropUnAuth = null; // un authorized dropboz session
-    private static Dropbox dropAuth = null; // authorized dropboz session
+    private static Cloud dropUnAuth = null; // un authorized dropboz session
+    private static Cloud dropAuth = null; // authorized dropboz session
 
     private static final String CORRECT_FILE_DROPBOX = "/JUnit/music.mp3";
     private static final String INCORRECT_FILE_DROPBOX = "/balaslkdjasc.mp3";

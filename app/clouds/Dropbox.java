@@ -1,12 +1,14 @@
 package clouds;
 
-import structures.OAuth2UserData;
 import com.dropbox.core.*;
 import commons.CloudFile;
 import commons.SystemProperty;
 import play.Logger;
+import structures.OAuth2UserData;
 import structures.Song;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -33,7 +35,6 @@ public class Dropbox implements Cloud {
         }
         return res;
     }
-
 
     @Override
     public List<Song> getFileList(String folderPath, List<String> requestedFileTypes) {
@@ -67,14 +68,38 @@ public class Dropbox implements Cloud {
     }
 
     @Override
+    public Boolean uploadFile(String fullDestPath, File inputFile) {
+        inputFile = new File("working-draft.txt");
+        fullDestPath = "/magnum-opus.txt";
+
+        Boolean res = false;
+        FileInputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(inputFile);
+            DbxEntry.File uploadedFile = client.uploadFile(fullDestPath, DbxWriteMode.add(), inputFile.length(), inputStream);
+            Logger.debug("Uploaded: " + uploadedFile.toString());
+            res = true;
+        } catch (Exception e) {
+            Logger.error("Error in uploadFile: " + e);
+        } finally {
+            try {
+                inputStream.close();
+            } catch (Exception e) {
+                Logger.error("Error close inputStream in uploadFile: " + e);
+            }
+        }
+        return res;
+    }
+
+    @Override
     public OAuth2UserData retrieveAccessToken(String code, String redirectUrl) {
 
         OAuth2UserData oAuth2UserData = new OAuth2UserData();
         try {
             oAuth2UserData.setAccessToken(client.getAccessToken());
-            oAuth2UserData.setUniqueCloudId(((Long)client.getAccountInfo().userId).toString());
+            oAuth2UserData.setUniqueCloudId(((Long) client.getAccountInfo().userId).toString());
         } catch (DbxException e) {
-            Logger.error("Error retrieveAccessToken");
+            Logger.error("Error retrieveAccessToken" + e);
             oAuth2UserData = null;
         }
 
