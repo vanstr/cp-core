@@ -1,7 +1,7 @@
 package clouds;
 
-import clouds.oauth.OAuth2UserData;
-import structure.Song;
+import structures.OAuth2UserData;
+import structures.Song;
 
 import java.util.List;
 
@@ -18,7 +18,9 @@ public interface Cloud {
      * @return array of file
      */
     public List<Song> getFileList(String folderPath, List<String> requestedFileTypes);
+
     public String refreshToken(String refreshToken);
+
     public OAuth2UserData retrieveAccessToken(String code, String redirectUrl);
 
 }

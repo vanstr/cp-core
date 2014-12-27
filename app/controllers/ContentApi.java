@@ -7,8 +7,6 @@ import clouds.GDrive;
 import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.JsonNode;
 import commons.FileFetcher;
-import commons.PlayListHelper;
-import commons.SongMetadataPopulation;
 import commons.SystemProperty;
 import controllers.commons.BaseController;
 import controllers.commons.Secured;
@@ -19,8 +17,8 @@ import play.Logger;
 import play.libs.Json;
 import play.mvc.Result;
 import play.mvc.Security;
-import structure.PlayList;
-import structure.Song;
+import structures.PlayList;
+import structures.Song;
 
 import java.util.*;
 
@@ -52,7 +50,7 @@ public class ContentApi extends BaseController {
         Logger.debug("getPlayList");
         Long userId = Long.parseLong(session("userId"));
         PlayList result = getPlayList("/", userId);
-        SongMetadataPopulation.populate(result, userId);
+        PlayList.populate(result, userId);
 
         return returnInJsonOk(result);
     }
@@ -111,7 +109,7 @@ public class ContentApi extends BaseController {
             Logger.error("Exception in getPlayList", e);
         }
 
-        PlayList playList = PlayListHelper.mergePlayLists(dropboxFetcher.getPlayList(), driveFetcher.getPlayList());
+        PlayList playList = PlayList.mergePlayLists(dropboxFetcher.getPlayList(), driveFetcher.getPlayList());
 
         return playList;
     }

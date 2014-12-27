@@ -1,4 +1,4 @@
-package structure;
+package structures;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import models.SongEntity;

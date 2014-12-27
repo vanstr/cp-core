@@ -3,7 +3,7 @@ package clouds;
 import commons.FileFetcher;
 import models.UserEntity;
 import play.Logger;
-import structure.PlayList;
+import structures.PlayList;
 
 /**
  * Created with IntelliJ IDEA.

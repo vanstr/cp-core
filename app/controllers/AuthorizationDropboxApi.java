@@ -1,7 +1,7 @@
 package controllers;
 
 import clouds.Dropbox;
-import clouds.oauth.OAuth2UserData;
+import structures.OAuth2UserData;
 import commons.SystemProperty;
 import controllers.commons.BaseController;
 import controllers.commons.Secured;

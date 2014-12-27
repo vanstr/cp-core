@@ -5,7 +5,7 @@ import models.UserEntity;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import play.Logger;
-import structure.Song;
+import structures.Song;
 
 import java.util.ArrayList;
 import java.util.List;

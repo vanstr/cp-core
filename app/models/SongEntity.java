@@ -7,8 +7,8 @@ import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import play.Logger;
 import play.db.ebean.Model;
-import structure.Song;
-import structure.SongMetadata;
+import structures.Song;
+import structures.SongMetadata;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;

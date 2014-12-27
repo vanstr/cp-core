@@ -1,8 +1,9 @@
-package structure;
+package structures;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import models.PlayListEntity;
 import models.SongEntity;
+import models.UserEntity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -37,6 +38,35 @@ public class PlayList implements Serializable{
         this.songs = new ArrayList<Song>();
         for(SongEntity songEntity : entity.getSongs()){
             this.songs.add(new Song(songEntity));
+        }
+    }
+
+    public static PlayList mergePlayLists(PlayList playList1, PlayList playList2){
+        PlayList playList = new PlayList();
+        if(playList1 != null){
+            playList.addSongs(playList1.getSongs());
+        }
+        if(playList2 != null){
+            playList.addSongs(playList2.getSongs());
+        }
+        return playList;
+    }
+
+    public static void populate(PlayList playList, long userId) {
+
+        UserEntity userEntity = UserEntity.getUserById(userId);
+
+        if(playList != null) {
+            int size = playList.getSongs().size();
+            for (int i = 0; i < size; i++) {
+                Song song = playList.getSongs().get(i);
+
+                SongEntity songEntity = SongEntity.getSongByHash(userEntity, song);
+                if (songEntity != null) {
+                    SongMetadata metadata = new SongMetadata(songEntity);
+                    song.setMetadata(metadata);
+                }
+            }
         }
     }
 

@@ -1,10 +1,9 @@
-package commons;
+package structures;
 
 import app.BaseModelTest;
+import commons.SystemProperty;
 import org.junit.Test;
 import play.Logger;
-import structure.PlayList;
-import structure.Song;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +12,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 
-public class SongMetadataPopulationTest extends BaseModelTest {
+public class PlaylistTest extends BaseModelTest {
 
 
     @Test
@@ -29,7 +28,7 @@ public class SongMetadataPopulationTest extends BaseModelTest {
         data.add(trackDoesNotHaveMetadata);
         playList.addSongs(data);
 
-        SongMetadataPopulation.populate(playList, originUserEntity.getId());
+        PlayList.populate(playList, originUserEntity.getId());
 
         Logger.debug("Songs in playlist:" + playList.getSongs().size());
         try {
