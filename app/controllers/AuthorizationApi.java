@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import commons.PasswordService;
 import controllers.commons.BaseController;
 import controllers.commons.Secured;
-import models.PlayListEntity;
-import models.SongEntity;
 import models.UserEntity;
 import play.Logger;
 import play.mvc.Result;
@@ -85,8 +83,6 @@ public class AuthorizationApi extends BaseController {
         Logger.debug("removeAccount");
         long userId = Long.parseLong(session("userId"));
 
-        PlayListEntity.deletePlayListsByUserId(userId);
-        SongEntity.deleteSongsByUserId(userId);
         UserEntity.deleteUserById(userId);
 
         session().clear();
@@ -100,7 +96,7 @@ public class AuthorizationApi extends BaseController {
         Logger.debug("getUser");
         UserEntity userEntity = getUserFromSession();
 
-        return returnInJsonCreated(userEntity);
+        return returnInJsonOk(userEntity);
     }
 
     @Security.Authenticated(Secured.class)

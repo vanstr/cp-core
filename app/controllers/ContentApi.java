@@ -22,7 +22,6 @@ import play.mvc.Security;
 import structure.PlayList;
 import structure.Song;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -140,11 +139,7 @@ public class ContentApi extends BaseController {
             songs.addAll(addNewSongs(songsToAdd, user));
         }
 
-        PlayListEntity playListEntity = new PlayListEntity();
-        playListEntity.setName(playList.getName());
-        playListEntity.setUserEntity(user);
-        playListEntity.setCreated(new Timestamp(System.currentTimeMillis()));
-        playListEntity.setUpdated(new Timestamp(System.currentTimeMillis()));
+        PlayListEntity playListEntity = new PlayListEntity(user, playList.getName());
         playListEntity.addSongEntities(songs);
 
         playListEntity.save();

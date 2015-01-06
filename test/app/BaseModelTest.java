@@ -86,8 +86,6 @@ public class BaseModelTest {
         dropboxUserEntry.setId(Long.parseLong(USER_ID));
         dropboxUserEntry.setDropboxAccessKey("BAus-dLEjW8AAAAAAAAAAVDysztTsSGkiwlJV7Fm6lvHYxbp0-QdBsyE_Hb_7dYd");
         dropboxUserEntry.setDropboxUid("192670402");
-        dropboxUserEntry.setDriveAccessToken("7hlztwsgm4v8l2f");
-        dropboxUserEntry.setDriveRefreshToken("C6jC5Vm8aiRDiNwy");
         dropboxUserEntry.setLogin("dropbox");
         dropboxUserEntry.setPassword(PasswordService.encrypt("123"));
         dropboxUserEntry.save();

@@ -1,14 +1,23 @@
 package models;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.ExpressionList;
-import play.Logger;
 import play.db.ebean.Model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by alex on 9/23/14.
@@ -21,12 +30,13 @@ public class PlayListEntity extends Model implements Serializable {
     private Long id;
 
     @ManyToOne(targetEntity=UserEntity.class, optional = false)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-    private UserEntity userEntity;
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 
     @Column(nullable = false)
     private String name;
 
+    // TODO
     @Column(nullable = false, columnDefinition = "timestamp NOT NULL DEFAULT 0")
     private Timestamp created;
 
@@ -34,7 +44,7 @@ public class PlayListEntity extends Model implements Serializable {
     private Timestamp updated;
 
     //TODO why not tested?
-    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name="playlist_song",
             joinColumns={@JoinColumn(name="playlist_id")},
             inverseJoinColumns={@JoinColumn(name="song_id")})
@@ -50,12 +60,12 @@ public class PlayListEntity extends Model implements Serializable {
         this.id = id;
     }
 
-    public UserEntity getUserEntity() {
-        return userEntity;
+    public UserEntity getUser() {
+        return user;
     }
 
-    public void setUserEntity(UserEntity userEntity) {
-        this.userEntity = userEntity;
+    public void setUser(UserEntity user) {
+        this.user = user;
     }
 
     public String getName() {
@@ -110,17 +120,8 @@ public class PlayListEntity extends Model implements Serializable {
         return songEntities;
     }
 
-    public static void deletePlayListById(Long playListId){
-        Ebean.delete(find.byId(playListId));
-    }
-
-    public static void deletePlayListsByUserId(Long userId){
-        ExpressionList<PlayListEntity> userPlayListsExpression = find.where().eq("user_id", userId);
-        List<PlayListEntity> userEntity1 = userPlayListsExpression.findList();
-        Logger.debug("before delete: " + userEntity1.size());
-        Ebean.delete(userEntity1);
-
-        List<PlayListEntity> userEntity2 = userPlayListsExpression.findList();
-        Logger.debug("after delete: " + userEntity2.size());
+    public PlayListEntity(UserEntity user, String name){
+        setUser(user);
+        setName(name);
     }
 }

@@ -7,12 +7,19 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import play.db.ebean.Model;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Entity
 @Table(name = "user")
@@ -54,8 +61,13 @@ public class UserEntity extends Model implements Serializable {
 
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
     @JsonIdentityReference(alwaysAsId=true)
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<SongEntity> songEntities = new ArrayList<SongEntity>(0);
+
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
+    @JsonIdentityReference(alwaysAsId=true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<PlayListEntity> playListEntities = new HashSet<PlayListEntity>(0);
 
     public static Model.Finder<Long, UserEntity> find = new Model.Finder<Long, UserEntity>(Long.class, UserEntity.class);
 
@@ -189,11 +201,16 @@ public class UserEntity extends Model implements Serializable {
         return find.byId(userId);
     }
 
+
+    public Set<PlayListEntity> getPlayListEntities() {
+        return playListEntities;
+    }
+
+    public void setPlayListEntities(Set<PlayListEntity> playListEntities) {
+        this.playListEntities = playListEntities;
+    }
+
     public static void deleteUserById(Long userId){
-        Map<String, Object> fields = new HashMap<String, Object>();
-        fields.put("user_id", userId);
-        Ebean.delete(PlayListEntity.getPlayListsByFields(fields));
-        Ebean.delete(SongEntity.getSongsByFields(fields));
         Ebean.delete(UserEntity.getUserById(userId));
     }
 
