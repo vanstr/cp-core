@@ -16,10 +16,7 @@ public class PlayListEntityTest extends BaseModelTest {
     @Test
     public void testCreatePlayList(){
         UserEntity user = UserEntity.getUserById(1L);
-        PlayListEntity playListEntity = new PlayListEntity();
-        playListEntity.setName("My test playlist");
-
-        playListEntity.setUser(user);
+        PlayListEntity playListEntity = new PlayListEntity(user, "My test playlist");
         List<SongEntity> songEntityList = new ArrayList<SongEntity>();
         songEntityList.add(originSongEntity);
         playListEntity.addSongEntities(songEntityList);

@@ -40,7 +40,7 @@ public class BaseModelTest {
         createUsers();
 
         originUserEntity = UserEntity.getUserById(1L);
-        originSongEntity = createSong(originUserEntity.getId());
+        originSongEntity = createSong();
     }
 
     private static Map<String, String> getSettings() {
@@ -58,7 +58,7 @@ public class BaseModelTest {
         return settings;
     }
 
-    private static SongEntity createSong(long id) {
+    private static SongEntity createSong() {
         SongEntity songEntity = new SongEntity();
         songEntity.setUser(originUserEntity);
         songEntity.setCloudId(SystemProperty.DROPBOX_CLOUD_ID);
