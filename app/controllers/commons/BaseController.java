@@ -1,6 +1,7 @@
 package controllers.commons;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import models.UserEntity;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -43,6 +44,12 @@ public class BaseController extends Controller {
             return ok(json);
         }
         return ok(jsonp(callback, json));
+    }
+
+    public static UserEntity getUserFromSession() {
+        Long userId = Long.parseLong(session("userId"));
+        UserEntity userEntity = UserEntity.getUserById(userId);
+        return userEntity;
     }
 
 }

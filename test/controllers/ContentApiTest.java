@@ -28,7 +28,6 @@ import static play.test.Helpers.*;
  */
 public class ContentApiTest extends BaseModelTest {
 
-    private static final String USER_ID = originUserEntity.getId().toString();
     private static PlayListEntity testPlayListEntity = null;
     private static PlayListEntity playListWithOneSong = null;
     @Test
@@ -109,9 +108,7 @@ public class ContentApiTest extends BaseModelTest {
 
     @Test
     public void testGetPlayLists(){
-        PlayListEntity playListEntity = new PlayListEntity();
-        playListEntity.setUserEntity(originUserEntity);
-        playListEntity.setName("playlist2");
+        PlayListEntity playListEntity = new PlayListEntity(originUserEntity, "playlist2");
         playListEntity.addSongEntities(SongEntity.find.all());
         playListEntity.save();
         FakeRequest request = new FakeRequest("GET", "/api/playLists")
@@ -159,9 +156,7 @@ public class ContentApiTest extends BaseModelTest {
 
     @Test
     public void testAddSongToPlayList(){
-        playListWithOneSong = new PlayListEntity();
-        playListWithOneSong.setName("Test PLaylist");
-        playListWithOneSong.setUserEntity(originUserEntity);
+        playListWithOneSong = new PlayListEntity(originUserEntity, "Test PLaylist");
         playListWithOneSong.save();
         FakeRequest request = new FakeRequest("POST", "/api/playListSong")
                 .withSession("userId", USER_ID);
@@ -183,15 +178,14 @@ public class ContentApiTest extends BaseModelTest {
 
     @Test
     public void testRemoveSongFromPlayList(){
-        PlayListEntity playListEntity = new PlayListEntity();
         SongEntity song1 = new SongEntity();
         song1.setUser(originUserEntity);
         song1.setCloudId(DROPBOX_CLOUD_ID);
         song1.setFileId("songToRemoveFromPlayList.mp3");
         song1.setFileName("songToRemoveFromPlayList.mp3");
         song1.save();
-        playListEntity.setName("Test PLaylist");
-        playListEntity.setUserEntity(originUserEntity);
+
+        PlayListEntity playListEntity = new PlayListEntity(originUserEntity, "Test PLaylist");
         playListEntity.addSongEntities(Arrays.asList(song1));
         playListEntity.save();
 
@@ -211,9 +205,7 @@ public class ContentApiTest extends BaseModelTest {
 
     @Test
     public void testDeletePlayList(){
-        PlayListEntity playListEntity = new PlayListEntity();
-        playListEntity.setName("name");
-        playListEntity.setUserEntity(originUserEntity);
+        PlayListEntity playListEntity = new PlayListEntity(originUserEntity, "name");
         playListEntity.save();
         Long playListId = playListEntity.getId();
         FakeRequest request = new FakeRequest("DELETE", "/api/playList/" + playListId)

@@ -16,10 +16,7 @@ public class PlayListEntityTest extends BaseModelTest {
     @Test
     public void testCreatePlayList(){
         UserEntity user = UserEntity.getUserById(1L);
-        PlayListEntity playListEntity = new PlayListEntity();
-        playListEntity.setName("My test playlist");
-
-        playListEntity.setUserEntity(user);
+        PlayListEntity playListEntity = new PlayListEntity(user, "My test playlist");
         List<SongEntity> songEntityList = new ArrayList<SongEntity>();
         songEntityList.add(originSongEntity);
         playListEntity.addSongEntities(songEntityList);
@@ -29,4 +26,13 @@ public class PlayListEntityTest extends BaseModelTest {
 
         assertFalse(PlayListEntity.find.all().isEmpty());
     }
+
+    //TODO
+    @Test
+    public void testDeleteUserPlaylists(){
+        // Create two playlists for user
+        // call method
+        // check that user playlist count is 0
+    }
+
 }

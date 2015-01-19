@@ -1,6 +1,7 @@
 package app;
 
 import com.avaje.ebean.Ebean;
+import commons.PasswordService;
 import commons.SystemProperty;
 import models.PlayListEntity;
 import models.SongEntity;
@@ -22,6 +23,7 @@ public class BaseModelTest {
 
     public static TestServer testServer;
 
+    public static final String USER_ID = "1";
     public static UserEntity originUserEntity = null;
     public static SongEntity originSongEntity = null;
 
@@ -38,7 +40,7 @@ public class BaseModelTest {
         createUsers();
 
         originUserEntity = UserEntity.getUserById(1L);
-        originSongEntity = createSong(originUserEntity.getId());
+        originSongEntity = createSong();
     }
 
     private static Map<String, String> getSettings() {
@@ -56,7 +58,7 @@ public class BaseModelTest {
         return settings;
     }
 
-    private static SongEntity createSong(long id) {
+    private static SongEntity createSong() {
         SongEntity songEntity = new SongEntity();
         songEntity.setUser(originUserEntity);
         songEntity.setCloudId(SystemProperty.DROPBOX_CLOUD_ID);
@@ -73,20 +75,20 @@ public class BaseModelTest {
         UserEntity gDriveUser = new UserEntity();
         gDriveUser.setId(2L);
         gDriveUser.setLogin("gdrive");
-        gDriveUser.setPassword("123456");
+        gDriveUser.setPassword(PasswordService.encrypt("123456"));
         gDriveUser.setDriveAccessToken("ya29.hADeLWkw9ImDLr7p7hivANfWYhI8fJcfNBESB9pBJ9y3S5VyhyuJdQLY");
         gDriveUser.setDriveRefreshToken("1/sTej2wr_j-D3XYL0yVkrWoyBNuRyZn9N7qlMWZRnuPk");
         gDriveUser.setGoogleEmail("cp.cloudplayer@gmail.com");
         gDriveUser.setDriveTokenExpires(1403469638767L);
         gDriveUser.save();
 
-        UserEntity newUserEntity = new UserEntity();
-        newUserEntity.setId(1L);
-        newUserEntity.setDropboxAccessKey("BAus-dLEjW8AAAAAAAAAAVDysztTsSGkiwlJV7Fm6lvHYxbp0-QdBsyE_Hb_7dYd");
-        newUserEntity.setDropboxUid("192670402");
-        newUserEntity.setLogin("dropbox");
-        newUserEntity.setPassword("123");
-        newUserEntity.save();
+        UserEntity dropboxUserEntry = new UserEntity();
+        dropboxUserEntry.setId(Long.parseLong(USER_ID));
+        dropboxUserEntry.setDropboxAccessKey("BAus-dLEjW8AAAAAAAAAAVDysztTsSGkiwlJV7Fm6lvHYxbp0-QdBsyE_Hb_7dYd");
+        dropboxUserEntry.setDropboxUid("192670402");
+        dropboxUserEntry.setLogin("dropbox");
+        dropboxUserEntry.setPassword(PasswordService.encrypt("123"));
+        dropboxUserEntry.save();
 
     }
 

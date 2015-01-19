@@ -1,9 +1,7 @@
 package models;
 
-import com.avaje.ebean.Ebean;
 import play.db.ebean.Model;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -32,12 +30,13 @@ public class PlayListEntity extends Model implements Serializable {
     private Long id;
 
     @ManyToOne(targetEntity=UserEntity.class, optional = false)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-    private UserEntity userEntity;
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 
     @Column(nullable = false)
     private String name;
 
+    // TODO
     @Column(nullable = false, columnDefinition = "timestamp NOT NULL DEFAULT 0")
     private Timestamp created;
 
@@ -45,7 +44,7 @@ public class PlayListEntity extends Model implements Serializable {
     private Timestamp updated;
 
     //TODO why not tested?
-    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name="playlist_song",
             joinColumns={@JoinColumn(name="playlist_id")},
             inverseJoinColumns={@JoinColumn(name="song_id")})
@@ -61,12 +60,12 @@ public class PlayListEntity extends Model implements Serializable {
         this.id = id;
     }
 
-    public UserEntity getUserEntity() {
-        return userEntity;
+    public UserEntity getUser() {
+        return user;
     }
 
-    public void setUserEntity(UserEntity userEntity) {
-        this.userEntity = userEntity;
+    public void setUser(UserEntity user) {
+        this.user = user;
     }
 
     public String getName() {
@@ -121,7 +120,8 @@ public class PlayListEntity extends Model implements Serializable {
         return songEntities;
     }
 
-    public static void deletePlayListById(Long playListId){
-        Ebean.delete(PlayListEntity.find.byId(playListId));
+    public PlayListEntity(UserEntity user, String name){
+        setUser(user);
+        setName(name);
     }
 }
