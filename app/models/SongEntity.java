@@ -35,9 +35,9 @@ public class SongEntity extends Model implements Serializable {
     @Id
     private Long id;
 
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
-    @JsonIdentityReference(alwaysAsId=true)
-    @ManyToOne(targetEntity=UserEntity.class, optional = false)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
+    @ManyToOne(targetEntity = UserEntity.class, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
@@ -58,11 +58,13 @@ public class SongEntity extends Model implements Serializable {
     private String metadataTitle;
     private String metadataYear;
 
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "songs", cascade = CascadeType.ALL)
     private Set<PlayListEntity> playLists = new HashSet<PlayListEntity>(0);
 
     public static Model.Finder<Long, SongEntity> find = new Model.Finder<Long, SongEntity>(Long.class, SongEntity.class);
 
-    public SongEntity(){}
+    public SongEntity() {
+    }
 
     public SongEntity(Song song, UserEntity user){
         this(user, song.getCloudId(), song.getFileId(), song.getFileName());
@@ -71,7 +73,7 @@ public class SongEntity extends Model implements Serializable {
         this.setMetadata(song);
     }
 
-    public SongEntity(UserEntity user, Long cloudId, String fileId, String fileName){
+    public SongEntity(UserEntity user, Long cloudId, String fileId, String fileName) {
         this.setUser(user);
         this.setCloudId(cloudId);
         this.setFileId(fileId);
@@ -182,8 +184,6 @@ public class SongEntity extends Model implements Serializable {
         this.metadataYear = metadataYear;
     }
 
-
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "songs", cascade = CascadeType.ALL)
     public Set<PlayListEntity> getPlayLists() {
         return playLists;
     }
@@ -207,7 +207,7 @@ public class SongEntity extends Model implements Serializable {
     public static SongEntity getSongByFields(Map<String, Object> fields) {
         ExpressionList<SongEntity> expressionList = find.where().allEq(fields);
         SongEntity songEntity = null;
-        if(expressionList != null){
+        if (expressionList != null) {
             songEntity = expressionList.findUnique();
         }
 
@@ -240,7 +240,7 @@ public class SongEntity extends Model implements Serializable {
     public static List<SongEntity> getSongsByMultipleFields(List<Map<String, Object>> fields){
         //TODO with 1 query
         List<SongEntity> result = new ArrayList<SongEntity>();
-        for(Map<String, Object> entry : fields){
+        for (Map<String, Object> entry : fields) {
             result.addAll(getSongsByFields(entry));
         }
         return result;
@@ -267,6 +267,11 @@ public class SongEntity extends Model implements Serializable {
         List<SongEntity> userEntity2 = userSongs.findList();
         Logger.debug("after delete: " + userEntity2.size());
     }
+
+    public static SongEntity getSongById(Long id) {
+        return find.byId(id);
+    }
+
 
     @Override
     public boolean equals(Object o) {

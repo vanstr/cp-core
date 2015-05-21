@@ -1,6 +1,10 @@
 package controllers;
 
-import clouds.*;
+import clouds.Cloud;
+import clouds.DriveFileFetcher;
+import clouds.Dropbox;
+import clouds.DropboxFileFetcher;
+import clouds.GDrive;
 import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.JsonNode;
 import commons.FileFetcher;
@@ -17,7 +21,12 @@ import play.mvc.Security;
 import structures.PlayList;
 import structures.Song;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Security.Authenticated(Secured.class)
 public class ContentApi extends BaseController {
@@ -124,11 +133,8 @@ public class ContentApi extends BaseController {
             songs.addAll(songEntities);
         }
 
-        PlayListEntity playListEntity = new PlayListEntity();
-        playListEntity.setName(playList.getName());
-        playListEntity.setUserEntity(user);
+        PlayListEntity playListEntity = new PlayListEntity(user, playList.getName());
         playListEntity.addSongEntities(songs);
-
         playListEntity.save();
 
         return returnInJsonOk(playListEntity.getId());
