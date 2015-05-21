@@ -1,8 +1,15 @@
 package clouds;
 
-import com.dropbox.core.*;
+import com.dropbox.core.DbxClient;
+import com.dropbox.core.DbxEntry;
+import com.dropbox.core.DbxException;
+import com.dropbox.core.DbxRequestConfig;
+import com.dropbox.core.DbxUrlWithExpiration;
+import com.dropbox.core.DbxWriteMode;
 import commons.CloudFile;
-import commons.SystemProperty;
+import commons.HttpWorker;
+import org.json.JSONException;
+import org.json.JSONObject;
 import play.Logger;
 import structures.OAuth2UserData;
 import structures.Song;
@@ -15,16 +22,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import static commons.SystemProperty.*;
+
 public class Dropbox implements Cloud {
 
+    private static final String GRANT_TYPE_AUTHORIZATION = "authorization_code";
     private DbxClient client;
 
     public Dropbox() {
     }
 
-    public Dropbox(String accessToken) throws Exception {
+    public Dropbox(String accessToken){
         DbxRequestConfig config = new DbxRequestConfig("Cloud_Player", Locale.getDefault().toString());
-        this.client = new DbxClient(config, accessToken);
+        client = new DbxClient(config, accessToken);
     }
 
     @Override
@@ -53,7 +63,7 @@ public class Dropbox implements Cloud {
                     if (entry.isFile() && CloudFile.checkFileType(entry.asFile().name, requestedFileTypes)) {
                         DbxUrlWithExpiration urlWithExpiration = client.createTemporaryDirectUrl(entry.path);
 
-                        files.add(new Song(SystemProperty.DROPBOX_CLOUD_ID,
+                        files.add(new Song(DROPBOX_CLOUD_ID,
                                         entry.path,
                                         getFileNameFromFilePath(entry.path),
                                         urlWithExpiration.url,
@@ -106,21 +116,28 @@ public class Dropbox implements Cloud {
         return res;
     }
 
+
+
     @Override
     public OAuth2UserData retrieveAccessToken(String code, String redirectUrl) {
-
-        OAuth2UserData oAuth2UserData = new OAuth2UserData();
+        JSONObject object = HttpWorker.retrieveAccessToken(code, DROPBOX_APP_KEY,
+                DROPBOX_APP_SECRET, GRANT_TYPE_AUTHORIZATION,
+                redirectUrl, null, DROPBOX_TOKEN_URL);
+        OAuth2UserData oAuth2UserData = null;
         try {
-            oAuth2UserData.setAccessToken(client.getAccessToken());
-            oAuth2UserData.setUniqueCloudId(((Long) client.getAccountInfo().userId).toString());
-        } catch (DbxException e) {
-            Logger.error("Error retrieveAccessToken" + e);
-            oAuth2UserData = null;
+            oAuth2UserData = parseDropboxData(object);
+        } catch (JSONException e) {
+            Logger.error("Exception in retrieveAccessToken", e);
         }
-
         return oAuth2UserData;
     }
 
+    private static OAuth2UserData parseDropboxData(JSONObject jsonObject) throws JSONException {
+        OAuth2UserData oAuth2UserData = new OAuth2UserData();
+        oAuth2UserData.setAccessToken(jsonObject.getString("access_token"));
+        oAuth2UserData.setUniqueCloudId(jsonObject.getString("uid"));
+        return oAuth2UserData;
+    }
 
     private String getFileNameFromFilePath(String filePath) {
         return filePath.substring(filePath.lastIndexOf("/") + 1, filePath.length());

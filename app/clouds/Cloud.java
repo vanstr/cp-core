@@ -7,6 +7,8 @@ import java.net.URL;
 import java.util.List;
 
 public interface Cloud {
+
+    static final String GRANT_TYPE_AUTHORIZATION = "authorization_code";
     /**
      * Get file link for downloading
      * @return  file download link

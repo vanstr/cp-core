@@ -14,6 +14,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -92,6 +93,22 @@ public class HttpWorker {
         } catch (IOException e) {
             Logger.error("Exception:" + e);
         }
+        return object;
+    }
+
+    public static JSONObject retrieveAccessToken(String code, String clientId,
+                                          String clientSecret, String grantType,
+                                          String redirectUri, String scope, String url){
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("code", code);
+        params.put("client_id", clientId);
+        params.put("client_secret", clientSecret);
+        params.put("grant_type", grantType);
+        params.put("redirect_uri", redirectUri);
+        if(scope != null && !scope.isEmpty()){
+            params.put("scope", scope);
+        }
+        JSONObject object = sendPostRequest(url, params);
         return object;
     }
 }
